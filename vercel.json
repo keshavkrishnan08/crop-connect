@@ -1,0 +1,16 @@
+{
+  "crons": [
+    {
+      "path": "/api/stripe/auto-release",
+      "schedule": "0 */1 * * *"
+    },
+    {
+      "path": "/api/cron/auto-cancel",
+      "schedule": "0 */1 * * *"
+    },
+    {
+      "path": "/api/cron/auto-resolve-disputes",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}
