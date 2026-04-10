@@ -2,15 +2,15 @@
   "crons": [
     {
       "path": "/api/stripe/auto-release",
-      "schedule": "0 */1 * * *"
+      "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/auto-cancel",
-      "schedule": "0 */1 * * *"
+      "schedule": "0 7 * * *"
     },
     {
       "path": "/api/cron/auto-resolve-disputes",
-      "schedule": "0 6 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }
