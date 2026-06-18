@@ -7,13 +7,13 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/lib/supabase";
 import {
     getContract, getMessages, sendMessage, getBoard, addNode, updateNode, deleteNode,
-    addEdge, deleteEdge, highlightNode, setDeliveryStatus, confirmContract, counterContract,
-    declineContract, renewContract, completeContract,
+    addEdge, deleteEdge, setEdgeLabel, highlightNode, setDeliveryStatus, rescheduleDelivery,
+    setDeliveryNote, confirmContract, counterContract, declineContract, renewContract,
+    completeContract, getCompletionRecords,
 } from "@/lib/queries";
 import {
     type Contract, type NegotiationMessage, type BoardNode, type BoardEdge, type Terms,
-    type Delivery, type NodeType, type NodeStatus, type DeliveryStatus,
-    CONTRACT_STATUS_META,
+    type NodeType, type NodeStatus, type DeliveryStatus,
 } from "@/lib/types";
 import { contractValueCents, fallbackAgreement, isLocked } from "@/lib/contract";
 import { formatMoney, formatDate, relativeTime, cn } from "@/lib/utils";
@@ -30,10 +30,15 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
     Handshake, Pen, Nodes, Calendar as CalIcon, Sparkle, Check, X, ArrowRight,
-    Repeat, Pulse, Copy, Download, Share,
+    Repeat, Pulse, Copy, Download, Share, Star,
 } from "@/components/icons";
 
 type Tab = "negotiate" | "agreement" | "board" | "deliveries";
+
+interface CompletionRow {
+    id: string; outcome: string; rating: number | null; notes: string | null; created_at: string;
+    party?: { full_name: string; avatar_url: string | null };
+}
 
 export function ContractWorkspace({ id }: { id: string }) {
     const { profile } = useAuth();
@@ -49,15 +54,19 @@ export function ContractWorkspace({ id }: { id: string }) {
     const [tab, setTab] = React.useState<Tab>("negotiate");
     const [busy, setBusy] = React.useState(false);
     const [counterOpen, setCounterOpen] = React.useState(false);
+    const [renewOpen, setRenewOpen] = React.useState(false);
+    const [completeOpen, setCompleteOpen] = React.useState(false);
+    const [completions, setCompletions] = React.useState<CompletionRow[]>([]);
 
     const load = React.useCallback(async () => {
         const c = await getContract(id);
         setContract(c);
         if (c) {
-            const [msgs, board] = await Promise.all([getMessages(id), getBoard(id)]);
+            const [msgs, board, comps] = await Promise.all([getMessages(id), getBoard(id), getCompletionRecords(id)]);
             setMessages(msgs);
             setNodes(board.nodes);
             setEdges(board.edges);
+            setCompletions(comps as CompletionRow[]);
         }
         setLoading(false);
     }, [id]);
@@ -126,14 +135,14 @@ export function ContractWorkspace({ id }: { id: string }) {
         try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied", "Share it with your counterparty."); }
         catch { toast.error("Couldn't copy link"); }
     };
-    const doRenew = async () => {
+    const submitRenew = async (terms: Terms) => {
         setBusy(true);
-        try { await renewContract(contract, meId, contract.terms); toast.success("Renewed", "A fresh term has begun."); await load(); }
+        try { await renewContract(contract, meId, terms); toast.success("Renewed", "A fresh term has begun."); setRenewOpen(false); await load(); }
         finally { setBusy(false); }
     };
-    const doComplete = async () => {
+    const submitComplete = async (rating: number | null, notes: string) => {
         setBusy(true);
-        try { await completeContract(contract, meId, "completed"); toast.success("Marked complete"); await load(); }
+        try { await completeContract(contract, meId, "completed", { rating, notes: notes || null }); toast.success("Marked complete", "Thanks for closing the loop."); setCompleteOpen(false); await load(); }
         finally { setBusy(false); }
     };
 
@@ -154,11 +163,45 @@ export function ContractWorkspace({ id }: { id: string }) {
         onRenameNode: (nid: string, label: string) => { setNodes((n) => n.map((m) => m.id === nid ? { ...m, label } : m)); updateNode(nid, { label }); },
         onSetStatus: (nid: string, status: NodeStatus) => { setNodes((n) => n.map((m) => m.id === nid ? { ...m, status } : m)); updateNode(nid, { status }); },
         onHighlight: (nid: string) => { setNodes((n) => n.map((m) => ({ ...m, highlighted: m.id === nid, status: m.id === nid ? "active" : m.status }))); highlightNode(id, nid); },
+        onSetMeta: (nid: string, meta: Record<string, unknown>) => { setNodes((n) => n.map((m) => m.id === nid ? { ...m, meta } : m)); updateNode(nid, { meta }); },
+        onLabelEdge: (eid: string, label: string) => { setEdges((e) => e.map((x) => x.id === eid ? { ...x, label } : x)); setEdgeLabel(eid, label || null); },
+    };
+
+    // advance the product highlight along the first outgoing edge
+    const advanceProduct = () => {
+        const current = nodes.find((n) => n.highlighted);
+        if (!current) {
+            if (nodes[0]) boardHandlers.onHighlight(nodes[0].id);
+            return;
+        }
+        const edge = edges.find((e) => e.source === current.id);
+        const next = edge && nodes.find((n) => n.id === edge.target);
+        if (next) {
+            setNodes((n) => n.map((m) => m.id === current.id ? { ...m, status: "done", highlighted: false } : m));
+            updateNode(current.id, { status: "done" });
+            boardHandlers.onHighlight(next.id);
+            toast.success(`Product moved to “${next.label}”`);
+        } else {
+            toast.info("Product is at the final step");
+        }
     };
 
     const advanceDelivery = async (did: string, next: DeliveryStatus) => {
         setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, status: next } : d) } : c);
         await setDeliveryStatus(did, next);
+    };
+
+    const deliveryHandlers = {
+        onAdvance: advanceDelivery,
+        onReschedule: (did: string, date: string) => {
+            setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, scheduled_date: date } : d) } : c);
+            rescheduleDelivery(did, date);
+        },
+        onNote: (did: string, note: string) => {
+            setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, note } : d) } : c);
+            setDeliveryNote(did, note || null);
+        },
+        onMissed: (did: string) => advanceDelivery(did, "missed"),
     };
 
     const TABS: { key: Tab; label: string; icon: React.ComponentType<{ size?: number }> }[] = [
@@ -240,17 +283,22 @@ export function ContractWorkspace({ id }: { id: string }) {
 
                     {tab === "board" && (
                         <div>
-                            <div className="mb-3 flex items-center justify-between">
+                            <div className="mb-3 flex items-center justify-between gap-3">
                                 <p className="text-sm text-ink-muted">
-                                    {boardEditable ? "Drag steps, connect them, and mark where the product is right now." : "The live supply-chain map for this contract."}
+                                    {boardEditable ? "Drag steps, connect them, label the flow, and mark where the product is." : "The live supply-chain map for this contract."}
                                 </p>
+                                {boardEditable && (
+                                    <Button size="sm" variant="soft" onClick={advanceProduct} className="shrink-0">
+                                        <Pulse size={15} /> Advance product
+                                    </Button>
+                                )}
                             </div>
                             <SupplyChainBoard nodes={nodes} edges={edges} editable={boardEditable} handlers={boardHandlers} height={540} />
                         </div>
                     )}
 
                     {tab === "deliveries" && (
-                        <DeliveryCalendar deliveries={contract.deliveries ?? []} unit={t.unit} editable={boardEditable} onAdvance={advanceDelivery} />
+                        <DeliveryCalendar deliveries={contract.deliveries ?? []} unit={t.unit} editable={boardEditable} handlers={deliveryHandlers} />
                     )}
                 </div>
 
@@ -289,8 +337,8 @@ export function ContractWorkspace({ id }: { id: string }) {
                         <GlassCard className="p-5">
                             <h3 className="mb-1 font-display text-lg text-ink">Manage</h3>
                             <p className="mb-4 text-[13px] text-ink-muted">Renew for another term or close out when complete.</p>
-                            <Button variant="soft" className="mb-2 w-full" onClick={doRenew} loading={busy}><Repeat size={16} /> Renew term</Button>
-                            <Button variant="ghost" size="sm" className="w-full" onClick={doComplete}><Check size={15} /> Mark complete</Button>
+                            <Button variant="soft" className="mb-2 w-full" onClick={() => setRenewOpen(true)}><Repeat size={16} /> Renew term</Button>
+                            <Button variant="ghost" size="sm" className="w-full" onClick={() => setCompleteOpen(true)}><Check size={15} /> Mark complete</Button>
                         </GlassCard>
                     )}
 
@@ -308,12 +356,36 @@ export function ContractWorkspace({ id }: { id: string }) {
                             {t.quality_terms && <Row k="Quality" v={t.quality_terms} />}
                         </dl>
                     </GlassCard>
+
+                    {completions.length > 0 && (
+                        <GlassCard className="p-5">
+                            <h3 className="mb-3 font-display text-lg text-ink">Completion history</h3>
+                            <div className="space-y-3">
+                                {completions.map((c) => (
+                                    <div key={c.id} className="rounded-2xl bg-paper-warm/70 p-3">
+                                        <div className="flex items-center justify-between">
+                                            <span className="text-sm font-semibold capitalize text-ink">{c.outcome}</span>
+                                            {c.rating != null && (
+                                                <span className="flex gap-0.5">
+                                                    {[1, 2, 3, 4, 5].map((n) => (
+                                                        <Star key={n} size={14} filled={n <= (c.rating ?? 0)} className={n <= (c.rating ?? 0) ? "text-harvest-400" : "text-line-strong"} />
+                                                    ))}
+                                                </span>
+                                            )}
+                                        </div>
+                                        {c.notes && <p className="mt-1 text-[13px] text-ink-muted">{c.notes}</p>}
+                                        <p className="mt-1 text-2xs text-ink-faint">{c.party?.full_name} · {relativeTime(c.created_at)}</p>
+                                    </div>
+                                ))}
+                            </div>
+                        </GlassCard>
+                    )}
                 </aside>
             </div>
 
             {counterOpen && (
                 <CounterModal
-                    initial={t}
+                    title="Counter-offer" submitLabel="Send counter" initial={t} busy={busy}
                     onClose={() => setCounterOpen(false)}
                     onSubmit={async (terms, note) => {
                         setBusy(true);
@@ -321,6 +393,18 @@ export function ContractWorkspace({ id }: { id: string }) {
                         finally { setBusy(false); }
                     }}
                 />
+            )}
+
+            {renewOpen && (
+                <CounterModal
+                    title="Renew this contract" submitLabel="Renew term" initial={t} busy={busy} noteLabel="Renewal note (optional)"
+                    onClose={() => setRenewOpen(false)}
+                    onSubmit={(terms) => submitRenew(terms)}
+                />
+            )}
+
+            {completeOpen && (
+                <CompleteModal busy={busy} onClose={() => setCompleteOpen(false)} onSubmit={submitComplete} />
             )}
         </div>
     );
@@ -506,26 +590,62 @@ function pick(p?: Contract["farm"]) {
     return { full_name: p?.full_name ?? "", org_name: p?.org_name ?? null, location_label: p?.location_label ?? null };
 }
 
-// ---------------- Counter modal ----------------
-function CounterModal({ initial, onClose, onSubmit }: { initial: Terms; onClose: () => void; onSubmit: (t: Terms, note?: string) => Promise<void> }) {
+// ---------------- Counter / Renew modal ----------------
+function CounterModal({
+    title, submitLabel, initial, busy, noteLabel = "Add a note (optional)…", onClose, onSubmit,
+}: {
+    title: string; submitLabel: string; initial: Terms; busy: boolean; noteLabel?: string;
+    onClose: () => void; onSubmit: (t: Terms, note?: string) => void | Promise<void>;
+}) {
     const [terms, setTerms] = React.useState<Terms>({ ...initial });
     const [note, setNote] = React.useState("");
-    const [busy, setBusy] = React.useState(false);
     return (
         <div className="fixed inset-0 z-[120] grid place-items-center p-4">
             <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm animate-fade-in" onClick={onClose} />
-            <div className="relative z-10 w-full max-w-2xl max-h-[90vh] overflow-y-auto glass-card p-6 animate-scale-in">
+            <div className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto glass-card p-6 animate-scale-in">
                 <div className="mb-5 flex items-center justify-between">
-                    <h3 className="font-display text-2xl text-ink">Counter-offer</h3>
+                    <h3 className="font-display text-2xl text-ink">{title}</h3>
                     <button onClick={onClose} className="text-ink-faint hover:text-ink"><X size={20} /></button>
                 </div>
                 <TermsForm value={terms} onChange={setTerms} />
-                <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder="Add a note (optional)…" className="field mt-4 h-auto py-3" />
+                <textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} placeholder={noteLabel} className="field mt-4 h-auto py-3" />
                 <div className="mt-5 flex justify-end gap-2">
                     <Button variant="ghost" onClick={onClose}>Cancel</Button>
-                    <Button loading={busy} onClick={async () => { setBusy(true); try { await onSubmit(terms, note); } finally { setBusy(false); } }}>
-                        <ArrowRight size={16} /> Send counter
+                    <Button loading={busy} onClick={() => onSubmit(terms, note)}>
+                        <ArrowRight size={16} /> {submitLabel}
                     </Button>
+                </div>
+            </div>
+        </div>
+    );
+}
+
+// ---------------- Complete modal ----------------
+function CompleteModal({ busy, onClose, onSubmit }: { busy: boolean; onClose: () => void; onSubmit: (rating: number | null, notes: string) => void | Promise<void> }) {
+    const [rating, setRating] = React.useState(0);
+    const [hover, setHover] = React.useState(0);
+    const [notes, setNotes] = React.useState("");
+    return (
+        <div className="fixed inset-0 z-[120] grid place-items-center p-4">
+            <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm animate-fade-in" onClick={onClose} />
+            <div className="relative z-10 w-full max-w-md glass-card p-6 animate-scale-in">
+                <div className="mb-1 flex items-center justify-between">
+                    <h3 className="font-display text-2xl text-ink">Close out this contract</h3>
+                    <button onClick={onClose} className="text-ink-faint hover:text-ink"><X size={20} /></button>
+                </div>
+                <p className="mb-5 text-sm text-ink-muted">Mark the contract complete and rate how the relationship went. This feeds reputation.</p>
+                <p className="label">How did it go?</p>
+                <div className="mb-4 flex gap-1.5">
+                    {[1, 2, 3, 4, 5].map((n) => (
+                        <button key={n} onMouseEnter={() => setHover(n)} onMouseLeave={() => setHover(0)} onClick={() => setRating(n)} aria-label={`${n} stars`}>
+                            <Star size={30} filled={n <= (hover || rating)} className={n <= (hover || rating) ? "text-harvest-400" : "text-line-strong"} />
+                        </button>
+                    ))}
+                </div>
+                <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} placeholder="Anything worth noting for next time? (optional)" className="field h-auto py-3" />
+                <div className="mt-5 flex justify-end gap-2">
+                    <Button variant="ghost" onClick={onClose}>Cancel</Button>
+                    <Button loading={busy} onClick={() => onSubmit(rating || null, notes)}><Check size={16} /> Mark complete</Button>
                 </div>
             </div>
         </div>

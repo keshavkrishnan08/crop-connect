@@ -327,6 +327,12 @@ export const Share = (p: IconProps) => (
     </Base>
 );
 
+export const Star = ({ filled, ...p }: IconProps & { filled?: boolean }) => (
+    <Base {...p} fill={filled ? "currentColor" : "none"}>
+        <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 17l-5.2 2.6 1-5.8-4.3-4.1 5.9-.9L12 3.5Z" />
+    </Base>
+);
+
 export const Repeat = (p: IconProps) => (
     <Base {...p}>
         <path d="M4 9a5 5 0 0 1 5-5h7l-2.5-2.5M20 15a5 5 0 0 1-5 5H8l2.5 2.5" />

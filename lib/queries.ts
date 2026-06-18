@@ -216,9 +216,24 @@ export async function renewContract(contract: Contract, meId: string, terms: Ter
     await generateScheduleAndBoard({ ...contract, terms: renewed });
 }
 
-export async function completeContract(contract: Contract, meId: string, outcome: "completed" | "closed") {
+export async function completeContract(
+    contract: Contract, meId: string, outcome: "completed" | "closed",
+    opts: { notes?: string | null; rating?: number | null } = {},
+) {
     await supabase.from("contracts").update({ status: outcome }).eq("id", contract.id);
-    await supabase.from("completion_records").insert({ contract_id: contract.id, party_id: meId, outcome, notes: null });
+    await supabase.from("completion_records").insert({
+        contract_id: contract.id, party_id: meId, outcome,
+        notes: opts.notes ?? null, rating: opts.rating ?? null,
+    });
+}
+
+export async function getCompletionRecords(contractId: string) {
+    const { data } = await supabase
+        .from("completion_records")
+        .select("*, party:profiles!completion_records_party_id_fkey(*)")
+        .eq("contract_id", contractId)
+        .order("created_at", { ascending: false });
+    return data ?? [];
 }
 
 // ---------------- MESSAGES ----------------
@@ -254,7 +269,7 @@ export async function addNode(contractId: string, n: { type: NodeType; label: st
     return data as BoardNode;
 }
 
-export async function updateNode(id: string, patch: Partial<Pick<BoardNode, "x" | "y" | "label" | "status" | "highlighted" | "type">>) {
+export async function updateNode(id: string, patch: Partial<Pick<BoardNode, "x" | "y" | "label" | "status" | "highlighted" | "type" | "meta">>) {
     await supabase.from("board_nodes").update(patch).eq("id", id);
 }
 
@@ -271,6 +286,10 @@ export async function deleteEdge(id: string) {
     await supabase.from("board_edges").delete().eq("id", id);
 }
 
+export async function setEdgeLabel(id: string, label: string | null) {
+    await supabase.from("board_edges").update({ label }).eq("id", id);
+}
+
 /** Move the product highlight to one node (clears others). */
 export async function highlightNode(contractId: string, nodeId: string) {
     await supabase.from("board_nodes").update({ highlighted: false }).eq("contract_id", contractId);
@@ -280,6 +299,14 @@ export async function highlightNode(contractId: string, nodeId: string) {
 // ---------------- DELIVERIES ----------------
 export async function setDeliveryStatus(id: string, status: Delivery["status"]) {
     await supabase.from("deliveries").update({ status }).eq("id", id);
+}
+
+export async function rescheduleDelivery(id: string, scheduled_date: string) {
+    await supabase.from("deliveries").update({ scheduled_date }).eq("id", id);
+}
+
+export async function setDeliveryNote(id: string, note: string | null) {
+    await supabase.from("deliveries").update({ note }).eq("id", id);
 }
 
 /** Upcoming scheduled deliveries across all my contracts (RLS-scoped). */

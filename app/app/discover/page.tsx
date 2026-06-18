@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/app/PageHeader";
 import {
@@ -11,6 +12,7 @@ import { useToast } from "@/components/ui/Toast";
 import { TermsForm } from "@/components/contract/TermsForm";
 import {
     Compass, Search, MapPin, Sparkle, Wheat, Storefront, ArrowRight, X, Handshake,
+    Check, Plus, Clock, Scale,
 } from "@/components/icons";
 import { useAuth } from "@/lib/auth";
 import { getMyListings, getOpenListings, proposeContract } from "@/lib/queries";
@@ -66,6 +68,18 @@ function ReferencePicker({
     );
 }
 
+// ---------------- Sorting ----------------
+type SortKey = "best" | "near" | "new" | "price";
+
+const SORT_OPTIONS: { key: SortKey; label: string; icon: React.ReactNode }[] = [
+    { key: "best", label: "Best match", icon: <Sparkle size={13} /> },
+    { key: "near", label: "Nearest", icon: <MapPin size={13} /> },
+    { key: "new", label: "Newest", icon: <Clock size={13} /> },
+    { key: "price", label: "Price ↑", icon: <Scale size={13} /> },
+];
+
+const FAVORITES_KEY = "cc:favorites";
+
 export default function DiscoverPage() {
     const { profile } = useAuth();
     const { success, error: toastError } = useToast();
@@ -84,6 +98,11 @@ export default function DiscoverPage() {
     const [crop, setCrop] = React.useState("");
     const [cadence, setCadence] = React.useState<string>("");
     const [maxPrice, setMaxPrice] = React.useState(""); // dollars input
+
+    // sort + favorites
+    const [sortBy, setSortBy] = React.useState<SortKey>("best");
+    const [favorites, setFavorites] = React.useState<Set<string>>(new Set());
+    const [savedOnly, setSavedOnly] = React.useState(false);
 
     // propose modal
     const [target, setTarget] = React.useState<Listing | null>(null);
@@ -127,7 +146,51 @@ export default function DiscoverPage() {
     }, [reference, filtered]);
 
     const ranked = Boolean(reference);
+
+    // sort the ranked/filtered list, then optionally narrow to favorites
+    const sorted = React.useMemo(() => {
+        const arr = [...results];
+        switch (sortBy) {
+            case "near":
+                arr.sort((a, b) => (a.distanceKm ?? Infinity) - (b.distanceKm ?? Infinity));
+                break;
+            case "new":
+                arr.sort((a, b) => +new Date(b.listing.created_at) - +new Date(a.listing.created_at));
+                break;
+            case "price":
+                arr.sort((a, b) => a.listing.terms.unit_price_cents - b.listing.terms.unit_price_cents);
+                break;
+            default: // "best" — score desc (only meaningful with a reference)
+                if (ranked) arr.sort((a, b) => b.score - a.score);
+                break;
+        }
+        return arr;
+    }, [results, sortBy, ranked]);
+
+    const visible = React.useMemo(
+        () => (savedOnly ? sorted.filter((m) => favorites.has(m.listing.id)) : sorted),
+        [sorted, savedOnly, favorites],
+    );
+
     const hasFilters = Boolean(filters.q || filters.crop || filters.cadence || filters.maxPriceCents);
+
+    // load favorites once on mount
+    React.useEffect(() => {
+        try {
+            const raw = localStorage.getItem(FAVORITES_KEY);
+            if (raw) setFavorites(new Set(JSON.parse(raw) as string[]));
+        } catch { /* ignore */ }
+    }, []);
+
+    function toggleFavorite(id: string) {
+        setFavorites((prev) => {
+            const next = new Set(prev);
+            if (next.has(id)) next.delete(id);
+            else next.add(id);
+            try { localStorage.setItem(FAVORITES_KEY, JSON.stringify([...next])); } catch { /* ignore */ }
+            return next;
+        });
+    }
 
     function openPropose(listing: Listing) {
         setTarget(listing);
@@ -237,7 +300,7 @@ export default function DiscoverPage() {
                 {hasFilters && (
                     <div className="mt-2.5 flex items-center justify-between px-0.5">
                         <span className="text-[13px] text-ink-muted">
-                            {results.length} {results.length === 1 ? "match" : "matches"}
+                            {visible.length} {visible.length === 1 ? "match" : "matches"}
                         </span>
                         <button onClick={resetFilters} className="text-[13px] font-medium text-forest-600 hover:text-forest-700">
                             Clear filters
@@ -254,23 +317,60 @@ export default function DiscoverPage() {
             )}
 
             {/* results header */}
-            {!loading && results.length > 0 && (
-                <div className="mb-4 flex items-center gap-2">
-                    {ranked ? (
-                        <>
-                            <span className="text-gradient inline-flex items-center gap-1.5">
-                                <Sparkle size={16} className="text-harvest-500" />
-                                <Eyebrow>AI-ranked matches</Eyebrow>
-                            </span>
-                            {reference && (
-                                <span className="text-[13px] text-ink-faint">
-                                    for {reference.terms.crop || reference.title}
+            {!loading && (results.length > 0 || savedOnly) && (
+                <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex items-center gap-2">
+                        {ranked ? (
+                            <>
+                                <span className="text-gradient inline-flex items-center gap-1.5">
+                                    <Sparkle size={16} className="text-harvest-500" />
+                                    <Eyebrow>AI-ranked matches</Eyebrow>
                                 </span>
+                                {reference && (
+                                    <span className="text-[13px] text-ink-faint">
+                                        for {reference.terms.crop || reference.title}
+                                    </span>
+                                )}
+                            </>
+                        ) : (
+                            <Eyebrow>Latest open {opposite === "need" ? "needs" : "supply"}</Eyebrow>
+                        )}
+                    </div>
+
+                    {/* sort + saved filter */}
+                    <div className="flex flex-wrap items-center gap-1.5">
+                        {SORT_OPTIONS.map((opt) => {
+                            const disabled = opt.key === "best" && !ranked;
+                            return (
+                                <button
+                                    key={opt.key}
+                                    type="button"
+                                    disabled={disabled}
+                                    onClick={() => setSortBy(opt.key)}
+                                    className={cn(
+                                        "chip inline-flex items-center gap-1.5",
+                                        sortBy === opt.key && "chip-active",
+                                        disabled && "cursor-not-allowed opacity-40",
+                                    )}
+                                    title={disabled ? "Pick a reference listing to rank by match" : undefined}
+                                >
+                                    {opt.icon}
+                                    {opt.label}
+                                </button>
+                            );
+                        })}
+                        <span className="mx-1 hidden h-4 w-px bg-line sm:block" />
+                        <button
+                            type="button"
+                            onClick={() => setSavedOnly((v) => !v)}
+                            className={cn("chip inline-flex items-center gap-1.5", savedOnly && "chip-active")}
+                        >
+                            <Check size={13} /> Saved only
+                            {favorites.size > 0 && (
+                                <span className="text-ink-faint">· {favorites.size}</span>
                             )}
-                        </>
-                    ) : (
-                        <Eyebrow>Latest open {opposite === "need" ? "needs" : "supply"}</Eyebrow>
-                    )}
+                        </button>
+                    </div>
                 </div>
             )}
 
@@ -279,25 +379,35 @@ export default function DiscoverPage() {
                 <div className="grid place-items-center py-24">
                     <Spinner size={28} />
                 </div>
-            ) : results.length === 0 ? (
+            ) : visible.length === 0 ? (
                 <EmptyState
                     icon={<Compass size={26} />}
-                    title="No matches just yet"
+                    title={savedOnly ? "Nothing saved yet" : "No matches just yet"}
                     description={
-                        hasFilters
-                            ? "Nothing fits these filters. Try loosening the crop or price."
-                            : "There's no open " + (opposite === "need" ? "buyer demand" : "farm supply") + " right now. Check back soon."
+                        savedOnly
+                            ? "Tap Save on any match to keep it here for later."
+                            : hasFilters
+                                ? "Nothing fits these filters. Try loosening the crop or price."
+                                : "There's no open " + (opposite === "need" ? "buyer demand" : "farm supply") + " right now. Check back soon."
                     }
-                    action={hasFilters ? <Button variant="soft" size="sm" onClick={resetFilters}>Clear filters</Button> : undefined}
+                    action={
+                        savedOnly
+                            ? <Button variant="soft" size="sm" onClick={() => setSavedOnly(false)}>Show all matches</Button>
+                            : hasFilters
+                                ? <Button variant="soft" size="sm" onClick={resetFilters}>Clear filters</Button>
+                                : undefined
+                    }
                 />
             ) : (
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                    {results.map((m, i) => (
+                    {visible.map((m, i) => (
                         <MatchCard
                             key={m.listing.id}
                             match={m}
                             ranked={ranked}
                             index={i}
+                            saved={favorites.has(m.listing.id)}
+                            onToggleSave={() => toggleFavorite(m.listing.id)}
                             onPropose={() => openPropose(m.listing)}
                         />
                     ))}
@@ -308,6 +418,7 @@ export default function DiscoverPage() {
             {target && terms && (
                 <ProposeModal
                     listing={target}
+                    reference={reference}
                     terms={terms}
                     setTerms={setTerms}
                     note={note}
@@ -323,8 +434,15 @@ export default function DiscoverPage() {
 
 // ---------------- Match card ----------------
 function MatchCard({
-    match, ranked, index, onPropose,
-}: { match: MatchResult; ranked: boolean; index: number; onPropose: () => void }) {
+    match, ranked, index, saved, onToggleSave, onPropose,
+}: {
+    match: MatchResult;
+    ranked: boolean;
+    index: number;
+    saved: boolean;
+    onToggleSave: () => void;
+    onPropose: () => void;
+}) {
     const { listing, score, reasons, distanceKm } = match;
     const owner = listing.owner;
     const orgName = owner?.org_name || owner?.full_name || "Independent grower";
@@ -341,7 +459,13 @@ function MatchCard({
                 <div className="flex min-w-0 items-center gap-3">
                     <Avatar name={orgName} src={owner?.avatar_url} size={40} />
                     <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-ink">{orgName}</p>
+                        <Link
+                            href={`/app/u/${listing.owner_id}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="block truncate text-sm font-semibold text-ink transition-colors hover:text-forest-600"
+                        >
+                            {orgName}
+                        </Link>
                         <p className="flex items-center gap-1 text-[12.5px] text-ink-muted">
                             <MapPin size={13} className="text-ink-faint" />
                             <span className="truncate">{place || "Location not set"}</span>
@@ -378,9 +502,20 @@ function MatchCard({
                     <p className="text-[11px] font-semibold uppercase tracking-wide text-ink-faint">Committed value</p>
                     <p className="font-display text-xl text-ink">{formatMoney(contractValueCents(listing.terms))}</p>
                 </div>
-                <Button size="sm" onClick={onPropose}>
-                    <Handshake size={16} /> Propose
-                </Button>
+                <div className="flex items-center gap-2">
+                    <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); onToggleSave(); }}
+                        aria-pressed={saved}
+                        className={cn("btn-ghost btn-sm gap-1.5", saved && "text-forest-600")}
+                    >
+                        {saved ? <Check size={15} /> : <Plus size={15} />}
+                        {saved ? "Saved" : "Save"}
+                    </button>
+                    <Button size="sm" onClick={onPropose}>
+                        <Handshake size={16} /> Propose
+                    </Button>
+                </div>
             </div>
         </GlassCard>
     );
@@ -388,9 +523,10 @@ function MatchCard({
 
 // ---------------- Propose modal ----------------
 function ProposeModal({
-    listing, terms, setTerms, note, setNote, submitting, onClose, onConfirm,
+    listing, reference, terms, setTerms, note, setNote, submitting, onClose, onConfirm,
 }: {
     listing: Listing;
+    reference: Listing | null;
     terms: Terms;
     setTerms: (t: Terms) => void;
     note: string;
@@ -401,6 +537,27 @@ function ProposeModal({
 }) {
     const owner = listing.owner;
     const orgName = owner?.org_name || owner?.full_name || "this grower";
+
+    const [suggesting, setSuggesting] = React.useState(false);
+    const [rationale, setRationale] = React.useState<string | null>(null);
+
+    async function suggestTerms() {
+        if (!reference) return;
+        setSuggesting(true);
+        try {
+            const res = await fetch("/api/ai/suggest-terms", {
+                method: "POST",
+                headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    ref: { terms: reference.terms, type: reference.type, ceiling: reference.price_ceiling_cents },
+                    candidate: { terms: listing.terms, type: listing.type, ceiling: listing.price_ceiling_cents },
+                }),
+            });
+            const data = await res.json();
+            if (data?.terms) { setTerms({ ...data.terms, notes: terms.notes }); setRationale(data.rationale ?? null); }
+        } catch { /* leave terms as-is */ }
+        finally { setSuggesting(false); }
+    }
 
     React.useEffect(() => {
         const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -436,6 +593,21 @@ function ProposeModal({
                         Terms are pre-filled from their {listing.type === "need" ? "need" : "offer"}. Adjust anything before sending.
                     </p>
                 </div>
+
+                {reference && (
+                    <div className="glass-tint mb-5 flex items-start gap-3 rounded-2xl p-4">
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-white/70 text-harvest-500"><Sparkle size={18} /></span>
+                        <div className="min-w-0 flex-1">
+                            <p className="text-sm font-semibold text-ink">Start from a fair meeting point</p>
+                            <p className="text-[13px] text-ink-muted">
+                                {rationale ?? "Let CropConnect propose terms that balance both sides — quantity, price within budget, and your overlapping window."}
+                            </p>
+                        </div>
+                        <Button variant="soft" size="sm" onClick={suggestTerms} loading={suggesting} className="shrink-0">
+                            <Sparkle size={15} /> {rationale ? "Redo" : "Suggest"}
+                        </Button>
+                    </div>
+                )}
 
                 <TermsForm value={terms} onChange={setTerms} />
 

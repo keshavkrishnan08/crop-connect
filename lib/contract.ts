@@ -4,6 +4,7 @@ import {
     type Contract,
     type Profile,
     type NodeType,
+    type ListingType,
     CADENCE_DAYS,
     CADENCE_LABEL,
 } from "@/lib/types";
@@ -104,6 +105,54 @@ ${terms.quality_terms || "Produce must arrive in fresh, saleable condition. The 
 At the end of the term both parties will be prompted to renew, revise, or close this agreement.
 
 ${terms.notes ? `8. NOTES\n${terms.notes}\n\n` : ""}This is a good-faith commitment between the parties. CropConnect facilitates the agreement and tracks fulfillment but is not a party to it. Have any binding contract reviewed by a qualified attorney.`;
+}
+
+interface SideInput { terms: Terms; type: ListingType; ceiling?: number | null }
+
+/**
+ * Compute a fair starting contract where a supply offer and a buyer need meet.
+ * Pure, deterministic logic — the AI route only adds a human rationale on top.
+ *   • quantity  → the smaller commitment (nobody is over-extended)
+ *   • cadence   → demand-driven (the buyer's need)
+ *   • price     → supply price if within the buyer's ceiling, else split the gap
+ *   • term      → the overlapping window
+ */
+export function suggestFairTerms(a: SideInput, b: SideInput): Terms {
+    const supply = a.type === "supply" ? a : b;
+    const need = a.type === "need" ? a : b;
+    const s = supply.terms;
+    const n = need.terms;
+
+    const qtys = [s.quantity, n.quantity].filter((q) => q > 0);
+    const quantity = qtys.length ? Math.min(...qtys) : s.quantity || n.quantity;
+
+    const ceiling = need.ceiling ?? (n.unit_price_cents || null);
+    let price = s.unit_price_cents || n.unit_price_cents;
+    if (ceiling && price > ceiling) price = Math.round((price + ceiling) / 2);
+
+    const start = laterDate(s.term_start, n.term_start);
+    const end = earlierDate(s.term_end, n.term_end);
+
+    return {
+        crop: s.crop || n.crop,
+        grade: s.grade || n.grade,
+        quantity,
+        unit: s.unit || n.unit,
+        cadence: n.cadence || s.cadence,
+        term_start: start,
+        term_end: end > start ? end : start,
+        unit_price_cents: price,
+        delivery_terms: s.delivery_terms || n.delivery_terms,
+        quality_terms: s.quality_terms || n.quality_terms,
+        notes: null,
+    };
+}
+
+function laterDate(a: string, b: string): string {
+    return new Date(a) > new Date(b) ? a : b;
+}
+function earlierDate(a: string, b: string): string {
+    return new Date(a) < new Date(b) ? a : b;
 }
 
 function fmt(iso: string): string {

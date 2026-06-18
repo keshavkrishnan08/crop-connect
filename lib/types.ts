@@ -86,6 +86,9 @@ export interface Profile {
     avatar_url: string | null;
     crops: string[] | null; // farm: what they grow
     needs: string[] | null; // buyer: what they typically need
+    website: string | null;
+    phone: string | null;
+    certifications: string[] | null;
     completed_contracts: number;
     renewed_contracts: number;
     created_at: string;
@@ -197,6 +200,7 @@ export interface CompletionRecord {
     contract_id: string;
     party_id: string;
     outcome: "completed" | "renewed" | "closed";
+    rating: number | null;
     notes: string | null;
     created_at: string;
 }
