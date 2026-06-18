@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { claudeText, aiEnabled } from "@/lib/anthropic";
 import { fallbackAgreement, contractValueCents, deliveryCount } from "@/lib/contract";
 import { rateLimit, clientKey } from "@/lib/rate-limit";
-import type { Terms } from "@/lib/types";
+import { hasBand, type Terms } from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -38,7 +38,13 @@ export async function POST(req: Request) {
         buyer_location: buyer.location_label,
         crop: terms.crop,
         grade: terms.grade,
-        quantity_per_delivery: `${terms.quantity} ${terms.unit}`,
+        quantity_per_delivery: hasBand(terms)
+            ? `${terms.quantity_min}-${terms.quantity_max} ${terms.unit} (target ${terms.quantity})`
+            : `${terms.quantity} ${terms.unit}`,
+        quantity_is_flexible_band: hasBand(terms),
+        crop_failure_clause: terms.crop_failure_clause,
+        min_committed_cycles: terms.min_commit_cycles,
+        opt_out_notice_days: terms.opt_out_notice_days,
         cadence: terms.cadence,
         deliveries: deliveryCount(terms),
         term: `${terms.term_start} to ${terms.term_end}`,
@@ -54,7 +60,10 @@ export async function POST(req: Request) {
             "You are a contracts assistant for CropConnect, a local-food supply platform. " +
             "Draft a clean, plain-language LOCAL SUPPLY AGREEMENT from the structured facts. " +
             "Be clear and fair to both parties. Use numbered sections: Product, Quantity & Cadence, Term, " +
-            "Price, Delivery, Quality & Acceptance, Renewal, Notes (omit Notes if none). Keep it under 350 words. " +
+            "Price, Delivery, Quality & Acceptance, Flexibility & Risk-Sharing, Renewal, Notes (omit Notes if none). " +
+            "In Flexibility & Risk-Sharing, cover whichever apply from the facts: the good-faith quantity band, the " +
+            "crop-failure clause (weather/pest shortfalls forgiven with notice), the minimum committed cycles, and the " +
+            "opt-out notice period. Keep it under 380 words. " +
             "Plain text only, no markdown. End with a one-line good-faith disclaimer that CropConnect is not a party " +
             "and a lawyer should review binding contracts. Do not invent terms not present in the facts.",
         prompt: `Draft the agreement from these facts:\n${JSON.stringify(facts, null, 2)}`,
