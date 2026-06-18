@@ -28,6 +28,7 @@ export type ContractStatus =
     | "proposed"
     | "countered"
     | "agreed"
+    | "sampling"
     | "active"
     | "completed"
     | "renewed"
@@ -38,6 +39,7 @@ export const CONTRACT_FLOW: ContractStatus[] = [
     "proposed",
     "countered",
     "agreed",
+    "sampling",
     "active",
     "completed",
 ];
@@ -50,6 +52,7 @@ export const CONTRACT_STATUS_META: Record<
     proposed: { label: "Proposed", tone: "amber" },
     countered: { label: "Countered", tone: "amber" },
     agreed: { label: "Agreed", tone: "sky" },
+    sampling: { label: "Sampling", tone: "amber" },
     active: { label: "Active", tone: "forest" },
     completed: { label: "Completed", tone: "neutral" },
     renewed: { label: "Renewed", tone: "forest" },
@@ -121,6 +124,7 @@ export interface Terms {
     crop_failure_clause: boolean; // forgive weather/pest shortfalls, no penalty
     opt_out_notice_days: number | null; // either party may adjust/exit with this notice
     min_commit_cycles: number | null; // firm for the first N deliveries, flexible after
+    sample_first: boolean; // one sample delivery to approve before the full commitment
     notes: string | null;
 }
 
@@ -181,6 +185,7 @@ export interface Delivery {
     scheduled_date: string;
     quantity: number;
     status: DeliveryStatus;
+    is_sample: boolean;
     note: string | null;
 }
 

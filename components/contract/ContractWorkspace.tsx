@@ -9,7 +9,7 @@ import {
     getContract, getMessages, sendMessage, getBoard, addNode, updateNode, deleteNode,
     addEdge, deleteEdge, setEdgeLabel, highlightNode, setDeliveryStatus, rescheduleDelivery,
     setDeliveryNote, confirmContract, counterContract, declineContract, renewContract,
-    completeContract, getCompletionRecords,
+    completeContract, getCompletionRecords, sendSample, acceptSample, rejectSample,
 } from "@/lib/queries";
 import {
     type Contract, type NegotiationMessage, type BoardNode, type BoardEdge, type Terms,
@@ -32,8 +32,9 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
     Handshake, Pen, Nodes, Calendar as CalIcon, Sparkle, Check, X, ArrowRight,
-    Repeat, Pulse, Copy, Download, Share, Star,
+    Repeat, Pulse, Copy, Download, Share, Star, Crate, Truck, Clock,
 } from "@/components/icons";
+import { type Delivery } from "@/lib/types";
 
 type Tab = "negotiate" | "agreement" | "board" | "deliveries";
 
@@ -98,6 +99,8 @@ export function ContractWorkspace({ id }: { id: string }) {
     const negotiating = ["proposed", "countered", "agreed"].includes(contract.status);
     const boardEditable = ["active", "renewed"].includes(contract.status);
     const terminal = ["completed", "closed"].includes(contract.status);
+    const sampling = contract.status === "sampling";
+    const sample = contract.deliveries?.find((d) => d.is_sample) ?? null;
     const latestVersion = contract.versions?.[contract.versions.length - 1];
     const prevVersion = contract.versions && contract.versions.length > 1 ? contract.versions[contract.versions.length - 2] : null;
 
@@ -117,7 +120,11 @@ export function ContractWorkspace({ id }: { id: string }) {
                     if (data?.text) await supabase.from("contracts").update({ agreement_text: data.text }).eq("id", contract.id);
                 } catch { /* non-fatal */ }
             }
-            toast.success(otherConfirmed ? "Contract activated" : "Confirmed", otherConfirmed ? "Supply chain, deliveries & agreement are ready." : "Waiting on the other party.");
+            const willSample = otherConfirmed && contract.terms.sample_first;
+            toast.success(
+                otherConfirmed ? (willSample ? "Sample stage started" : "Contract activated") : "Confirmed",
+                willSample ? "A sample ships before the full commitment." : otherConfirmed ? "Supply chain & deliveries are ready." : "Waiting on the other party.",
+            );
             await load();
         } finally { setBusy(false); }
     };
@@ -136,6 +143,24 @@ export function ContractWorkspace({ id }: { id: string }) {
     const copyLink = async () => {
         try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied", "Share it with your counterparty."); }
         catch { toast.error("Couldn't copy link"); }
+    };
+
+    const doSendSample = async () => {
+        setBusy(true);
+        try { await sendSample(contract.id); toast.success("Sample marked sent"); await load(); }
+        finally { setBusy(false); }
+    };
+    const doAcceptSample = async () => {
+        setBusy(true);
+        try { await acceptSample(contract, meId); toast.success("Sample accepted", "The committed term is now active."); await load(); }
+        finally { setBusy(false); }
+    };
+    const doRejectSample = async () => {
+        const ok = await confirm({ title: "Sample didn't meet spec?", description: "This reopens the terms — nothing is locked in.", confirmLabel: "Reopen terms", tone: "danger" });
+        if (!ok) return;
+        setBusy(true);
+        try { await rejectSample(contract, meId); toast.info("Terms reopened"); await load(); }
+        finally { setBusy(false); }
     };
     const submitRenew = async (terms: Terms) => {
         setBusy(true);
@@ -301,13 +326,20 @@ export function ContractWorkspace({ id }: { id: string }) {
                     )}
 
                     {tab === "deliveries" && (
-                        <DeliveryCalendar deliveries={contract.deliveries ?? []} unit={t.unit} editable={boardEditable} handlers={deliveryHandlers} />
+                        <DeliveryCalendar deliveries={(contract.deliveries ?? []).filter((d) => !d.is_sample)} unit={t.unit} editable={boardEditable} handlers={deliveryHandlers} />
                     )}
                 </div>
 
                 {/* sidebar */}
                 <aside className="space-y-5">
                     <LifecycleTracker status={contract.status} />
+
+                    {sampling && (
+                        <SamplePanel
+                            sample={sample} unit={t.unit} isFarm={isFarm} busy={busy}
+                            onSend={doSendSample} onAccept={doAcceptSample} onReject={doRejectSample}
+                        />
+                    )}
 
                     {/* action card */}
                     {negotiating && !terminal && (
@@ -442,6 +474,60 @@ function ConfirmRow({ label, done }: { label: string; done: boolean }) {
             <span className={cn("text-sm", done ? "font-semibold text-ink" : "text-ink-muted")}>{label}</span>
             <span className="ml-auto text-2xs font-medium uppercase tracking-wide text-ink-faint">{done ? "Confirmed" : "Pending"}</span>
         </div>
+    );
+}
+
+// ---------------- Sample shipment ----------------
+function SamplePanel({
+    sample, unit, isFarm, busy, onSend, onAccept, onReject,
+}: {
+    sample: Delivery | null; unit: string; isFarm: boolean; busy: boolean;
+    onSend: () => void; onAccept: () => void; onReject: () => void;
+}) {
+    const sent = sample?.status === "delivered";
+    return (
+        <GlassCard className="overflow-hidden p-0">
+            <div className="flex items-center gap-2 border-b border-line bg-harvest-400/8 px-5 py-3">
+                <Crate size={17} className="text-harvest-500" />
+                <h3 className="font-display text-lg text-ink">Sample shipment</h3>
+            </div>
+            <div className="p-5">
+                <p className="mb-4 text-[13px] leading-relaxed text-ink-muted">
+                    One sample ships before anyone locks in the full term. Try it, then commit — or walk away with nothing lost.
+                </p>
+
+                {sample && (
+                    <div className="mb-4 flex items-center gap-3 rounded-2xl bg-paper-warm/70 p-3">
+                        <span className={cn("grid h-9 w-9 place-items-center rounded-xl", sent ? "bg-sky/10 text-sky" : "bg-ink/5 text-ink-muted")}>
+                            {sent ? <Truck size={17} /> : <Clock size={17} />}
+                        </span>
+                        <div className="text-sm">
+                            <p className="font-semibold text-ink">{sent ? "Sample sent" : "Sample scheduled"}</p>
+                            <p className="text-[13px] text-ink-muted">{sample.quantity} {unit} · {formatDate(sample.scheduled_date, "long")}</p>
+                        </div>
+                    </div>
+                )}
+
+                {/* Farm side */}
+                {isFarm && !sent && (
+                    <Button className="w-full" onClick={onSend} loading={busy}><Truck size={17} /> Mark sample sent</Button>
+                )}
+                {isFarm && sent && (
+                    <p className="rounded-xl bg-paper-warm px-3 py-2.5 text-center text-[13px] text-ink-muted">Sample sent — waiting on the buyer's approval.</p>
+                )}
+
+                {/* Buyer side */}
+                {!isFarm && !sent && (
+                    <p className="rounded-xl bg-paper-warm px-3 py-2.5 text-center text-[13px] text-ink-muted">Waiting for the farm to send your sample.</p>
+                )}
+                {!isFarm && sent && (
+                    <div className="space-y-2">
+                        <Button className="w-full" onClick={onAccept} loading={busy}><Check size={17} /> Accept & start contract</Button>
+                        <Button variant="ghost" size="sm" className="w-full text-berry" onClick={onReject}><X size={15} /> Sample didn't meet spec</Button>
+                    </div>
+                )}
+            </div>
+        </GlassCard>
     );
 }
 

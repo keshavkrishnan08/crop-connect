@@ -5,7 +5,7 @@ import { Field, Select, Textarea, FieldGroup } from "@/components/ui/kit";
 import { type Terms, type Cadence, CADENCE_LABEL } from "@/lib/types";
 import { contractValueCents, deliveryCount } from "@/lib/contract";
 import { formatMoney, cn } from "@/lib/utils";
-import { Shield, Leaf, Check } from "@/components/icons";
+import { Shield, Leaf, Check, Crate } from "@/components/icons";
 
 const UNITS = ["lb", "kg", "case", "bushel", "crate", "flat", "dozen", "bunch", "unit"];
 const CROPS = [
@@ -115,6 +115,23 @@ export function TermsForm({
                     <span>
                         <span className="flex items-center gap-1.5 text-sm font-semibold text-ink"><Leaf size={15} className="text-forest-500" /> Crop-failure clause</span>
                         <span className="text-[12.5px] text-ink-muted">Shortfalls from weather, pests or disease are forgiven with notice — no penalty, no reliability hit.</span>
+                    </span>
+                </button>
+
+                <button
+                    type="button"
+                    onClick={() => set("sample_first", !value.sample_first)}
+                    className={cn(
+                        "mt-2.5 flex w-full items-start gap-3 rounded-xl border p-3 text-left transition",
+                        value.sample_first ? "border-forest-300 bg-white" : "border-line bg-white/50",
+                    )}
+                >
+                    <span className={cn("mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition", value.sample_first ? "border-forest-500 bg-forest-500 text-white" : "border-line-strong bg-white")}>
+                        {value.sample_first && <Check size={13} />}
+                    </span>
+                    <span>
+                        <span className="flex items-center gap-1.5 text-sm font-semibold text-ink"><Crate size={15} className="text-forest-500" /> Sample shipment first</span>
+                        <span className="text-[12.5px] text-ink-muted">One sample delivery to approve before the full commitment kicks in. Try a shipment, then lock in the season.</span>
                     </span>
                 </button>
             </div>
