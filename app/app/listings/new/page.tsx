@@ -6,12 +6,13 @@ import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Button, Field, FieldGroup } from "@/components/ui/kit";
 import { TermsForm } from "@/components/contract/TermsForm";
+import { VisibilityToggle } from "@/components/contract/VisibilityToggle";
 import { Wheat, Storefront, MapPin, ArrowRight } from "@/components/icons";
 import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/lib/auth";
 import { createListing } from "@/lib/queries";
 import { emptyTerms, contractValueCents, deliveryCount } from "@/lib/contract";
-import { type Terms, type ListingType } from "@/lib/types";
+import { type Terms, type ListingType, type ListingVisibility } from "@/lib/types";
 import { cn, formatMoney } from "@/lib/utils";
 
 export default function NewListingPage() {
@@ -24,6 +25,7 @@ export default function NewListingPage() {
     const [terms, setTerms] = useState<Terms>(() => emptyTerms());
     const [ceiling, setCeiling] = useState<number | null>(null);
     const [locationLabel, setLocationLabel] = useState(profile?.location_label ?? "");
+    const [visibility, setVisibility] = useState<ListingVisibility>("public");
     const [saving, setSaving] = useState(false);
 
     const value = useMemo(() => contractValueCents(terms), [terms]);
@@ -46,6 +48,7 @@ export default function NewListingPage() {
                 terms,
                 price_ceiling_cents: type === "need" ? ceiling : null,
                 location_label: locationLabel.trim() || null,
+                visibility,
             });
             toast.success("Listing published", "It's now live and ready to match.");
             router.push("/app/listings");
@@ -118,6 +121,8 @@ export default function NewListingPage() {
                             />
                         </div>
                     </FieldGroup>
+
+                    <VisibilityToggle value={visibility} onChange={setVisibility} />
 
                     <div className="flex items-center justify-end gap-3 pt-1">
                         <Button onClick={submit} loading={saving} disabled={!valid}>
