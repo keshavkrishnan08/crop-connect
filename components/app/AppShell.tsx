@@ -60,8 +60,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     return (
         <ConfirmProvider>
             <div className="min-h-screen bg-paper bg-aurora">
-                {/* Sidebar (desktop) */}
-                <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] flex-col border-r border-line bg-white/55 backdrop-blur-xl lg:flex">
+                {/* Sidebar — always visible from tablet up */}
+                <aside className="fixed inset-y-0 left-0 z-40 hidden w-[252px] flex-col border-r border-line bg-white/55 backdrop-blur-xl md:flex">
                     <div className="px-5 py-5"><Logo size="md" /></div>
                     <nav className="flex-1 space-y-1 px-3">
                         {NAV.map((item) => <NavLink key={item.href} {...item} active={isActive(pathname, item)} />)}
@@ -73,7 +73,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </aside>
 
                 {/* Mobile top bar */}
-                <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-white/70 px-4 py-3 backdrop-blur-xl lg:hidden">
+                <header className="sticky top-0 z-40 flex items-center justify-between border-b border-line bg-white/70 px-4 py-3 backdrop-blur-xl md:hidden">
                     <Logo size="sm" />
                     <div className="flex items-center gap-2">
                         <NotificationsBell items={notif} />
@@ -83,7 +83,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
                 {/* Mobile drawer */}
                 {mobileOpen && (
-                    <div className="fixed inset-0 z-50 lg:hidden">
+                    <div className="fixed inset-0 z-50 md:hidden">
                         <div className="absolute inset-0 bg-ink/30 backdrop-blur-sm animate-fade-in" onClick={() => setMobileOpen(false)} />
                         <div className="absolute inset-y-0 left-0 flex w-[270px] flex-col bg-paper p-4 animate-fade-up">
                             <div className="mb-4 flex items-center justify-between">
@@ -102,9 +102,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 )}
 
                 {/* Main */}
-                <main className="lg:pl-[252px]">
-                    {/* Desktop utility bar */}
-                    <div className="sticky top-0 z-30 hidden items-center justify-end gap-2.5 border-b border-line bg-paper/55 px-10 py-2.5 backdrop-blur-xl lg:flex">
+                <main className="md:pl-[252px]">
+                    {/* Utility bar */}
+                    <div className="sticky top-0 z-30 hidden items-center justify-end gap-2.5 border-b border-line bg-paper/55 px-6 py-2.5 backdrop-blur-xl md:flex lg:px-10">
                         <button
                             onClick={() => window.dispatchEvent(new Event("cmdk:open"))}
                             className="flex items-center gap-2 rounded-xl border border-line bg-white/70 px-3 py-2 text-sm text-ink-faint transition hover:bg-white hover:text-ink-soft"
