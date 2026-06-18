@@ -65,6 +65,22 @@ export async function setListingStatus(id: string, status: Listing["status"]) {
     await supabase.from("listings").update({ status }).eq("id", id);
 }
 
+export async function updateListing(id: string, patch: {
+    title?: string; terms?: Terms; price_ceiling_cents?: number | null; location_label?: string | null;
+}) {
+    const { error } = await supabase.from("listings").update(patch).eq("id", id);
+    if (error) throw error;
+}
+
+/** Public-facing profile + their active listings, for trust before proposing. */
+export async function getPublicProfile(id: string) {
+    const [{ data: profile }, { data: listings }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", id).single(),
+        supabase.from("listings").select("*, owner:profiles!listings_owner_id_fkey(*)").eq("owner_id", id).eq("status", "active").order("created_at", { ascending: false }),
+    ]);
+    return { profile: (profile as Profile | null), listings: (listings ?? []) as Listing[] };
+}
+
 // ---------------- CONTRACTS ----------------
 const CONTRACT_SELECT = `*, ${FARM}, ${BUYER}`;
 
