@@ -94,6 +94,9 @@ export function fallbackAgreement(
         : "";
     const renewalNo = flexLines.length ? 8 : 7;
     const notesNo = renewalNo + 1;
+    const deliveryLine = terms.delivery_method === "courier"
+        ? `Delivery is fulfilled by a CropConnect-arranged local courier for each shipment, with the courier fee billed to the Buyer. ${terms.delivery_terms ?? ""}`.trim()
+        : (terms.delivery_terms || "The Farm delivers, or the Buyer collects, for each scheduled delivery — arranged directly between the parties.");
 
     return `LOCAL SUPPLY AGREEMENT
 
@@ -112,7 +115,7 @@ From ${fmt(terms.term_start)} to ${fmt(terms.term_end)}.
 ${price} per ${terms.unit}, for an estimated total committed value of ${total}.
 
 5. DELIVERY
-${terms.delivery_terms || "Delivery logistics to be arranged directly between the parties for each scheduled delivery."}
+${deliveryLine}
 
 6. QUALITY & ACCEPTANCE
 ${terms.quality_terms || "Produce must arrive in fresh, saleable condition. The Buyer may reject any delivery that does not meet the agreed specification, with prompt notice to the Farm."}
@@ -161,6 +164,7 @@ export function suggestFairTerms(a: SideInput, b: SideInput): Terms {
         term_start: start,
         term_end: end > start ? end : start,
         unit_price_cents: price,
+        delivery_method: s.delivery_method || n.delivery_method || "farm",
         delivery_terms: s.delivery_terms || n.delivery_terms,
         quality_terms: s.quality_terms || n.quality_terms,
         crop_failure_clause: true,
@@ -226,6 +230,7 @@ export function emptyTerms(overrides: Partial<Terms> = {}): Terms {
         term_start: today.toISOString().slice(0, 10),
         term_end: end.toISOString().slice(0, 10),
         unit_price_cents: 0,
+        delivery_method: "farm",
         delivery_terms: null,
         quality_terms: null,
         // De-risked by default — this is the whole point.

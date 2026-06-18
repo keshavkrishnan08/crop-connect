@@ -4,8 +4,9 @@ import * as React from "react";
 import { Field, Select, Textarea, FieldGroup } from "@/components/ui/kit";
 import { type Terms, type Cadence, CADENCE_LABEL } from "@/lib/types";
 import { contractValueCents, deliveryCount } from "@/lib/contract";
+import { estimateCourier, platformMarkupPct } from "@/lib/shipping";
 import { formatMoney, cn } from "@/lib/utils";
-import { Shield, Leaf, Check, Crate } from "@/components/icons";
+import { Shield, Leaf, Check, Crate, Barn, Truck } from "@/components/icons";
 
 const UNITS = ["lb", "kg", "case", "bushel", "crate", "flat", "dozen", "bunch", "unit"];
 const CROPS = [
@@ -167,14 +168,68 @@ export function TermsForm({
 
             {showCeiling && <ValueReadout total={total} count={count} />}
 
-            <FieldGroup label="Delivery terms (optional)" hint="Who delivers or picks up, location, window">
-                <Textarea rows={2} placeholder="e.g. Farm delivers to the restaurant kitchen door, Tuesdays 7–9am." value={value.delivery_terms ?? ""} onChange={(e) => set("delivery_terms", e.target.value || null)} />
-            </FieldGroup>
+            {/* ---- Delivery method ---- */}
+            <div>
+                <label className="label">Delivery</label>
+                <div className="grid gap-2.5 sm:grid-cols-2">
+                    <MethodCard
+                        active={value.delivery_method === "farm"}
+                        onClick={() => set("delivery_method", "farm")}
+                        icon={<Barn size={18} />}
+                        title="Farm delivers"
+                        sub="The farm drops off or the buyer collects. No added fee."
+                    />
+                    <MethodCard
+                        active={value.delivery_method === "courier"}
+                        onClick={() => set("delivery_method", "courier")}
+                        icon={<Truck size={18} />}
+                        title="CropConnect courier"
+                        sub={`We arrange a local courier — about ${formatMoney(estimateCourier(null).totalCents)}/run, billed to the buyer.`}
+                    />
+                </div>
+                {value.delivery_method === "courier" && (
+                    <p className="mt-2 rounded-xl bg-forest-50/60 px-3 py-2 text-[12.5px] text-forest-700">
+                        CropConnect dispatches a same-day local courier (powered by Uber Direct) and handles the logistics. The fee includes a {platformMarkupPct()}% platform service charge. Exact price is quoted per delivery once both locations are set.
+                    </p>
+                )}
+                <Textarea
+                    rows={2} className="mt-2.5"
+                    placeholder="Pickup/drop-off notes (optional) — e.g. kitchen door, Tuesdays 7–9am."
+                    value={value.delivery_terms ?? ""}
+                    onChange={(e) => set("delivery_terms", e.target.value || null)}
+                />
+            </div>
 
             <FieldGroup label="Quality & acceptance (optional)" hint="Basic spec; what counts as acceptable">
                 <Textarea rows={2} placeholder="e.g. Fresh, firm, no blemishes. Buyer may reject sub-spec deliveries with same-day notice." value={value.quality_terms ?? ""} onChange={(e) => set("quality_terms", e.target.value || null)} />
             </FieldGroup>
         </div>
+    );
+}
+
+function MethodCard({ active, onClick, icon, title, sub }: {
+    active: boolean; onClick: () => void; icon: React.ReactNode; title: string; sub: string;
+}) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={cn(
+                "flex items-start gap-3 rounded-2xl border p-3.5 text-left transition",
+                active ? "border-forest-400 bg-forest-50/50 ring-2 ring-forest-400/20" : "border-line bg-white/60 hover:border-line-strong",
+            )}
+        >
+            <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-xl", active ? "bg-forest-500 text-white" : "bg-paper-sunk text-ink-soft")}>
+                {icon}
+            </span>
+            <span>
+                <span className="flex items-center gap-1.5 text-sm font-semibold text-ink">
+                    {title}
+                    {active && <Check size={14} className="text-forest-500" />}
+                </span>
+                <span className="text-[12.5px] text-ink-muted">{sub}</span>
+            </span>
+        </button>
     );
 }
 

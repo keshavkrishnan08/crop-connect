@@ -32,9 +32,10 @@ import { useConfirm } from "@/components/ui/ConfirmDialog";
 import { Tooltip } from "@/components/ui/Tooltip";
 import {
     Handshake, Pen, Nodes, Calendar as CalIcon, Sparkle, Check, X, ArrowRight,
-    Repeat, Pulse, Copy, Download, Share, Star, Crate, Truck, Clock,
+    Repeat, Pulse, Copy, Download, Share, Star, Crate, Truck, Clock, Barn,
 } from "@/components/icons";
-import { type Delivery } from "@/lib/types";
+import { type Delivery, DELIVERY_METHOD_LABEL } from "@/lib/types";
+import { type CourierQuote } from "@/lib/shipping";
 
 type Tab = "negotiate" | "agreement" | "board" | "deliveries";
 
@@ -395,6 +396,8 @@ export function ContractWorkspace({ id }: { id: string }) {
                         </dl>
                     </GlassCard>
 
+                    <LogisticsPanel contract={contract} />
+
                     {completions.length > 0 && (
                         <GlassCard className="p-5">
                             <h3 className="mb-3 font-display text-lg text-ink">Completion history</h3>
@@ -741,6 +744,62 @@ function CompleteModal({ busy, onClose, onSubmit }: { busy: boolean; onClose: ()
                 </div>
             </div>
         </div>
+    );
+}
+
+// ---------------- Logistics ----------------
+function LogisticsPanel({ contract }: { contract: Contract }) {
+    const t = contract.terms;
+    const toast = useToast();
+    const [quote, setQuote] = React.useState<CourierQuote | null>(null);
+    const [loading, setLoading] = React.useState(false);
+    const courier = t.delivery_method === "courier";
+
+    const getQuote = async () => {
+        setLoading(true);
+        try {
+            const res = await fetch("/api/shipping/quote", {
+                method: "POST", headers: { "content-type": "application/json" },
+                body: JSON.stringify({
+                    pickup: { lat: contract.farm?.lat ?? null, lng: contract.farm?.lng ?? null, label: contract.farm?.location_label ?? null },
+                    dropoff: { lat: contract.buyer?.lat ?? null, lng: contract.buyer?.lng ?? null, label: contract.buyer?.location_label ?? null },
+                }),
+            });
+            setQuote(await res.json());
+        } catch { toast.error("Couldn't get a quote"); }
+        finally { setLoading(false); }
+    };
+
+    return (
+        <GlassCard className="p-5">
+            <div className="mb-3 flex items-center gap-2.5">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-forest-50 text-forest-600">{courier ? <Truck size={18} /> : <Barn size={18} />}</span>
+                <div>
+                    <h3 className="font-display text-lg leading-none text-ink">Logistics</h3>
+                    <p className="mt-0.5 text-[13px] text-ink-muted">{DELIVERY_METHOD_LABEL[t.delivery_method]}</p>
+                </div>
+            </div>
+
+            {!courier ? (
+                <p className="text-[13px] leading-relaxed text-ink-muted">The farm delivers or the buyer collects, arranged directly between the parties. No platform fee.</p>
+            ) : !quote ? (
+                <>
+                    <p className="mb-3 text-[13px] leading-relaxed text-ink-muted">CropConnect arranges a same-day local courier so the farm never has to leave the field.</p>
+                    <Button variant="soft" className="w-full" onClick={getQuote} loading={loading}><Truck size={16} /> Get courier quote</Button>
+                </>
+            ) : (
+                <>
+                    <dl className="mb-3 space-y-2 text-sm">
+                        <div className="flex justify-between"><dt className="text-ink-faint">Courier</dt><dd className="font-medium text-ink">{formatMoney(quote.courierCents)}</dd></div>
+                        <div className="flex justify-between"><dt className="text-ink-faint">Service fee</dt><dd className="font-medium text-ink">{formatMoney(quote.platformFeeCents)}</dd></div>
+                        <div className="flex justify-between border-t border-line pt-2"><dt className="font-semibold text-ink">Total per run</dt><dd className="font-display text-lg text-forest-600">{formatMoney(quote.totalCents)}</dd></div>
+                    </dl>
+                    {quote.etaMins != null && <p className="mb-3 inline-flex items-center gap-1.5 text-[13px] text-ink-muted"><Clock size={14} /> ~{quote.etaMins} min pickup-to-drop</p>}
+                    <Button className="w-full" onClick={() => toast.success("Courier requested", "We'll dispatch for the next delivery.")}><Truck size={16} /> Request courier</Button>
+                    {quote.source === "estimate" && <p className="mt-2 text-2xs text-ink-faint">Estimate. Live pricing once a courier provider is connected.</p>}
+                </>
+            )}
+        </GlassCard>
     );
 }
 

@@ -196,3 +196,28 @@
   .animate-delay-400 { animation-delay: 0.4s; }
   .animate-delay-500 { animation-delay: 0.5s; }
 }
+
+/* ── Comfort Mode (accessibility) ──────────────────────────────
+   Apple-Dynamic-Type-style scaling. Raising the root font-size scales
+   all rem-based Tailwind text utilities up; we also enforce larger touch
+   targets, AA contrast on muted text, and clear focus rings. */
+html.comfort { font-size: 18px; }
+html.comfort body { letter-spacing: 0; }
+
+html.comfort .btn { min-height: 48px; }
+html.comfort .field,
+html.comfort .select { min-height: 52px; font-size: 1.02rem; }
+
+/* Darken the light grays for aging eyes (strict WCAG AA). */
+html.comfort .text-ink-muted { color: #2C352F !important; }
+html.comfort .text-ink-faint { color: #55615B !important; }
+
+/* Bigger tap targets for chips/badges and icon buttons. */
+html.comfort .chip,
+html.comfort .chip-active { padding: 0.6rem 1rem; }
+
+/* Stronger focus visibility. */
+html.comfort *:focus-visible {
+  outline: 3px solid rgba(30, 142, 90, 0.55);
+  outline-offset: 2px;
+}

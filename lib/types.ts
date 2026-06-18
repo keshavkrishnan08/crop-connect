@@ -20,6 +20,13 @@ export const CADENCE_DAYS: Record<Cadence, number> = {
     monthly: 30,
 };
 
+export type DeliveryMethod = "farm" | "courier";
+
+export const DELIVERY_METHOD_LABEL: Record<DeliveryMethod, string> = {
+    farm: "Farm delivers",
+    courier: "CropConnect courier",
+};
+
 export type ListingType = "supply" | "need";
 export type ListingStatus = "active" | "paused" | "matched" | "archived";
 
@@ -118,6 +125,7 @@ export interface Terms {
     term_start: string; // ISO date
     term_end: string; // ISO date
     unit_price_cents: number;
+    delivery_method: DeliveryMethod; // farm delivers, or CropConnect arranges a courier
     delivery_terms: string | null; // who delivers / location / window
     quality_terms: string | null; // spec + rejection
     // ---- flexibility / risk-sharing (the painkiller) ----
