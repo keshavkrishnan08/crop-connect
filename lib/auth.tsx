@@ -27,13 +27,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
 
-    const loadProfile = useCallback(async (userId: string) => {
-        const { data } = await supabase.from("profiles").select("*").eq("id", userId).single();
-        if (data) setProfile(data as Profile);
+    const loadProfile = useCallback(async (user: { id: string; email?: string | null; user_metadata?: Record<string, unknown> }) => {
+        const { data } = await supabase.from("profiles").select("*").eq("id", user.id).single();
+        if (data) {
+            setProfile(data as Profile);
+            return;
+        }
+        // Self-heal: no profile row yet (e.g. DB trigger not applied) → create a minimal one
+        // so the app never deadlocks. Onboarding then fills it in.
+        const meta = user.user_metadata ?? {};
+        const role = meta.role === "farm" || meta.role === "buyer" ? (meta.role as string) : "buyer";
+        const { data: created } = await supabase
+            .from("profiles")
+            .upsert({ id: user.id, email: user.email ?? null, full_name: (meta.full_name as string) || "", role })
+            .select()
+            .single();
+        setProfile((created as Profile) ?? null);
     }, []);
 
     const refreshProfile = useCallback(async () => {
-        if (session?.user) await loadProfile(session.user.id);
+        if (session?.user) await loadProfile(session.user);
     }, [session, loadProfile]);
 
     useEffect(() => {
@@ -41,13 +54,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         supabase.auth.getSession().then(async ({ data }) => {
             if (!active) return;
             setSession(data.session);
-            if (data.session?.user) await loadProfile(data.session.user.id);
+            if (data.session?.user) await loadProfile(data.session.user);
             setLoading(false);
         });
 
         const { data: sub } = supabase.auth.onAuthStateChange(async (_event, s) => {
             setSession(s);
-            if (s?.user) await loadProfile(s.user.id);
+            if (s?.user) await loadProfile(s.user);
             else setProfile(null);
         });
         return () => {

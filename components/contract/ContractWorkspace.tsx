@@ -92,7 +92,18 @@ export function ContractWorkspace({ id }: { id: string }) {
         setBusy(true);
         try {
             await confirmContract(contract, meId);
-            toast.success(otherConfirmed ? "Contract activated" : "Confirmed", otherConfirmed ? "Supply chain & deliveries are live." : "Waiting on the other party.");
+            // On activation, auto-draft the agreement if there isn't one yet.
+            if (otherConfirmed && !contract.agreement_text) {
+                try {
+                    const res = await fetch("/api/ai/draft-agreement", {
+                        method: "POST", headers: { "content-type": "application/json" },
+                        body: JSON.stringify({ terms: contract.terms, farm: pick(contract.farm), buyer: pick(contract.buyer) }),
+                    });
+                    const data = await res.json();
+                    if (data?.text) await supabase.from("contracts").update({ agreement_text: data.text }).eq("id", contract.id);
+                } catch { /* non-fatal */ }
+            }
+            toast.success(otherConfirmed ? "Contract activated" : "Confirmed", otherConfirmed ? "Supply chain, deliveries & agreement are ready." : "Waiting on the other party.");
             await load();
         } finally { setBusy(false); }
     };
@@ -163,7 +174,9 @@ export function ContractWorkspace({ id }: { id: string }) {
                                 <StatusBadge status={contract.status} />
                             </div>
                             <p className="text-sm text-ink-muted">
-                                {contract.farm?.org_name || contract.farm?.full_name} <span className="text-ink-faint">→</span> {contract.buyer?.org_name || contract.buyer?.full_name}
+                                <Link href={`/app/u/${contract.farm_id}`} className="font-medium text-ink-soft hover:text-forest-600">{contract.farm?.org_name || contract.farm?.full_name}</Link>
+                                <span className="text-ink-faint"> → </span>
+                                <Link href={`/app/u/${contract.buyer_id}`} className="font-medium text-ink-soft hover:text-forest-600">{contract.buyer?.org_name || contract.buyer?.full_name}</Link>
                             </p>
                         </div>
                     </div>
