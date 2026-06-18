@@ -51,6 +51,7 @@ export async function POST(req: Request) {
         term: `${terms.term_start} to ${terms.term_end}`,
         unit_price: `$${(terms.unit_price_cents / 100).toFixed(2)} per ${terms.unit}`,
         total_value: `$${(contractValueCents(terms) / 100).toFixed(2)}`,
+        delivery_method: terms.delivery_method === "courier" ? "CropConnect arranges a local courier (fee billed to buyer)" : "farm delivers or buyer collects",
         delivery_terms: terms.delivery_terms,
         quality_terms: terms.quality_terms,
         notes: terms.notes,
