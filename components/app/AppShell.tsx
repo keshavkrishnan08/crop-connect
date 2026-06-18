@@ -15,6 +15,7 @@ import {
     Logout, Plus, Menu, X, Barn, Storefront, Search,
 } from "@/components/icons";
 import { cn } from "@/lib/utils";
+import { ComfortToggle } from "@/components/a11y/ComfortMode";
 
 const NAV = [
     { href: "/app", label: "Dashboard", icon: Dashboard, exact: true },
@@ -93,6 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                                 {NAV.map((item) => <NavLink key={item.href} {...item} active={isActive(pathname, item)} />)}
                                 <NavLink href="/app/profile" label="Profile" icon={UserIcon} active={pathname === "/app/profile"} />
                             </nav>
+                            <ComfortToggle className="mb-3 w-full justify-center" />
                             <Link href="/app/listings/new" onClick={() => setMobileOpen(false)} className="btn-primary mb-3 w-full"><Plus size={18} /> New listing</Link>
                             <UserChip profile={profile} onSignOut={doSignOut} />
                         </div>
@@ -110,6 +112,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                             <Search size={16} /> Search
                             <kbd className="ml-4 rounded-md border border-line bg-paper-warm px-1.5 py-0.5 text-[10px] font-semibold text-ink-faint">⌘K</kbd>
                         </button>
+                        <ComfortToggle />
                         <NotificationsBell items={notif} />
                     </div>
                     <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-10 lg:py-9">{children}</div>

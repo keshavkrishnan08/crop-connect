@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/components/ui/Toast";
+import { ComfortProvider } from "@/components/a11y/ComfortMode";
 
 const inter = Inter({
     subsets: ["latin"],
@@ -55,7 +56,9 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${inter.variable} ${display.variable} ${mono.variable}`}>
             <body>
-                <ToastProvider>{children}</ToastProvider>
+                <ComfortProvider>
+                    <ToastProvider>{children}</ToastProvider>
+                </ComfortProvider>
             </body>
         </html>
     );

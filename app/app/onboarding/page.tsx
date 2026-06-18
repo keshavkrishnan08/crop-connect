@@ -6,9 +6,10 @@ import { useAuth } from "@/lib/auth";
 import { upsertProfile } from "@/lib/queries";
 import { useToast } from "@/components/ui/Toast";
 import { Button, Field, Textarea, FieldGroup, GlassCard, Eyebrow, Spinner } from "@/components/ui/kit";
-import { Barn, Storefront, Plus, ArrowRight, Check } from "@/components/icons";
+import { Barn, Storefront, Plus, ArrowRight, Check, Sparkle } from "@/components/icons";
 import type { Role } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { useComfort } from "@/components/a11y/ComfortMode";
 
 const PRESETS = [
     "Heirloom tomatoes", "Mixed greens", "Strawberries", "Sweet corn", "Carrots", "Kale",
@@ -19,6 +20,7 @@ export default function OnboardingPage() {
     const router = useRouter();
     const toast = useToast();
     const { session, profile, loading, refreshProfile } = useAuth();
+    const { comfort, toggle: toggleComfort } = useComfort();
 
     const [role, setRole] = useState<Role>("farm");
     const [fullName, setFullName] = useState("");
@@ -220,6 +222,43 @@ export default function OnboardingPage() {
                             </Button>
                         </div>
                     </div>
+
+                    {/* comfort mode */}
+                    <button
+                        type="button"
+                        onClick={toggleComfort}
+                        aria-pressed={comfort}
+                        aria-label={`Comfortable mode ${comfort ? "on" : "off"}`}
+                        className={cn(
+                            "flex w-full items-center gap-4 rounded-2xl border p-4 text-left transition animate-fade-up animate-delay-300",
+                            comfort
+                                ? "border-forest-300 bg-forest-50"
+                                : "border-line bg-white/70 hover:border-line-strong",
+                        )}
+                    >
+                        <span
+                            className={cn(
+                                "grid h-11 w-11 shrink-0 place-items-center rounded-xl",
+                                comfort ? "bg-forest-500 text-white" : "bg-paper-warm text-forest-600",
+                            )}
+                        >
+                            <Sparkle size={20} />
+                        </span>
+                        <span className="min-w-0 flex-1">
+                            <span className="block text-sm font-semibold text-ink">Comfortable mode</span>
+                            <span className="block text-[13px] text-ink-muted">
+                                Larger text and buttons, higher contrast. Easy to turn off anytime.
+                            </span>
+                        </span>
+                        <span
+                            className={cn(
+                                "shrink-0 rounded-lg px-2.5 py-1 text-2xs font-semibold uppercase tracking-wide",
+                                comfort ? "bg-forest-500 text-white" : "bg-paper-warm text-ink-faint",
+                            )}
+                        >
+                            {comfort ? "On" : "Off"}
+                        </span>
+                    </button>
 
                     <Button
                         type="submit"
