@@ -1,49 +1,61 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { ToastProvider } from "@/components/ui/Toast";
 
-const inter = Inter({ subsets: ["latin"] });
+const inter = Inter({
+    subsets: ["latin"],
+    variable: "--font-inter",
+    display: "swap",
+});
+
+const display = Instrument_Serif({
+    subsets: ["latin"],
+    weight: "400",
+    style: ["normal", "italic"],
+    variable: "--font-display",
+    display: "swap",
+});
+
+const mono = JetBrains_Mono({
+    subsets: ["latin"],
+    weight: ["400", "500"],
+    variable: "--font-mono",
+    display: "swap",
+});
 
 export const metadata: Metadata = {
+    metadataBase: new URL("https://cropconnect.app"),
     title: {
-        default: "CropConnect — Farm-to-Table Marketplace",
-        template: "%s | CropConnect",
+        default: "CropConnect — Committed local supply, on contract",
+        template: "%s · CropConnect",
     },
-    description: "The premier agricultural marketplace connecting farmers directly to buyers. Fair pricing, transparent trade, thriving community.",
-    keywords: ["agriculture", "marketplace", "farm to table", "farmers", "buyers", "organic", "produce", "direct trade"],
+    description:
+        "CropConnect turns informal, handshake supply relationships into structured, renewable contracts between farms and wholesale buyers. Predictable supply. Provable provenance.",
+    keywords: [
+        "supply contracts",
+        "local food",
+        "farm to table",
+        "wholesale produce",
+        "committed supply",
+        "agriculture",
+    ],
     openGraph: {
-        title: "CropConnect — Farm-to-Table Marketplace",
-        description: "The premier agricultural marketplace connecting farmers directly to buyers.",
+        title: "CropConnect — Committed local supply, on contract",
+        description:
+            "Structured, renewable supply contracts between farms and wholesale buyers.",
         siteName: "CropConnect",
         type: "website",
     },
 };
 
-import { AuthProvider } from "@/components/AuthProvider";
-import { ToastProvider } from "@/components/Toast";
-
 export default function RootLayout({
     children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang="en" className="light">
-            <head>
-                <link rel="preconnect" href="https://fonts.googleapis.com" />
-                <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-                <link
-                    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
-                    rel="stylesheet"
-                />
-                <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-            </head>
-            <body className={`${inter.className} bg-background-light dark:bg-background-dark text-[#131613] dark:text-gray-100 font-display transition-colors duration-200`}>
-                <AuthProvider>
-                    <ToastProvider>
-                        {children}
-                    </ToastProvider>
-                </AuthProvider>
+        <html lang="en" className={`${inter.variable} ${display.variable} ${mono.variable}`}>
+            <body>
+                <ToastProvider>{children}</ToastProvider>
             </body>
         </html>
     );
