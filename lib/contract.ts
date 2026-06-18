@@ -7,6 +7,7 @@ import {
     type ListingType,
     CADENCE_DAYS,
     CADENCE_LABEL,
+    hasBand,
 } from "@/lib/types";
 
 /** Number of deliveries implied by a set of terms. */
@@ -78,6 +79,20 @@ export function fallbackAgreement(
     const price = (terms.unit_price_cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
     const total = (contractValueCents(terms) / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
     const n = deliveryCount(terms);
+    const qty = hasBand(terms)
+        ? `${terms.quantity_min}–${terms.quantity_max} ${terms.unit} per delivery (target ${terms.quantity} ${terms.unit})`
+        : `${terms.quantity} ${terms.unit} per delivery`;
+
+    const flexLines: string[] = [];
+    if (hasBand(terms)) flexLines.push(`• Quantity is a good-faith band of ${terms.quantity_min}–${terms.quantity_max} ${terms.unit}. The Farm supplies within this range each cycle; the Buyer accepts within it.`);
+    if (terms.crop_failure_clause) flexLines.push("• Crop-failure clause: shortfalls caused by weather, pests, disease or other events outside the Farm's reasonable control are forgiven, with prompt notice, and do not count against the Farm.");
+    if (terms.min_commit_cycles) flexLines.push(`• The first ${terms.min_commit_cycles} ${terms.min_commit_cycles === 1 ? "delivery is" : "deliveries are"} firmly committed by both parties.`);
+    if (terms.opt_out_notice_days) flexLines.push(`• After the committed period, either party may adjust or end this agreement with ${terms.opt_out_notice_days} days' written notice.`);
+    const flexSection = flexLines.length
+        ? `7. FLEXIBILITY & RISK-SHARING\n${flexLines.join("\n")}\n\n`
+        : "";
+    const renewalNo = flexLines.length ? 8 : 7;
+    const notesNo = renewalNo + 1;
 
     return `LOCAL SUPPLY AGREEMENT
 
@@ -87,7 +102,7 @@ This agreement is made between ${farmName}${farm.location_label ? ` of ${farm.lo
 The Farm agrees to supply ${terms.crop}${terms.grade ? ` (${terms.grade})` : ""} to the Buyer over the term of this agreement.
 
 2. QUANTITY & CADENCE
-${terms.quantity} ${terms.unit} per delivery, ${CADENCE_LABEL[terms.cadence].toLowerCase()}${terms.cadence === "one_time" ? "" : ` (${n} deliveries in total)`}.
+${qty}, ${CADENCE_LABEL[terms.cadence].toLowerCase()}${terms.cadence === "one_time" ? "" : ` (${n} deliveries in total)`}.
 
 3. TERM
 From ${fmt(terms.term_start)} to ${fmt(terms.term_end)}.
@@ -101,10 +116,10 @@ ${terms.delivery_terms || "Delivery logistics to be arranged directly between th
 6. QUALITY & ACCEPTANCE
 ${terms.quality_terms || "Produce must arrive in fresh, saleable condition. The Buyer may reject any delivery that does not meet the agreed specification, with prompt notice to the Farm."}
 
-7. RENEWAL
+${flexSection}${renewalNo}. RENEWAL
 At the end of the term both parties will be prompted to renew, revise, or close this agreement.
 
-${terms.notes ? `8. NOTES\n${terms.notes}\n\n` : ""}This is a good-faith commitment between the parties. CropConnect facilitates the agreement and tracks fulfillment but is not a party to it. Have any binding contract reviewed by a qualified attorney.`;
+${terms.notes ? `${notesNo}. NOTES\n${terms.notes}\n\n` : ""}This is a good-faith commitment between the parties. CropConnect facilitates the agreement and tracks fulfillment but is not a party to it. Have any binding contract reviewed by a qualified attorney.`;
 }
 
 interface SideInput { terms: Terms; type: ListingType; ceiling?: number | null }
@@ -137,6 +152,9 @@ export function suggestFairTerms(a: SideInput, b: SideInput): Terms {
         crop: s.crop || n.crop,
         grade: s.grade || n.grade,
         quantity,
+        // a fair ±20% band so neither side is held to an exact number
+        quantity_min: Math.max(1, Math.round(quantity * 0.8)),
+        quantity_max: Math.round(quantity * 1.2),
         unit: s.unit || n.unit,
         cadence: n.cadence || s.cadence,
         term_start: start,
@@ -144,6 +162,9 @@ export function suggestFairTerms(a: SideInput, b: SideInput): Terms {
         unit_price_cents: price,
         delivery_terms: s.delivery_terms || n.delivery_terms,
         quality_terms: s.quality_terms || n.quality_terms,
+        crop_failure_clause: true,
+        opt_out_notice_days: 14,
+        min_commit_cycles: 2,
         notes: null,
     };
 }
@@ -196,6 +217,8 @@ export function emptyTerms(overrides: Partial<Terms> = {}): Terms {
         crop: "",
         grade: null,
         quantity: 0,
+        quantity_min: null,
+        quantity_max: null,
         unit: "lb",
         cadence: "weekly" as Cadence,
         term_start: today.toISOString().slice(0, 10),
@@ -203,7 +226,22 @@ export function emptyTerms(overrides: Partial<Terms> = {}): Terms {
         unit_price_cents: 0,
         delivery_terms: null,
         quality_terms: null,
+        // De-risked by default — this is the whole point.
+        crop_failure_clause: true,
+        opt_out_notice_days: 14,
+        min_commit_cycles: 2,
         notes: null,
         ...overrides,
+    };
+}
+
+/** Committed value as a range when a flexible band is set, else a single number. */
+export function contractValueRange(terms: Terms): { min: number; max: number } {
+    const n = deliveryCount(terms);
+    const lo = terms.quantity_min ?? terms.quantity;
+    const hi = terms.quantity_max ?? terms.quantity;
+    return {
+        min: Math.round(lo * terms.unit_price_cents * n),
+        max: Math.round(hi * terms.unit_price_cents * n),
     };
 }

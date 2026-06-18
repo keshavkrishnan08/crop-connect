@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
 import { TermsForm } from "@/components/contract/TermsForm";
+import { ReliabilityBadge } from "@/components/contract/ReliabilityBadge";
 import {
     Compass, Search, MapPin, Sparkle, Wheat, Storefront, ArrowRight, X, Handshake,
     Check, Plus, Clock, Scale,
@@ -473,6 +474,7 @@ function MatchCard({
                                 <span className="shrink-0 text-ink-faint">· {distanceKm} km</span>
                             )}
                         </p>
+                        {owner && <div className="mt-1.5"><ReliabilityBadge profile={owner} /></div>}
                     </div>
                 </div>
                 {ranked && <MatchRing score={score} />}
@@ -588,7 +590,10 @@ function ProposeModal({
 
                 <div className="mb-5 pr-8">
                     <div className="mb-1.5"><Eyebrow>Propose a contract</Eyebrow></div>
-                    <h2 className="font-display text-2xl leading-tight text-ink">To {orgName}</h2>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <h2 className="font-display text-2xl leading-tight text-ink">To {orgName}</h2>
+                        {owner && <ReliabilityBadge profile={owner} />}
+                    </div>
                     <p className="mt-1 text-[13px] text-ink-muted">
                         Terms are pre-filled from their {listing.type === "need" ? "need" : "offer"}. Adjust anything before sending.
                     </p>

@@ -13,9 +13,11 @@ import {
 } from "@/lib/queries";
 import {
     type Contract, type NegotiationMessage, type BoardNode, type BoardEdge, type Terms,
-    type NodeType, type NodeStatus, type DeliveryStatus,
+    type NodeType, type NodeStatus, type DeliveryStatus, hasBand,
 } from "@/lib/types";
-import { contractValueCents, fallbackAgreement, isLocked } from "@/lib/contract";
+import { contractValueCents, fallbackAgreement } from "@/lib/contract";
+import { qtyLabel } from "@/lib/display";
+import { ReliabilityBadge } from "@/components/contract/ReliabilityBadge";
 import { formatMoney, formatDate, relativeTime, cn } from "@/lib/utils";
 import { Avatar, Button, Spinner, GlassCard } from "@/components/ui/kit";
 import { StatusBadge } from "@/components/contract/StatusBadge";
@@ -242,6 +244,7 @@ export function ContractWorkspace({ id }: { id: string }) {
                                 <span className="text-ink-faint"> → </span>
                                 <Link href={`/app/u/${contract.buyer_id}`} className="font-medium text-ink-soft hover:text-forest-600">{contract.buyer?.org_name || contract.buyer?.full_name}</Link>
                             </p>
+                            {other && <div className="mt-1.5"><ReliabilityBadge profile={other} /></div>}
                         </div>
                     </div>
                     <div className="text-right">
@@ -349,9 +352,12 @@ export function ContractWorkspace({ id }: { id: string }) {
                         <h3 className="mb-3 font-display text-lg text-ink">Terms at a glance</h3>
                         <dl className="space-y-2.5 text-sm">
                             <Row k="Crop" v={`${t.crop}${t.grade ? ` · ${t.grade}` : ""}`} />
-                            <Row k="Per delivery" v={`${t.quantity} ${t.unit}`} />
+                            <Row k="Per delivery" v={hasBand(t) ? `${qtyLabel(t)} (target ${t.quantity})` : qtyLabel(t)} />
                             <Row k="Price" v={`${formatMoney(t.unit_price_cents)} / ${t.unit}`} />
                             <Row k="Term" v={`${formatDate(t.term_start)} – ${formatDate(t.term_end)}`} />
+                            {t.crop_failure_clause && <Row k="Crop failure" v="Forgiven" />}
+                            {t.min_commit_cycles ? <Row k="Firm cycles" v={`${t.min_commit_cycles}`} /> : null}
+                            {t.opt_out_notice_days ? <Row k="Opt-out" v={`${t.opt_out_notice_days} days' notice`} /> : null}
                             {t.delivery_terms && <Row k="Delivery" v={t.delivery_terms} />}
                             {t.quality_terms && <Row k="Quality" v={t.quality_terms} />}
                         </dl>
