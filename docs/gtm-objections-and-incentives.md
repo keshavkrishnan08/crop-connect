@@ -149,6 +149,39 @@ Handshakes are a great _retention_ tool and a terrible _growth, planning, and tr
 | #1–#4 time / tech aversion | **Comfort Mode** + concierge onboarding ("I'll set it up for you") |
 | #26 price-lock regret | bands + renegotiable renewal; price is a starting point, not a cage |
 
+## The simplification pitch (for the farmer who doesn't want growth)
+
+Some farmers will never want more buyers. They have one chef, they like it, they're done. Growth is dead on arrival. **So don't sell growth — sell less work.**
+
+The reframe:
+
+> **CropConnect isn't a place to find buyers. It's the operating system for the deal you already have.** Keep your one buyer. We just make it half the work.
+
+A handshake "works fine," but it still quietly costs the farmer time and stress every single week:
+
+| The chore the handshake still makes you do | What CropConnect does instead |
+|---|---|
+| Texting back and forth every week — "how much you got? what price? same as last time?" | Agree **once**; deliveries auto-schedule and just run |
+| **Driving the produce into the city** | **Courier picks up at the farm — you never leave the field** |
+| Remembering what you agreed ("was it $3 or $3.50?") | The contract is the single source of truth |
+| Tracking what you sent, chasing whether it arrived | Supply-chain board + delivery tracking does it for you |
+| The awkward "you said you'd take 40" conversation when something slips | A neutral, flexible written record — **protects the relationship** |
+| Remembering to talk about next season | Auto renewal prompt at term end |
+| Carrying it all in your head | One less thing in your head |
+
+**The emotional core:** a farmer's mental load is brutal. This is the rare tool that *subtracts* from it instead of adding. You think about farming; it thinks about logistics, memory, and paperwork.
+
+Creative one-liners to test:
+- "Keep your handshake. Lose the homework."
+- "Your deal, on autopilot."
+- "Stop doing the driving."
+- "Grow it. Hand it off. We've got the rest."
+- It's Calendly/QuickBooks for your supply relationship — not a marketplace, a manager.
+
+**Product implication:** there should be a first-class _"I already have a buyer"_ on-ramp — import that one relationship (direct-propose from a profile already exists), turn on the courier + auto-schedule + board, and never mention "discover more buyers." For this segment, hide growth entirely and lead with drop-off + autopilot.
+
+---
+
 ## The 5 that actually kill the deal
 - **#34/#35 crop-failure fear** → answered (clause + bands). Lead with it.
 - **#29 locked to a distributor** → genuinely structural. Disqualify, move on.
