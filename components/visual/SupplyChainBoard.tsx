@@ -47,6 +47,8 @@ export interface BoardHandlers {
     onRenameNode?: (id: string, label: string) => void;
     onSetStatus?: (id: string, status: NodeStatus) => void;
     onHighlight?: (id: string) => void;
+    onSetMeta?: (id: string, meta: Record<string, unknown>) => void;
+    onLabelEdge?: (id: string, label: string) => void;
 }
 
 export function SupplyChainBoard({
@@ -174,7 +176,8 @@ export function SupplyChainBoard({
                             const a = center(s), b = center(t);
                             const live = s.highlighted || t.highlighted;
                             return (
-                                <Edge key={ed.id} a={a} b={b} live={live}
+                                <Edge key={ed.id} a={a} b={b} live={live} label={ed.label} editable={editable}
+                                    onLabel={(v) => handlers.onLabelEdge?.(ed.id, v)}
                                     onDelete={editable ? () => handlers.onDeleteEdge?.(ed.id) : undefined} />
                             );
                         })}
@@ -278,6 +281,7 @@ export function SupplyChainBoard({
                     onRename={() => setEditing(sel.id)}
                     onStatus={(s) => handlers.onSetStatus?.(sel.id, s)}
                     onHighlight={() => handlers.onHighlight?.(sel.id)}
+                    onSetMeta={(meta) => handlers.onSetMeta?.(sel.id, meta)}
                     onDelete={() => { handlers.onDeleteNode?.(sel.id); setSelected(null); }}
                 />
             )}
@@ -305,21 +309,62 @@ function bezier(a: { x: number; y: number }, b: { x: number; y: number }) {
     return `M ${a.x} ${a.y} C ${a.x + dx} ${a.y}, ${b.x - dx} ${b.y}, ${b.x} ${b.y}`;
 }
 
-function Edge({ a, b, live, onDelete }: { a: { x: number; y: number }; b: { x: number; y: number }; live: boolean; onDelete?: () => void }) {
+function Edge({
+    a, b, live, label, editable, onLabel, onDelete,
+}: {
+    a: { x: number; y: number }; b: { x: number; y: number }; live: boolean;
+    label?: string | null; editable?: boolean; onLabel?: (v: string) => void; onDelete?: () => void;
+}) {
     const [hover, setHover] = React.useState(false);
+    const [editing, setEditing] = React.useState(false);
     const d = bezier(a, b);
     const mid = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
+    const showLabel = !!label || editing;
     return (
         <g onPointerEnter={() => setHover(true)} onPointerLeave={() => setHover(false)}>
             <path d={d} fill="none" stroke="transparent" strokeWidth={16} style={{ cursor: onDelete ? "pointer" : "default" }} />
             <path d={d} fill="none" stroke={live ? "#1E8E5A" : "rgba(14,21,18,0.18)"} strokeWidth={2}
                 strokeDasharray={live ? "6 6" : undefined} className={live ? "animate-marching" : undefined} markerEnd="url(#arrow)" />
             <circle cx={b.x} cy={b.y} r={3} fill={live ? "#1E8E5A" : "rgba(14,21,18,0.3)"} />
-            {onDelete && hover && (
-                <foreignObject x={mid.x - 11} y={mid.y - 11} width={22} height={22}>
-                    <button onClick={onDelete} className="grid h-[22px] w-[22px] place-items-center rounded-full bg-white text-berry shadow-glass hover:bg-berry hover:text-white">
-                        <X size={13} />
-                    </button>
+
+            {/* edge label */}
+            {showLabel && (
+                <foreignObject x={mid.x - 60} y={mid.y - 26} width={120} height={24}>
+                    {editing ? (
+                        <input
+                            autoFocus defaultValue={label ?? ""}
+                            onPointerDown={(e) => e.stopPropagation()}
+                            onBlur={(e) => { onLabel?.(e.target.value); setEditing(false); }}
+                            onKeyDown={(e) => { if (e.key === "Enter") (e.target as HTMLInputElement).blur(); }}
+                            placeholder="label"
+                            className="w-full rounded-md border border-forest-300 bg-white px-1.5 py-0.5 text-center text-2xs font-semibold outline-none"
+                        />
+                    ) : (
+                        <div
+                            onDoubleClick={() => editable && setEditing(true)}
+                            className="mx-auto w-fit rounded-md bg-white px-2 py-0.5 text-center text-2xs font-semibold text-ink-soft shadow-glass"
+                        >
+                            {label}
+                        </div>
+                    )}
+                </foreignObject>
+            )}
+
+            {/* hover controls */}
+            {editable && hover && !editing && (
+                <foreignObject x={mid.x - 24} y={mid.y - 2} width={52} height={24}>
+                    <div className="flex items-center justify-center gap-1">
+                        {!label && (
+                            <button onClick={() => setEditing(true)} className="grid h-[22px] w-[22px] place-items-center rounded-full bg-white text-forest-600 shadow-glass hover:bg-forest-500 hover:text-white">
+                                <Pen size={12} />
+                            </button>
+                        )}
+                        {onDelete && (
+                            <button onClick={onDelete} className="grid h-[22px] w-[22px] place-items-center rounded-full bg-white text-berry shadow-glass hover:bg-berry hover:text-white">
+                                <X size={12} />
+                            </button>
+                        )}
+                    </div>
                 </foreignObject>
             )}
             <defs>
@@ -357,13 +402,16 @@ function Palette({ onAdd }: { onAdd: (t: NodeType) => void }) {
 }
 
 function Inspector({
-    node, onClose, onRename, onStatus, onHighlight, onDelete,
+    node, onClose, onRename, onStatus, onHighlight, onSetMeta, onDelete,
 }: {
     node: BoardNode; onClose: () => void; onRename: () => void;
-    onStatus: (s: NodeStatus) => void; onHighlight: () => void; onDelete: () => void;
+    onStatus: (s: NodeStatus) => void; onHighlight: () => void;
+    onSetMeta: (meta: Record<string, unknown>) => void; onDelete: () => void;
 }) {
+    const meta = (node.meta ?? {}) as { date?: string; qty?: string; note?: string };
+    const patch = (k: string, v: string) => onSetMeta({ ...meta, [k]: v });
     return (
-        <div className="absolute right-4 top-4 w-60 glass-card p-4 animate-scale-in">
+        <div className="absolute right-4 top-4 max-h-[calc(100%-2rem)] w-64 overflow-y-auto glass-card p-4 animate-scale-in">
             <div className="mb-3 flex items-center justify-between">
                 <p className="font-display text-lg text-ink">{node.label}</p>
                 <button onClick={onClose} className="text-ink-faint hover:text-ink"><X size={16} /></button>
@@ -372,7 +420,7 @@ function Inspector({
                 <Route size={16} /> {node.highlighted ? "Product is here" : "Mark product here"}
             </button>
             <p className="label">Status</p>
-            <div className="mb-3 grid grid-cols-2 gap-1.5">
+            <div className="mb-4 grid grid-cols-2 gap-1.5">
                 {(["pending", "active", "done", "blocked"] as NodeStatus[]).map((s) => (
                     <button key={s} onClick={() => onStatus(s)}
                         className={cn("rounded-lg border px-2 py-1.5 text-xs font-semibold capitalize transition", node.status === s ? "border-forest-400 bg-forest-50 text-forest-600" : "border-line text-ink-muted hover:border-line-strong")}>
@@ -380,6 +428,14 @@ function Inspector({
                     </button>
                 ))}
             </div>
+
+            <p className="label">Details</p>
+            <div className="mb-4 space-y-2">
+                <input type="date" defaultValue={meta.date ?? ""} onChange={(e) => patch("date", e.target.value)} className="field h-9 text-[13px]" />
+                <input defaultValue={meta.qty ?? ""} onBlur={(e) => patch("qty", e.target.value)} placeholder="Quantity / load" className="field h-9 text-[13px]" />
+                <textarea defaultValue={meta.note ?? ""} onBlur={(e) => patch("note", e.target.value)} placeholder="Note…" rows={2} className="field h-auto py-2 text-[13px]" />
+            </div>
+
             <div className="flex gap-2">
                 <button onClick={onRename} className="btn-ghost btn-sm flex-1"><Pen size={14} /> Rename</button>
                 <button onClick={onDelete} className="btn btn-sm flex-1 bg-berry/8 text-berry hover:bg-berry/15"><X size={14} /> Delete</button>
