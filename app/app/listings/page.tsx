@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Badge, Button, LinkButton, EmptyState, Spinner } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
-import { Wheat, Storefront, Plus, ArrowRight, Clock, Check, Pen, Copy, Repeat } from "@/components/icons";
+import { Wheat, Storefront, Plus, ArrowRight, Clock, Check, Pen, Copy, Repeat, Shield } from "@/components/icons";
 import { useAuth } from "@/lib/auth";
 import { getMyListings, setListingStatus, createListing } from "@/lib/queries";
 import { contractValueCents, cadenceSummary } from "@/lib/contract";
@@ -259,9 +259,14 @@ function ListingCard({
                     {isSupply ? <Wheat size={13} /> : <Storefront size={13} />}
                     {isSupply ? "Supply offer" : "Buyer need"}
                 </Badge>
-                <Badge tone={status.tone} dot>
-                    {status.label}
-                </Badge>
+                <div className="flex items-center gap-1.5">
+                    {listing.visibility === "unlisted" && (
+                        <Badge tone="muted"><Shield size={12} /> Private</Badge>
+                    )}
+                    <Badge tone={status.tone} dot>
+                        {status.label}
+                    </Badge>
+                </div>
             </div>
 
             <h3 className="mt-4 font-display text-xl leading-snug text-ink">
