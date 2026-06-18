@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { type Terms } from "@/lib/types";
-import { contractValueCents, deliveryCount } from "@/lib/contract";
+import { type Terms, hasBand } from "@/lib/types";
+import { contractValueCents, contractValueRange, deliveryCount } from "@/lib/contract";
 import { formatMoney } from "@/lib/utils";
 
 /** Visual breakdown of how the committed value is built, with a cumulative ramp. */
@@ -10,6 +10,8 @@ export function ValueModel({ terms }: { terms: Terms }) {
     const count = deliveryCount(terms);
     const perDelivery = terms.quantity * terms.unit_price_cents;
     const total = contractValueCents(terms);
+    const band = hasBand(terms);
+    const range = contractValueRange(terms);
     const points = Array.from({ length: count }, (_, i) => (i + 1) * perDelivery);
     const max = points[points.length - 1] || 1;
 
@@ -18,10 +20,17 @@ export function ValueModel({ terms }: { terms: Terms }) {
             <h3 className="mb-1 font-display text-lg text-ink">Committed value</h3>
             <p className="mb-4 text-[13px] text-ink-muted">How this contract's value accrues over the term.</p>
 
-            <div className="mb-5 flex items-end gap-4">
-                <p className="font-display text-[2.5rem] leading-none text-forest-600">{formatMoney(total)}</p>
+            <div className="mb-5 flex flex-wrap items-end gap-x-4 gap-y-1">
+                {band ? (
+                    <p className="font-display text-[2.1rem] leading-none text-forest-600">
+                        {formatMoney(range.min, { compact: range.max > 1_000_00 })}<span className="text-ink-faint"> – </span>{formatMoney(range.max, { compact: range.max > 1_000_00 })}
+                    </p>
+                ) : (
+                    <p className="font-display text-[2.5rem] leading-none text-forest-600">{formatMoney(total)}</p>
+                )}
                 <p className="pb-1.5 text-sm text-ink-muted">
                     {formatMoney(perDelivery)} <span className="text-ink-faint">×</span> {count} {count === 1 ? "delivery" : "deliveries"}
+                    {band && <span className="text-ink-faint"> · flexible band</span>}
                 </p>
             </div>
 

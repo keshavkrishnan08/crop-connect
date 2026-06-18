@@ -4,7 +4,7 @@ import { LinkButton } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import {
     Wheat, Compass, Handshake, Pen, Truck, Repeat, Sparkle, Nodes, Shield, Scale,
-    Barn, Storefront, ArrowRight, Check, Pulse, Crate, MapPin,
+    Barn, Storefront, ArrowRight, Check, Pulse, Crate, MapPin, Leaf, Calendar, Clock,
 } from "@/components/icons";
 
 export default function Landing() {
@@ -13,7 +13,9 @@ export default function Landing() {
             <Nav />
             <Hero />
             <LogoBand />
+            <Flexibility />
             <ContractLoop />
+            <Reliability />
             <Features />
             <Audience />
             <AiSection />
@@ -51,17 +53,17 @@ function Hero() {
                 <div>
                     <Reveal>
                         <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-forest-600 backdrop-blur">
-                            <span className="h-1.5 w-1.5 rounded-full bg-forest-500 animate-pulse-ring" /> Committed-supply contracts
+                            <span className="h-1.5 w-1.5 rounded-full bg-forest-500 animate-pulse-ring" /> Committed supply, season-flexible
                         </span>
                     </Reveal>
                     <Reveal delay={0.05}>
                         <h1 className="mt-6 font-display text-[2.9rem] leading-[0.98] tracking-tight text-ink sm:text-6xl">
-                            Turn handshake supply into <span className="text-gradient italic">renewable contracts</span>.
+                            Committed local supply that <span className="text-gradient italic">flexes with your season</span>.
                         </h1>
                     </Reveal>
                     <Reveal delay={0.12}>
                         <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
-                            CropConnect binds farms and wholesale buyers to defined quantities, prices, and delivery cadences — then drafts the agreement and tracks every delivery. Predictable supply. Provable provenance.
+                            A handshake breaks. A rigid PO punishes a bad harvest. CropConnect contracts use quantity bands, a crop-failure clause, and an opt-out window — so farms get revenue certainty without yield risk, and buyers get reliable local supply without lock-in. You commit to a relationship, not a brittle number.
                         </p>
                     </Reveal>
                     <Reveal delay={0.18}>
@@ -72,8 +74,8 @@ function Hero() {
                     </Reveal>
                     <Reveal delay={0.24}>
                         <div className="mt-9 flex items-center gap-6 text-sm text-ink-muted">
-                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> No payments to set up</span>
-                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> Live in one metro</span>
+                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> Bands, not exact numbers</span>
+                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> Bad-weather shortfalls forgiven</span>
                         </div>
                     </Reveal>
                 </div>
@@ -101,12 +103,15 @@ function HeroVisual() {
                         <span className="badge bg-forest-50 text-forest-600"><span className="h-1.5 w-1.5 rounded-full bg-current" /> Active</span>
                     </div>
                     <h3 className="mt-3 font-display text-2xl text-ink">Heirloom tomatoes</h3>
-                    <p className="text-sm text-ink-muted">40 lb · weekly · Jun–Sep</p>
+                    <p className="text-sm text-ink-muted">30–50 lb/week · band · Jun–Sep</p>
+                    <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-2.5 py-1 text-2xs font-semibold text-forest-600">
+                        <Pulse size={12} /> Reliability 98%
+                    </div>
                     <div className="my-4 divider" />
                     <div className="flex items-end justify-between">
                         <div>
-                            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Committed value</p>
-                            <p className="font-display text-2xl text-forest-600">$5,200</p>
+                            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Committed range</p>
+                            <p className="font-display text-2xl text-forest-600">$3.9k–6.5k</p>
                         </div>
                         <div className="flex -space-x-2">
                             <span className="grid h-8 w-8 place-items-center rounded-full bg-forest-600 text-2xs font-bold text-white ring-2 ring-white">RF</span>
@@ -154,10 +159,83 @@ function LogoBand() {
     return (
         <div className="border-y border-line bg-white/40">
             <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-5 py-5 text-center text-sm text-ink-faint lg:px-8">
-                <span className="font-medium">What we sell is predictability and provability —</span>
+                <span className="font-medium">What we sell is flexible commitment and proven reliability —</span>
                 <span className="font-display text-lg italic text-ink-soft">not cheaper food.</span>
             </div>
         </div>
+    );
+}
+
+const FLEX = [
+    { Icon: Scale, title: "Quantity bands", body: "Commit to a range, not a number. “30–50 lb a week” — not exactly 40. Real farms can’t promise an exact yield months out, and real kitchens can’t promise exact demand. The band absorbs both." },
+    { Icon: Leaf, title: "Crop-failure clause", body: "Hail, drought, pests — when the weather wrecks a harvest, the shortfall is forgiven. No penalty, no breach. Built into every contract so a bad week never becomes a bad relationship." },
+    { Icon: Clock, title: "Opt-out window", body: "Life changes. Give notice inside the window and step out cleanly. Nobody is trapped in a deal that stopped working for them." },
+    { Icon: Calendar, title: "Short minimum commitment", body: "Start with a short minimum term so both sides can prove it out — then it stays flexible. You’re committing to a relationship, not signing your year away." },
+];
+
+function Flexibility() {
+    return (
+        <section className="bg-aurora py-20">
+            <div className="mx-auto max-w-6xl px-5 lg:px-8">
+                <Reveal>
+                    <p><span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-600"><span className="h-px w-5 bg-forest-400/60" /> The differentiator</span></p>
+                    <h2 className="mt-4 max-w-2xl font-display text-4xl leading-tight text-ink sm:text-5xl">Flexible commitment, not a rigid number.</h2>
+                    <p className="mt-4 max-w-xl text-lg text-ink-muted">A handshake gives you nothing to stand on. A fixed purchase order punishes the first bad harvest. CropConnect contracts bend where farming actually bends — so committing stops feeling risky.</p>
+                </Reveal>
+                <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    {FLEX.map((f) => (
+                        <StaggerItem key={f.title}>
+                            <div className="glass-card h-full p-6">
+                                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-50 text-forest-600"><f.Icon size={24} /></span>
+                                <h3 className="mt-4 font-display text-xl text-ink">{f.title}</h3>
+                                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">{f.body}</p>
+                            </div>
+                        </StaggerItem>
+                    ))}
+                </Stagger>
+            </div>
+        </section>
+    );
+}
+
+function Reliability() {
+    const points = [
+        { Icon: Pulse, t: "A real fulfillment record", b: "Every delivery you make — or miss — updates your reliability score. It’s history, not a testimonial." },
+        { Icon: Shield, t: "See it before you commit", b: "Check how dependable a farm or buyer has actually been, then decide. No more committing on a hunch." },
+        { Icon: Repeat, t: "Owned by the platform", b: "Your track record lives here. Build it over seasons — and leave it behind if you ever walk away." },
+    ];
+    return (
+        <section className="bg-paper-warm/60 py-20">
+            <div className="mx-auto max-w-6xl px-5 lg:px-8">
+                <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+                    <Reveal>
+                        <p><span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-600"><span className="h-px w-5 bg-forest-400/60" /> Reliability you can see</span></p>
+                        <h2 className="mt-4 font-display text-4xl leading-tight text-ink sm:text-5xl">Trust earned in deliveries, not words.</h2>
+                        <p className="mt-4 max-w-md text-lg text-ink-muted">Flexibility only works if both sides actually show up. So every fulfilled and missed delivery builds a reliability score on each profile — the trust layer, and the reason to stay.</p>
+                        <div className="mt-7 inline-flex items-center gap-4 rounded-3xl border border-line bg-white/70 px-6 py-4 backdrop-blur">
+                            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-500 text-white shadow-forest-glow"><Pulse size={24} /></span>
+                            <div>
+                                <p className="font-display text-3xl text-forest-600">98%</p>
+                                <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Deliveries fulfilled on band</p>
+                            </div>
+                        </div>
+                    </Reveal>
+                    <Stagger className="space-y-3">
+                        {points.map((p) => (
+                            <StaggerItem key={p.t}>
+                                <div className="flex items-start gap-4 glass-card p-5">
+                                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-forest-50 text-forest-600"><p.Icon size={22} /></span>
+                                    <div>
+                                        <p className="font-display text-lg text-ink">{p.t}</p>
+                                        <p className="mt-0.5 text-[15px] leading-relaxed text-ink-muted">{p.b}</p>
+                                    </div>
+                                </div>
+                            </StaggerItem>
+                        ))}
+                    </Stagger>
+                </div>
+            </div>
+        </section>
     );
 }
 
@@ -197,9 +275,9 @@ function ContractLoop() {
 
 const FEATURES = [
     { Icon: Nodes, title: "A living supply-chain board", body: "Map every step from harvest to drop-off on an editable, Miro-style canvas. Highlight exactly where the product is right now. Both parties keep it current until the contract closes." },
-    { Icon: Pen, title: "Instant agreement drafting", body: "Turn agreed terms into a clear, plain-language supply agreement in one click — no lawyer needed to start. The single biggest friction in committed local supply, gone." },
-    { Icon: Scale, title: "Value you can see", body: "Quantity × price × cadence becomes a committed value that accrues across the term. Negotiate with the numbers in front of you." },
-    { Icon: Shield, title: "Provable, renewable relationships", body: "Lightweight reputation tracks who fulfills and who renews. A renewed contract — not a one-off match — is the real proof of demand." },
+    { Icon: Pen, title: "Instant agreement drafting", body: "Turn agreed terms — bands, clauses, cadence, opt-out window — into a clear, plain-language agreement in one click. AI even suggests a fair starting point. No lawyer needed to begin." },
+    { Icon: Scale, title: "Bands you can see", body: "A quantity range × price × cadence becomes a committed value range that accrues across the term. Negotiate the band with the numbers right in front of you." },
+    { Icon: Shield, title: "Reliability that follows you", body: "Every fulfilled and missed delivery feeds a reliability score you can check before committing. A renewed contract — not a one-off match — is the real proof of demand." },
 ];
 
 function Features() {
@@ -234,9 +312,9 @@ function Audience() {
                     <div className="glass-card h-full overflow-hidden p-8">
                         <span className="grid h-14 w-14 place-items-center rounded-3xl bg-forest-50 text-forest-600"><Barn size={28} /></span>
                         <h3 className="mt-5 font-display text-3xl text-ink">For farms</h3>
-                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">A dependable, recurring sales channel. Lock in demand before the season, cut waste, and stop absorbing all the price uncertainty.</p>
+                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">Revenue certainty without yield risk. Lock in demand before the season inside a band you can actually hit — and if the weather turns, the crop-failure clause has your back.</p>
                         <ul className="mt-5 space-y-2.5">
-                            {["Predictable, committed revenue", "Less surplus and over-planting", "A direct channel you control"].map((x) => (
+                            {["Committed revenue, no exact-yield promise", "Bad-harvest shortfalls forgiven", "A reliability record that's yours to build"].map((x) => (
                                 <li key={x} className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="text-forest-500" /> {x}</li>
                             ))}
                         </ul>
@@ -246,9 +324,9 @@ function Audience() {
                     <div className="glass-card h-full overflow-hidden p-8">
                         <span className="grid h-14 w-14 place-items-center rounded-3xl bg-sky/10 text-sky"><Storefront size={28} /></span>
                         <h3 className="mt-5 font-display text-3xl text-ink">For buyers</h3>
-                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">Reliable local supply on standing terms — plus the provenance and story to market farm-to-table with confidence.</p>
+                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">Reliable local supply without lock-in. Plan menus around a dependable band, check a farm's reliability score before you commit, and step out cleanly through the opt-out window if you need to.</p>
                         <ul className="mt-5 space-y-2.5">
-                            {["Consistent inputs to plan menus around", "Local sourcing you can prove", "Standing terms, not weekly scrambles"].map((x) => (
+                            {["A supply band to plan menus around", "Vet reliability before you commit", "Opt-out window — no rigid lock-in"].map((x) => (
                                 <li key={x} className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="text-sky" /> {x}</li>
                             ))}
                         </ul>
@@ -267,14 +345,14 @@ function AiSection() {
                     <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
                         <div>
                             <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-harvest-300"><Sparkle size={14} /> Where AI fits</span>
-                            <h2 className="mt-5 font-display text-4xl leading-tight sm:text-5xl">We turn messy, informal supply into structured contracts — automatically.</h2>
-                            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75">AI is the enabler, not a veneer. It drafts the agreement from your agreed terms and ranks the counterparties most worth your time. Lead with the job done, not the model.</p>
+                            <h2 className="mt-5 font-display text-4xl leading-tight sm:text-5xl">We turn a messy handshake into a flexible contract — automatically.</h2>
+                            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75">AI is the enabler, not a veneer. It drafts the plain-language agreement from your terms, suggests a fair starting band and price, and ranks the counterparties most worth your time. Lead with the job done, not the model.</p>
                         </div>
                         <div className="space-y-3">
                             {[
-                                { Icon: Pen, t: "Contract generation", b: "Agreed terms → a clean supply agreement, instantly." },
+                                { Icon: Pen, t: "Plain-language drafting", b: "Bands, crop-failure clause, opt-out window → a clean agreement, instantly." },
+                                { Icon: Scale, t: "Fair starting point", b: "A suggested band and price to negotiate from, not a blank page." },
                                 { Icon: Compass, t: "Matching & recommendations", b: "The right farms and buyers, ranked by real fit." },
-                                { Icon: Pulse, t: "Built to learn", b: "Rule-based today; sharper as transactions accumulate." },
                             ].map((x) => (
                                 <div key={x.t} className="flex items-start gap-3.5 rounded-2xl bg-white/8 p-4 backdrop-blur">
                                     <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/12 text-harvest-300"><x.Icon size={20} /></span>

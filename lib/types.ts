@@ -91,14 +91,25 @@ export interface Profile {
     certifications: string[] | null;
     completed_contracts: number;
     renewed_contracts: number;
+    deliveries_confirmed: number;
+    deliveries_missed: number;
     created_at: string;
+}
+
+/** Fulfillment reliability derived from delivery history. */
+export function reliability(p: Pick<Profile, "deliveries_confirmed" | "deliveries_missed">) {
+    const total = (p.deliveries_confirmed ?? 0) + (p.deliveries_missed ?? 0);
+    const rate = total === 0 ? null : Math.round((p.deliveries_confirmed / total) * 100);
+    return { rate, total, confirmed: p.deliveries_confirmed ?? 0, missed: p.deliveries_missed ?? 0 };
 }
 
 /** Structured terms — the heart of every offer/need/contract version. */
 export interface Terms {
     crop: string;
     grade: string | null;
-    quantity: number; // per delivery
+    quantity: number; // typical / target per delivery
+    quantity_min: number | null; // flexible band — lower bound (null = exact)
+    quantity_max: number | null; // flexible band — upper bound
     unit: string; // lb, case, bushel, etc.
     cadence: Cadence;
     term_start: string; // ISO date
@@ -106,7 +117,16 @@ export interface Terms {
     unit_price_cents: number;
     delivery_terms: string | null; // who delivers / location / window
     quality_terms: string | null; // spec + rejection
+    // ---- flexibility / risk-sharing (the painkiller) ----
+    crop_failure_clause: boolean; // forgive weather/pest shortfalls, no penalty
+    opt_out_notice_days: number | null; // either party may adjust/exit with this notice
+    min_commit_cycles: number | null; // firm for the first N deliveries, flexible after
     notes: string | null;
+}
+
+/** Is this a flexible quantity band rather than an exact number? */
+export function hasBand(t: Terms): boolean {
+    return t.quantity_min != null && t.quantity_max != null && t.quantity_max > t.quantity_min;
 }
 
 export interface Listing {

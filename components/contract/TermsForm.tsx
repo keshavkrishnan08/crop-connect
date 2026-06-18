@@ -4,7 +4,8 @@ import * as React from "react";
 import { Field, Select, Textarea, FieldGroup } from "@/components/ui/kit";
 import { type Terms, type Cadence, CADENCE_LABEL } from "@/lib/types";
 import { contractValueCents, deliveryCount } from "@/lib/contract";
-import { formatMoney } from "@/lib/utils";
+import { formatMoney, cn } from "@/lib/utils";
+import { Shield, Leaf, Check } from "@/components/icons";
 
 const UNITS = ["lb", "kg", "case", "bushel", "crate", "flat", "dozen", "bunch", "unit"];
 const CROPS = [
@@ -45,7 +46,7 @@ export function TermsForm({
             </div>
 
             <div className="grid gap-4 sm:grid-cols-3">
-                <FieldGroup label="Quantity / delivery">
+                <FieldGroup label="Typical quantity / delivery">
                     <Field type="number" min={0} value={value.quantity || ""} onChange={(e) => set("quantity", Number(e.target.value))} />
                 </FieldGroup>
                 <FieldGroup label="Unit">
@@ -69,6 +70,53 @@ export function TermsForm({
                 <FieldGroup label="Term ends">
                     <Field type="date" value={value.term_end} onChange={(e) => set("term_end", e.target.value)} />
                 </FieldGroup>
+            </div>
+
+            {/* ---- Flexibility & risk-sharing: the painkiller ---- */}
+            <div className="rounded-2xl border border-forest-100 bg-forest-50/40 p-4 sm:p-5">
+                <div className="mb-3.5 flex items-center gap-2">
+                    <span className="grid h-8 w-8 place-items-center rounded-xl bg-white text-forest-600 shadow-glass"><Shield size={17} /></span>
+                    <div>
+                        <p className="text-sm font-semibold text-ink">Flexibility & risk-sharing</p>
+                        <p className="text-[12.5px] text-ink-muted">Commit to a relationship, not a brittle number.</p>
+                    </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <FieldGroup label="Flexible quantity band (optional)" hint="A good-faith range. Leave blank for an exact amount.">
+                        <div className="flex items-center gap-2">
+                            <Field type="number" min={0} placeholder="min" value={value.quantity_min ?? ""} onChange={(e) => set("quantity_min", e.target.value ? Number(e.target.value) : null)} />
+                            <span className="text-ink-faint">–</span>
+                            <Field type="number" min={0} placeholder="max" value={value.quantity_max ?? ""} onChange={(e) => set("quantity_max", e.target.value ? Number(e.target.value) : null)} />
+                            <span className="shrink-0 text-[13px] text-ink-muted">{value.unit}</span>
+                        </div>
+                    </FieldGroup>
+                    <div className="grid grid-cols-2 gap-4">
+                        <FieldGroup label="Firm cycles" hint="Committed deliveries">
+                            <Field type="number" min={0} placeholder="2" value={value.min_commit_cycles ?? ""} onChange={(e) => set("min_commit_cycles", e.target.value ? Number(e.target.value) : null)} />
+                        </FieldGroup>
+                        <FieldGroup label="Opt-out notice" hint="Days' notice">
+                            <Field type="number" min={0} placeholder="14" value={value.opt_out_notice_days ?? ""} onChange={(e) => set("opt_out_notice_days", e.target.value ? Number(e.target.value) : null)} />
+                        </FieldGroup>
+                    </div>
+                </div>
+
+                <button
+                    type="button"
+                    onClick={() => set("crop_failure_clause", !value.crop_failure_clause)}
+                    className={cn(
+                        "mt-3.5 flex w-full items-start gap-3 rounded-xl border p-3 text-left transition",
+                        value.crop_failure_clause ? "border-forest-300 bg-white" : "border-line bg-white/50",
+                    )}
+                >
+                    <span className={cn("mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-md border transition", value.crop_failure_clause ? "border-forest-500 bg-forest-500 text-white" : "border-line-strong bg-white")}>
+                        {value.crop_failure_clause && <Check size={13} />}
+                    </span>
+                    <span>
+                        <span className="flex items-center gap-1.5 text-sm font-semibold text-ink"><Leaf size={15} className="text-forest-500" /> Crop-failure clause</span>
+                        <span className="text-[12.5px] text-ink-muted">Shortfalls from weather, pests or disease are forgiven with notice — no penalty, no reliability hit.</span>
+                    </span>
+                </button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

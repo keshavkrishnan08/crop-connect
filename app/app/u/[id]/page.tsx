@@ -2,17 +2,20 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
-    LinkButton, Avatar, Badge, Spinner, EmptyState, Eyebrow, GlassCard,
+    LinkButton, Button, Avatar, Badge, Spinner, EmptyState, Eyebrow, GlassCard,
 } from "@/components/ui/kit";
+import { useToast } from "@/components/ui/Toast";
+import { ReliabilityBadge } from "@/components/contract/ReliabilityBadge";
 import {
     Barn, Storefront, MapPin, Check, Repeat, Wheat, ArrowRight, Leaf, Handshake,
 } from "@/components/icons";
 import { useAuth } from "@/lib/auth";
-import { getPublicProfile } from "@/lib/queries";
+import { getPublicProfile, proposeContract } from "@/lib/queries";
 import { contractValueCents, cadenceSummary } from "@/lib/contract";
 import { type Profile, type Listing } from "@/lib/types";
-import { cn, formatMoney } from "@/lib/utils";
+import { formatMoney } from "@/lib/utils";
 
 // ---------------- Reputation stat ----------------
 function Stat({ icon, value, label }: { icon: React.ReactNode; value: number; label: string }) {
@@ -30,50 +33,64 @@ function Stat({ icon, value, label }: { icon: React.ReactNode; value: number; la
 }
 
 // ---------------- Active listing card ----------------
-function ListingCard({ listing, index }: { listing: Listing; index: number }) {
+function ListingCard({ listing, index, canPropose, proposing, onPropose }: {
+    listing: Listing; index: number; canPropose: boolean; proposing: boolean; onPropose: () => void;
+}) {
     const t = listing.terms;
     const isSupply = listing.type === "supply";
     return (
-        <Link
-            href="/app/discover"
-            className="group block animate-fade-up"
-            style={{ animationDelay: `${120 + index * 60}ms` }}
-        >
-            <GlassCard hover className="flex h-full flex-col gap-4 p-5">
-                <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                        <h4 className="truncate font-display text-lg text-ink">{listing.title}</h4>
-                        <p className="mt-0.5 text-[13px] text-ink-muted">{cadenceSummary(t)}</p>
-                    </div>
-                    <Badge tone={isSupply ? "forest" : "sky"} className="shrink-0">
-                        {isSupply ? "Supplying" : "Seeking"}
-                    </Badge>
+        <GlassCard hover className="flex h-full flex-col gap-4 p-5 animate-fade-up" style={{ animationDelay: `${120 + index * 60}ms` }}>
+            <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                    <h4 className="truncate font-display text-lg text-ink">{listing.title}</h4>
+                    <p className="mt-0.5 text-[13px] text-ink-muted">{cadenceSummary(t)}</p>
                 </div>
+                <Badge tone={isSupply ? "forest" : "sky"} className="shrink-0">
+                    {isSupply ? "Supplying" : "Seeking"}
+                </Badge>
+            </div>
 
-                <div className="mt-auto flex items-end justify-between gap-3 border-t border-line pt-4">
-                    <div>
-                        <div className="text-2xs font-semibold uppercase tracking-[0.14em] text-ink-faint">
-                            Committed value
-                        </div>
-                        <div className="mt-1 font-display text-xl text-forest-600">
-                            {formatMoney(contractValueCents(t))}
-                        </div>
-                    </div>
-                    <span className="flex items-center gap-1 text-[13px] font-medium text-forest-500 transition-transform group-hover:translate-x-0.5">
-                        Propose <ArrowRight size={15} />
-                    </span>
+            <div className="mt-auto flex items-end justify-between gap-3 border-t border-line pt-4">
+                <div>
+                    <div className="text-2xs font-semibold uppercase tracking-[0.14em] text-ink-faint">Committed value</div>
+                    <div className="mt-1 font-display text-xl text-forest-600">{formatMoney(contractValueCents(t))}</div>
                 </div>
-            </GlassCard>
-        </Link>
+                {canPropose ? (
+                    <Button size="sm" loading={proposing} onClick={onPropose}>
+                        <Handshake size={15} /> Propose
+                    </Button>
+                ) : (
+                    <Link href="/app/discover" className="flex items-center gap-1 text-[13px] font-medium text-forest-500 hover:translate-x-0.5">
+                        View <ArrowRight size={15} />
+                    </Link>
+                )}
+            </div>
+        </GlassCard>
     );
 }
 
 // ---------------- Page ----------------
 export default function Page({ params }: { params: { id: string } }) {
     const { profile: me } = useAuth();
+    const router = useRouter();
+    const toast = useToast();
     const [loading, setLoading] = React.useState(true);
     const [profile, setProfile] = React.useState<Profile | null>(null);
     const [listings, setListings] = React.useState<Listing[]>([]);
+    const [proposingId, setProposingId] = React.useState<string | null>(null);
+
+    const propose = async (listing: Listing) => {
+        if (!me) return;
+        setProposingId(listing.id);
+        try {
+            const c = await proposeContract({ listing, meId: me.id, meRole: me.role, terms: listing.terms });
+            toast.success("Proposal sent", "Refine the terms on the contract.");
+            router.push(`/app/contracts/${c.id}`);
+        } catch {
+            setProposingId(null);
+            toast.error("Couldn't propose", "Please try again.");
+        }
+    };
 
     React.useEffect(() => {
         let active = true;
@@ -180,21 +197,14 @@ export default function Page({ params }: { params: { id: string } }) {
                 </div>
             </GlassCard>
 
-            {/* Reputation */}
+            {/* Reputation + reliability */}
             <section
-                className="animate-fade-up mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2"
+                className="animate-fade-up mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3"
                 style={{ animationDelay: "80ms" }}
             >
-                <Stat
-                    icon={<Check size={20} />}
-                    value={profile.completed_contracts}
-                    label="Contracts completed"
-                />
-                <Stat
-                    icon={<Repeat size={20} />}
-                    value={profile.renewed_contracts}
-                    label="Renewed"
-                />
+                <ReliabilityBadge profile={profile} size="lg" />
+                <Stat icon={<Check size={20} />} value={profile.completed_contracts} label="Contracts completed" />
+                <Stat icon={<Repeat size={20} />} value={profile.renewed_contracts} label="Renewed" />
             </section>
 
             {/* Crops / needs */}
@@ -247,7 +257,14 @@ export default function Page({ params }: { params: { id: string } }) {
                 ) : (
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         {listings.map((listing, i) => (
-                            <ListingCard key={listing.id} listing={listing} index={i} />
+                            <ListingCard
+                                key={listing.id}
+                                listing={listing}
+                                index={i}
+                                canPropose={!!me && !isSelf && me.role !== profile.role}
+                                proposing={proposingId === listing.id}
+                                onPropose={() => propose(listing)}
+                            />
                         ))}
                     </div>
                 )}
