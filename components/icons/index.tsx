@@ -304,6 +304,29 @@ export const Shield = (p: IconProps) => (
     </Base>
 );
 
+export const Copy = (p: IconProps) => (
+    <Base {...p}>
+        <rect x="9" y="9" width="11" height="11" rx="2.2" />
+        <path d="M5 15a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h7a2 2 0 0 1 2 2" />
+    </Base>
+);
+
+export const Download = (p: IconProps) => (
+    <Base {...p}>
+        <path d="M12 3v12M7.5 11 12 15.5 16.5 11" />
+        <path d="M4.5 19.5h15" />
+    </Base>
+);
+
+export const Share = (p: IconProps) => (
+    <Base {...p}>
+        <circle cx="6" cy="12" r="2.4" />
+        <circle cx="18" cy="6" r="2.4" />
+        <circle cx="18" cy="18" r="2.4" />
+        <path d="m8.1 10.9 7.8-3.8M8.1 13.1l7.8 3.8" />
+    </Base>
+);
+
 export const Repeat = (p: IconProps) => (
     <Base {...p}>
         <path d="M4 9a5 5 0 0 1 5-5h7l-2.5-2.5M20 15a5 5 0 0 1-5 5H8l2.5 2.5" />

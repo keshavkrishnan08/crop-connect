@@ -3,29 +3,33 @@
 import * as React from "react";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
-import { getMyContracts, getUpcomingDeliveries } from "@/lib/queries";
+import { getMyContracts, getUpcomingDeliveries, getMyListings } from "@/lib/queries";
 import { type Contract, type Delivery } from "@/lib/types";
 import { contractValueCents } from "@/lib/contract";
-import { formatMoney, formatDate, formatNumber } from "@/lib/utils";
+import { formatMoney, formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ContractCard } from "@/components/contract/ContractCard";
-import { Button, LinkButton, GlassCard, Spinner, EmptyState, Avatar } from "@/components/ui/kit";
+import { LinkButton, GlassCard, Spinner, EmptyState } from "@/components/ui/kit";
+import { CountUp } from "@/components/ui/CountUp";
 import {
     Pulse, Scale, Calendar as CalIcon, Repeat, Compass, Handshake, ArrowRight, Sparkle, Wheat,
+    User as UserIcon, Check,
 } from "@/components/icons";
 
 export default function DashboardPage() {
     const { profile } = useAuth();
     const [contracts, setContracts] = React.useState<Contract[] | null>(null);
     const [deliveries, setDeliveries] = React.useState<(Delivery & { contract: Contract })[]>([]);
+    const [listingCount, setListingCount] = React.useState(0);
 
     React.useEffect(() => {
         if (!profile) return;
         let active = true;
-        Promise.all([getMyContracts(profile.id), getUpcomingDeliveries(5)]).then(([c, d]) => {
+        Promise.all([getMyContracts(profile.id), getUpcomingDeliveries(5), getMyListings(profile.id)]).then(([c, d, l]) => {
             if (!active) return;
             setContracts(c);
             setDeliveries(d);
+            setListingCount(l.length);
         });
         return () => { active = false; };
     }, [profile]);
@@ -57,11 +61,14 @@ export default function DashboardPage() {
 
             {/* stats */}
             <div className="mb-7 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Stat icon={<Pulse size={20} />} label="Active contracts" value={formatNumber(activeContracts.length)} tone="forest" />
-                <Stat icon={<Scale size={20} />} label="Committed value" value={formatMoney(gmv, { compact: gmv > 1_000_00 })} tone="harvest" />
-                <Stat icon={<Handshake size={20} />} label="In negotiation" value={formatNumber(negotiating.length)} tone="sky" />
-                <Stat icon={<Repeat size={20} />} label="Renewals" value={formatNumber(renewed)} sub={`${completed} completed`} tone="forest" />
+                <Stat icon={<Pulse size={20} />} label="Active contracts" to={activeContracts.length} tone="forest" />
+                <Stat icon={<Scale size={20} />} label="Committed value" to={gmv} format={(n) => formatMoney(n, { compact: gmv > 1_000_00 })} tone="harvest" />
+                <Stat icon={<Handshake size={20} />} label="In negotiation" to={negotiating.length} tone="sky" />
+                <Stat icon={<Repeat size={20} />} label="Renewals" to={renewed} sub={`${completed} completed`} tone="forest" />
             </div>
+
+            {/* getting started */}
+            <GettingStarted profile={profile} hasListing={listingCount > 0} hasContract={contracts.length > 0} />
 
             {/* renewal prompts */}
             {renewSoon.length > 0 && (
@@ -161,14 +168,55 @@ export default function DashboardPage() {
     );
 }
 
-function Stat({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub?: string; tone: "forest" | "harvest" | "sky" }) {
+function Stat({ icon, label, to, format, sub, tone }: { icon: React.ReactNode; label: string; to: number; format?: (n: number) => string; sub?: string; tone: "forest" | "harvest" | "sky" }) {
     const toneCls = tone === "harvest" ? "bg-harvest-400/12 text-harvest-500" : tone === "sky" ? "bg-sky/10 text-sky" : "bg-forest-50 text-forest-600";
     return (
         <GlassCard className="p-5" hover>
             <span className={`mb-3 grid h-10 w-10 place-items-center rounded-2xl ${toneCls}`}>{icon}</span>
-            <p className="font-display text-3xl leading-none text-ink">{value}</p>
+            <p className="font-display text-3xl leading-none text-ink"><CountUp to={to} format={format} /></p>
             <p className="mt-1.5 text-[13px] font-medium text-ink-muted">{label}</p>
             {sub && <p className="text-2xs text-ink-faint">{sub}</p>}
+        </GlassCard>
+    );
+}
+
+function GettingStarted({ profile, hasListing, hasContract }: { profile: { full_name: string; bio: string | null; location_label: string | null }; hasListing: boolean; hasContract: boolean }) {
+    const steps = [
+        { done: !!(profile.bio || profile.location_label), label: "Complete your profile", sub: "Add your location and a short bio", href: "/app/profile", icon: UserIcon },
+        { done: hasListing, label: "Post your first listing", sub: "A supply offer or a buyer need", href: "/app/listings/new", icon: Wheat },
+        { done: hasContract, label: "Propose a contract", sub: "Find a match and commit to terms", href: "/app/discover", icon: Handshake },
+    ];
+    const completed = steps.filter((s) => s.done).length;
+    if (completed === steps.length) return null;
+    const pct = Math.round((completed / steps.length) * 100);
+
+    return (
+        <GlassCard className="mb-7 overflow-hidden p-0">
+            <div className="flex items-center justify-between gap-4 border-b border-line px-5 py-3.5">
+                <div className="flex items-center gap-2">
+                    <Sparkle size={17} className="text-harvest-500" />
+                    <h3 className="font-display text-lg text-ink">Get set up</h3>
+                </div>
+                <div className="flex items-center gap-2.5">
+                    <div className="h-1.5 w-28 overflow-hidden rounded-full bg-paper-sunk">
+                        <div className="h-full rounded-full bg-gradient-to-r from-forest-400 to-forest-600 transition-all duration-700" style={{ width: `${pct}%` }} />
+                    </div>
+                    <span className="text-2xs font-semibold text-ink-faint">{completed}/{steps.length}</span>
+                </div>
+            </div>
+            <div className="grid gap-px bg-line sm:grid-cols-3">
+                {steps.map((s) => (
+                    <Link key={s.label} href={s.href} className={`flex items-start gap-3 bg-white/70 px-5 py-4 transition hover:bg-paper-warm/70 ${s.done ? "opacity-60" : ""}`}>
+                        <span className={`mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-xl ${s.done ? "bg-forest-500 text-white" : "bg-forest-50 text-forest-600"}`}>
+                            {s.done ? <Check size={16} /> : <s.icon size={16} />}
+                        </span>
+                        <div>
+                            <p className={`text-sm font-semibold text-ink ${s.done ? "line-through decoration-ink-faint/40" : ""}`}>{s.label}</p>
+                            <p className="text-[12.5px] text-ink-muted">{s.sub}</p>
+                        </div>
+                    </Link>
+                ))}
+            </div>
         </GlassCard>
     );
 }
