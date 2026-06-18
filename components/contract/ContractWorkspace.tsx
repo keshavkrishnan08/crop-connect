@@ -26,9 +26,11 @@ import { ValueModel } from "@/components/visual/ValueModel";
 import { TermDiff } from "@/components/visual/TermDiff";
 import { SupplyChainBoard } from "@/components/visual/SupplyChainBoard";
 import { useToast } from "@/components/ui/Toast";
+import { useConfirm } from "@/components/ui/ConfirmDialog";
+import { Tooltip } from "@/components/ui/Tooltip";
 import {
-    Handshake, Pen, Nodes, Calendar as CalIcon, Scale, Sparkle, Check, X, ArrowRight,
-    Repeat, Pulse, MapPin,
+    Handshake, Pen, Nodes, Calendar as CalIcon, Sparkle, Check, X, ArrowRight,
+    Repeat, Pulse, Copy, Download, Share,
 } from "@/components/icons";
 
 type Tab = "negotiate" | "agreement" | "board" | "deliveries";
@@ -37,6 +39,7 @@ export function ContractWorkspace({ id }: { id: string }) {
     const { profile } = useAuth();
     const router = useRouter();
     const toast = useToast();
+    const confirm = useConfirm();
 
     const [contract, setContract] = React.useState<Contract | null>(null);
     const [messages, setMessages] = React.useState<NegotiationMessage[]>([]);
@@ -108,9 +111,20 @@ export function ContractWorkspace({ id }: { id: string }) {
         } finally { setBusy(false); }
     };
     const doDecline = async () => {
+        const ok = await confirm({
+            title: "Decline this contract?",
+            description: "This closes the negotiation for both parties and can't be undone.",
+            confirmLabel: "Decline", tone: "danger",
+        });
+        if (!ok) return;
         setBusy(true);
         try { await declineContract(contract, meId); toast.info("Contract closed"); await load(); }
         finally { setBusy(false); }
+    };
+
+    const copyLink = async () => {
+        try { await navigator.clipboard.writeText(window.location.href); toast.success("Link copied", "Share it with your counterparty."); }
+        catch { toast.error("Couldn't copy link"); }
     };
     const doRenew = async () => {
         setBusy(true);
@@ -157,9 +171,16 @@ export function ContractWorkspace({ id }: { id: string }) {
     return (
         <div className="animate-fade-up">
             {/* breadcrumb */}
-            <Link href="/app/contracts" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink">
-                <ArrowRight size={15} className="rotate-180" /> All contracts
-            </Link>
+            <div className="mb-4 flex items-center justify-between">
+                <Link href="/app/contracts" className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-muted hover:text-ink">
+                    <ArrowRight size={15} className="rotate-180" /> All contracts
+                </Link>
+                <Tooltip label="Copy contract link">
+                    <button onClick={copyLink} className="grid h-9 w-9 place-items-center rounded-xl border border-line bg-white/70 text-ink-soft transition hover:bg-white hover:text-ink">
+                        <Share size={16} />
+                    </button>
+                </Tooltip>
+            </div>
 
             {/* header */}
             <GlassCard className="mb-5 p-5 sm:p-6">
@@ -427,16 +448,43 @@ function AgreementPanel({ contract, onSaved }: { contract: Contract; onSaved: ()
         } finally { setLoading(false); }
     };
 
+    const copyAgreement = async () => {
+        try { await navigator.clipboard.writeText(text); toast.success("Agreement copied"); }
+        catch { toast.error("Couldn't copy"); }
+    };
+
+    const downloadAgreement = () => {
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `${contract.terms.crop || "supply"}-agreement.txt`.replace(/\s+/g, "-").toLowerCase();
+        a.click();
+        URL.revokeObjectURL(url);
+    };
+
     return (
         <GlassCard className="p-6">
-            <div className="mb-4 flex items-center justify-between">
+            <div className="mb-4 flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2">
                     <Pen size={18} className="text-forest-600" />
                     <h3 className="font-display text-xl text-ink">Supply agreement</h3>
                 </div>
-                <Button variant={text ? "ghost" : "primary"} size="sm" onClick={generate} loading={loading}>
-                    <Sparkle size={15} /> {text ? "Regenerate" : "Generate"}
-                </Button>
+                <div className="flex items-center gap-1.5">
+                    {text && (
+                        <>
+                            <Tooltip label="Copy">
+                                <button onClick={copyAgreement} className="grid h-9 w-9 place-items-center rounded-xl border border-line bg-white/70 text-ink-soft transition hover:bg-white hover:text-ink"><Copy size={16} /></button>
+                            </Tooltip>
+                            <Tooltip label="Download .txt">
+                                <button onClick={downloadAgreement} className="grid h-9 w-9 place-items-center rounded-xl border border-line bg-white/70 text-ink-soft transition hover:bg-white hover:text-ink"><Download size={16} /></button>
+                            </Tooltip>
+                        </>
+                    )}
+                    <Button variant={text ? "ghost" : "primary"} size="sm" onClick={generate} loading={loading}>
+                        <Sparkle size={15} /> {text ? "Regenerate" : "Generate"}
+                    </Button>
+                </div>
             </div>
             {!text ? (
                 <div className="rounded-2xl border border-dashed border-line-strong bg-paper-warm/60 px-6 py-12 text-center">
