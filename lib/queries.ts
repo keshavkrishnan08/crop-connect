@@ -25,6 +25,7 @@ export async function getProfile(id: string) {
 export async function createListing(input: {
     owner_id: string; type: ListingType; title: string; terms: Terms;
     price_ceiling_cents?: number | null; location_label?: string | null; lat?: number | null; lng?: number | null;
+    visibility?: "public" | "unlisted";
 }) {
     const { data, error } = await supabase.from("listings").insert(input).select().single();
     if (error) throw error;
@@ -46,6 +47,7 @@ export async function getOpenListings(type?: ListingType) {
         .from("listings")
         .select("*, owner:profiles!listings_owner_id_fkey(*)")
         .eq("status", "active")
+        .eq("visibility", "public")
         .order("created_at", { ascending: false });
     if (type) q = q.eq("type", type);
     const { data } = await q;
@@ -67,6 +69,7 @@ export async function setListingStatus(id: string, status: Listing["status"]) {
 
 export async function updateListing(id: string, patch: {
     title?: string; terms?: Terms; price_ceiling_cents?: number | null; location_label?: string | null;
+    visibility?: "public" | "unlisted";
 }) {
     const { error } = await supabase.from("listings").update(patch).eq("id", id);
     if (error) throw error;

@@ -29,6 +29,7 @@ export const DELIVERY_METHOD_LABEL: Record<DeliveryMethod, string> = {
 
 export type ListingType = "supply" | "need";
 export type ListingStatus = "active" | "paused" | "matched" | "archived";
+export type ListingVisibility = "public" | "unlisted";
 
 export type ContractStatus =
     | "draft"
@@ -152,6 +153,7 @@ export interface Listing {
     lat: number | null;
     lng: number | null;
     status: ListingStatus;
+    visibility: ListingVisibility;
     created_at: string;
     owner?: Profile;
 }

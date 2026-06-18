@@ -4,9 +4,10 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { getListing, updateListing } from "@/lib/queries";
-import { type Listing, type Terms } from "@/lib/types";
+import { type Listing, type Terms, type ListingVisibility } from "@/lib/types";
 import { PageHeader } from "@/components/app/PageHeader";
 import { TermsForm } from "@/components/contract/TermsForm";
+import { VisibilityToggle } from "@/components/contract/VisibilityToggle";
 import { Button, GlassCard, Field, FieldGroup, Spinner, EmptyState } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
 import { ArrowRight, Wheat } from "@/components/icons";
@@ -21,6 +22,7 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
     const [title, setTitle] = React.useState("");
     const [ceiling, setCeiling] = React.useState<number | null>(null);
     const [location, setLocation] = React.useState("");
+    const [visibility, setVisibility] = React.useState<ListingVisibility>("public");
     const [saving, setSaving] = React.useState(false);
 
     React.useEffect(() => {
@@ -31,6 +33,7 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
             setTitle(l.title);
             setCeiling(l.price_ceiling_cents);
             setLocation(l.location_label ?? "");
+            setVisibility(l.visibility ?? "public");
         });
     }, [params.id]);
 
@@ -58,6 +61,7 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
                 terms,
                 price_ceiling_cents: isNeed ? ceiling : null,
                 location_label: location || null,
+                visibility,
             });
             toast.success("Listing updated");
             router.push("/app/listings");
@@ -79,6 +83,9 @@ export default function EditListingPage({ params }: { params: { id: string } }) 
                 <FieldGroup label="Location" className="mt-5">
                     <Field value={location} onChange={(e) => setLocation(e.target.value)} placeholder="e.g. Sonoma County, CA" />
                 </FieldGroup>
+                <div className="mt-5">
+                    <VisibilityToggle value={visibility} onChange={setVisibility} />
+                </div>
                 <div className="mt-6 flex justify-end gap-2">
                     <Button variant="ghost" onClick={() => router.push("/app/listings")}>Cancel</Button>
                     <Button onClick={save} loading={saving}>Save changes <ArrowRight size={16} /></Button>
