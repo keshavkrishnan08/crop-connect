@@ -8,8 +8,8 @@ import { supabase } from "@/lib/supabase";
 import {
     getContract, getMessages, sendMessage, getBoard, addNode, updateNode, deleteNode,
     addEdge, deleteEdge, setEdgeLabel, highlightNode, setDeliveryStatus, rescheduleDelivery,
-    setDeliveryNote, confirmContract, counterContract, declineContract, renewContract,
-    completeContract, getCompletionRecords, sendSample, acceptSample, rejectSample,
+    setDeliveryNote, declareDelivery, confirmContract, counterContract, declineContract,
+    renewContract, completeContract, getCompletionRecords, sendSample, acceptSample, rejectSample,
 } from "@/lib/queries";
 import {
     type Contract, type NegotiationMessage, type BoardNode, type BoardEdge, type Terms,
@@ -230,6 +230,10 @@ export function ContractWorkspace({ id }: { id: string }) {
             setDeliveryNote(did, note || null);
         },
         onMissed: (did: string) => advanceDelivery(did, "missed"),
+        onDeclare: (did: string, qty: number, forgiven: boolean) => {
+            setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, declared_quantity: qty, shortfall_forgiven: forgiven } : d) } : c);
+            declareDelivery(did, qty, forgiven);
+        },
     };
 
     const TABS: { key: Tab; label: string; icon: React.ComponentType<{ size?: number }> }[] = [
@@ -327,7 +331,15 @@ export function ContractWorkspace({ id }: { id: string }) {
                     )}
 
                     {tab === "deliveries" && (
-                        <DeliveryCalendar deliveries={(contract.deliveries ?? []).filter((d) => !d.is_sample)} unit={t.unit} editable={boardEditable} handlers={deliveryHandlers} />
+                        <DeliveryCalendar
+                            deliveries={(contract.deliveries ?? []).filter((d) => !d.is_sample)}
+                            unit={t.unit}
+                            editable={boardEditable}
+                            isFarm={isFarm}
+                            band={hasBand(t) ? { min: t.quantity_min as number, max: t.quantity_max as number } : null}
+                            cropFailure={t.crop_failure_clause}
+                            handlers={deliveryHandlers}
+                        />
                     )}
                 </div>
 
