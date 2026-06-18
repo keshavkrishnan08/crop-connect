@@ -10,13 +10,18 @@ import { useToast } from "@/components/ui/Toast";
 import { useAuth } from "@/lib/auth";
 import { upsertProfile } from "@/lib/queries";
 import { cn, formatNumber } from "@/lib/utils";
-import { Barn, Storefront, Check, Repeat, Plus, Pen } from "@/components/icons";
+import { Barn, Storefront, Check, Repeat, Plus, Pen, Shield, MapPin, ArrowRight } from "@/components/icons";
 import type { Role } from "@/lib/types";
 
 const PRESETS = [
     "Heirloom tomatoes", "Mixed greens", "Strawberries", "Sweet corn",
     "Carrots", "Kale", "Bell peppers", "Berries", "Herbs", "Squash",
     "Apples", "Microgreens",
+];
+
+const CERT_PRESETS = [
+    "Certified Organic", "Certified Naturally Grown", "GAP Certified", "Non-GMO",
+    "Regenerative", "Fair Trade", "Animal Welfare Approved", "Food Safety (HACCP)",
 ];
 
 export default function ProfilePage() {
@@ -50,10 +55,14 @@ function ProfileForm({
     const [avatarUrl, setAvatarUrl] = useState(profile.avatar_url ?? "");
     const [location, setLocation] = useState(profile.location_label ?? "");
     const [bio, setBio] = useState(profile.bio ?? "");
+    const [website, setWebsite] = useState(profile.website ?? "");
+    const [phone, setPhone] = useState(profile.phone ?? "");
     const [tags, setTags] = useState<string[]>(
         (isFarm ? profile.crops : profile.needs) ?? [],
     );
+    const [certs, setCerts] = useState<string[]>(profile.certifications ?? []);
     const [custom, setCustom] = useState("");
+    const [customCert, setCustomCert] = useState("");
     const [saving, setSaving] = useState(false);
 
     const tagKey = isFarm ? "crops" : "needs";
@@ -63,6 +72,11 @@ function ProfileForm({
         const extra = tags.filter((t) => !PRESETS.includes(t));
         return [...PRESETS, ...extra];
     }, [tags]);
+
+    const certOptions = useMemo(() => {
+        const extra = certs.filter((c) => !CERT_PRESETS.includes(c));
+        return [...CERT_PRESETS, ...extra];
+    }, [certs]);
 
     function toggle(tag: string) {
         setTags((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
@@ -75,6 +89,17 @@ function ProfileForm({
         setCustom("");
     }
 
+    function toggleCert(cert: string) {
+        setCerts((prev) => (prev.includes(cert) ? prev.filter((c) => c !== cert) : [...prev, cert]));
+    }
+
+    function addCustomCert() {
+        const v = customCert.trim();
+        if (!v) return;
+        if (!certs.includes(v)) setCerts((prev) => [...prev, v]);
+        setCustomCert("");
+    }
+
     async function save() {
         setSaving(true);
         try {
@@ -85,6 +110,9 @@ function ProfileForm({
                 avatar_url: avatarUrl.trim() || null,
                 location_label: location.trim() || null,
                 bio: bio.trim() || null,
+                website: website.trim() || null,
+                phone: phone.trim() || null,
+                certifications: certs,
                 [tagKey]: tags,
             });
             await refreshProfile();
@@ -123,6 +151,32 @@ function ProfileForm({
                 </div>
             </div>
 
+            {(website.trim() || phone.trim() || location.trim()) && (
+                <div className="mb-6 flex flex-wrap items-center gap-x-5 gap-y-2 rounded-2xl border border-line bg-paper-warm/50 px-4 py-3 text-sm animate-fade-up" style={{ animationDelay: "30ms" }}>
+                    {location.trim() && (
+                        <span className="inline-flex items-center gap-1.5 text-ink-muted">
+                            <MapPin size={14} className="text-forest-500" /> {location.trim()}
+                        </span>
+                    )}
+                    {website.trim() && (
+                        <a
+                            href={website.trim()}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="inline-flex items-center gap-1.5 font-medium text-forest-600 transition-colors hover:text-forest-700"
+                        >
+                            {website.trim().replace(/^https?:\/\//, "")}
+                            <ArrowRight size={13} />
+                        </a>
+                    )}
+                    {phone.trim() && (
+                        <a href={`tel:${phone.trim()}`} className="inline-flex items-center gap-1.5 text-ink-muted transition-colors hover:text-ink">
+                            {phone.trim()}
+                        </a>
+                    )}
+                </div>
+            )}
+
             <GlassCard className="space-y-6 p-6 animate-fade-up sm:p-8" style={{ animationDelay: "60ms" }}>
                 {/* Avatar */}
                 <div className="flex items-center gap-5">
@@ -153,6 +207,27 @@ function ProfileForm({
                 <FieldGroup label="Location">
                     <Field value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Sonoma County, CA" />
                 </FieldGroup>
+
+                <div className="grid gap-5 sm:grid-cols-2">
+                    <FieldGroup label="Website" hint="Your farm or company site.">
+                        <Field
+                            value={website}
+                            onChange={(e) => setWebsite(e.target.value)}
+                            placeholder="https://sunriseacres.com"
+                            inputMode="url"
+                            type="url"
+                        />
+                    </FieldGroup>
+                    <FieldGroup label="Phone" hint="Shared with confirmed counterparties.">
+                        <Field
+                            value={phone}
+                            onChange={(e) => setPhone(e.target.value)}
+                            placeholder="(555) 010-2233"
+                            inputMode="tel"
+                            type="tel"
+                        />
+                    </FieldGroup>
+                </div>
 
                 <FieldGroup label="Bio" hint="A short line on who you are and what you're after.">
                     <Textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="We grow certified-organic row crops on 40 acres…" />
@@ -189,6 +264,50 @@ function ProfileForm({
                             placeholder="Add your own…"
                         />
                         <Button type="button" variant="soft" onClick={addCustom}>
+                            <Plus size={16} /> Add
+                        </Button>
+                    </div>
+                </div>
+
+                <div className="divider" />
+
+                {/* Certifications */}
+                <div>
+                    <div className="flex items-center gap-2">
+                        <span className="grid h-7 w-7 place-items-center rounded-lg bg-forest-50 text-forest-600">
+                            <Shield size={15} />
+                        </span>
+                        <label className="label !mb-0">Certifications</label>
+                    </div>
+                    <p className="mt-1 text-[12.5px] text-ink-faint">
+                        Credentials buyers can trust. They appear on your public profile.
+                    </p>
+                    <div className="mt-3 flex flex-wrap gap-2">
+                        {certOptions.map((cert) => {
+                            const active = certs.includes(cert);
+                            return (
+                                <button
+                                    key={cert}
+                                    type="button"
+                                    onClick={() => toggleCert(cert)}
+                                    className={cn(active ? "chip-active" : "chip")}
+                                >
+                                    {active ? <Check size={13} /> : <Shield size={13} />}
+                                    {cert}
+                                </button>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-3 flex gap-2">
+                        <Field
+                            value={customCert}
+                            onChange={(e) => setCustomCert(e.target.value)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") { e.preventDefault(); addCustomCert(); }
+                            }}
+                            placeholder="Add another certification…"
+                        />
+                        <Button type="button" variant="soft" onClick={addCustomCert}>
                             <Plus size={16} /> Add
                         </Button>
                     </div>
