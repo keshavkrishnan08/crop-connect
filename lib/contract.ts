@@ -84,6 +84,7 @@ export function fallbackAgreement(
         : `${terms.quantity} ${terms.unit} per delivery`;
 
     const flexLines: string[] = [];
+    if (terms.sample_first) flexLines.push("• Sample first: before the committed term begins, the Farm provides one sample delivery for the Buyer's approval. The full commitment takes effect only once the sample is accepted.");
     if (hasBand(terms)) flexLines.push(`• Quantity is a good-faith band of ${terms.quantity_min}–${terms.quantity_max} ${terms.unit}. The Farm supplies within this range each cycle; the Buyer accepts within it.`);
     if (terms.crop_failure_clause) flexLines.push("• Crop-failure clause: shortfalls caused by weather, pests, disease or other events outside the Farm's reasonable control are forgiven, with prompt notice, and do not count against the Farm.");
     if (terms.min_commit_cycles) flexLines.push(`• The first ${terms.min_commit_cycles} ${terms.min_commit_cycles === 1 ? "delivery is" : "deliveries are"} firmly committed by both parties.`);
@@ -165,6 +166,7 @@ export function suggestFairTerms(a: SideInput, b: SideInput): Terms {
         crop_failure_clause: true,
         opt_out_notice_days: 14,
         min_commit_cycles: 2,
+        sample_first: true,
         notes: null,
     };
 }
@@ -230,9 +232,15 @@ export function emptyTerms(overrides: Partial<Terms> = {}): Terms {
         crop_failure_clause: true,
         opt_out_notice_days: 14,
         min_commit_cycles: 2,
+        sample_first: true,
         notes: null,
         ...overrides,
     };
+}
+
+/** Quantity for the sample shipment — the band's low end, or the typical amount. */
+export function sampleQuantity(terms: Terms): number {
+    return terms.quantity_min ?? terms.quantity ?? 0;
 }
 
 /** Committed value as a range when a flexible band is set, else a single number. */

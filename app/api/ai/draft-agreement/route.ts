@@ -42,6 +42,7 @@ export async function POST(req: Request) {
             ? `${terms.quantity_min}-${terms.quantity_max} ${terms.unit} (target ${terms.quantity})`
             : `${terms.quantity} ${terms.unit}`,
         quantity_is_flexible_band: hasBand(terms),
+        sample_shipment_first: terms.sample_first,
         crop_failure_clause: terms.crop_failure_clause,
         min_committed_cycles: terms.min_commit_cycles,
         opt_out_notice_days: terms.opt_out_notice_days,
@@ -61,9 +62,9 @@ export async function POST(req: Request) {
             "Draft a clean, plain-language LOCAL SUPPLY AGREEMENT from the structured facts. " +
             "Be clear and fair to both parties. Use numbered sections: Product, Quantity & Cadence, Term, " +
             "Price, Delivery, Quality & Acceptance, Flexibility & Risk-Sharing, Renewal, Notes (omit Notes if none). " +
-            "In Flexibility & Risk-Sharing, cover whichever apply from the facts: the good-faith quantity band, the " +
-            "crop-failure clause (weather/pest shortfalls forgiven with notice), the minimum committed cycles, and the " +
-            "opt-out notice period. Keep it under 380 words. " +
+            "In Flexibility & Risk-Sharing, cover whichever apply from the facts: the sample shipment that must be accepted " +
+            "before the full commitment begins, the good-faith quantity band, the crop-failure clause (weather/pest shortfalls " +
+            "forgiven with notice), the minimum committed cycles, and the opt-out notice period. Keep it under 400 words. " +
             "Plain text only, no markdown. End with a one-line good-faith disclaimer that CropConnect is not a party " +
             "and a lawyer should review binding contracts. Do not invent terms not present in the facts.",
         prompt: `Draft the agreement from these facts:\n${JSON.stringify(facts, null, 2)}`,

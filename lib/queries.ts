@@ -4,7 +4,7 @@ import {
     type ContractStatus, type NegotiationMessage, type BoardNode, type BoardEdge,
     type Delivery, type NodeType, type NodeStatus,
 } from "@/lib/types";
-import { buildSchedule, defaultBoard, DEFAULT_EDGES, contractValueCents } from "@/lib/contract";
+import { buildSchedule, defaultBoard, DEFAULT_EDGES, contractValueCents, sampleQuantity } from "@/lib/contract";
 
 const FARM = "farm:profiles!contracts_farm_id_fkey(*)";
 const BUYER = "buyer:profiles!contracts_buyer_id_fkey(*)";
@@ -160,24 +160,74 @@ export async function confirmContract(contract: Contract, meId: string) {
     const isFarm = contract.farm_id === meId;
     const patch = isFarm ? { farm_confirmed: true } : { buyer_confirmed: true };
     const bothConfirmed = isFarm ? contract.buyer_confirmed : contract.farm_confirmed;
+    const sampleFirst = contract.terms.sample_first;
 
-    if (bothConfirmed) {
+    let body: string;
+    if (bothConfirmed && sampleFirst) {
+        // Both agree → a sample ships before anyone locks in the full term.
+        await supabase.from("contracts").update({ ...patch, status: "sampling" }).eq("id", contract.id);
+        await createSampleDelivery(contract);
+        body = "Both confirmed — a sample ships before the full commitment.";
+    } else if (bothConfirmed) {
         await supabase.from("contracts").update({ ...patch, status: "active" }).eq("id", contract.id);
         await generateScheduleAndBoard(contract);
         if (contract.listing_id) await setListingStatus(contract.listing_id, "matched");
+        body = "Confirmed — contract is now active.";
     } else {
-        const status: ContractStatus = "agreed";
-        await supabase.from("contracts").update({ ...patch, status }).eq("id", contract.id);
+        await supabase.from("contracts").update({ ...patch, status: "agreed" as ContractStatus }).eq("id", contract.id);
+        body = "Confirmed these terms. Awaiting the other party.";
     }
     await supabase.from("negotiation_messages").insert({
-        contract_id: contract.id, sender_id: meId, kind: "accept",
-        body: bothConfirmed ? "Confirmed — contract is now active." : "Confirmed these terms. Awaiting the other party.",
+        contract_id: contract.id, sender_id: meId, kind: "accept", body,
+    });
+}
+
+async function createSampleDelivery(contract: Contract) {
+    const { count } = await supabase.from("deliveries").select("*", { count: "exact", head: true })
+        .eq("contract_id", contract.id).eq("is_sample", true);
+    if (count) return;
+    const d = new Date();
+    d.setDate(d.getDate() + 3);
+    await supabase.from("deliveries").insert({
+        contract_id: contract.id, seq: 0, scheduled_date: d.toISOString().slice(0, 10),
+        quantity: sampleQuantity(contract.terms), status: "scheduled", is_sample: true,
+    });
+}
+
+/** Promote a sampling/agreed contract to active: build the schedule + board. */
+export async function activateContract(contract: Contract) {
+    await supabase.from("contracts").update({ status: "active" }).eq("id", contract.id);
+    await generateScheduleAndBoard(contract);
+    if (contract.listing_id) await setListingStatus(contract.listing_id, "matched");
+}
+
+/** Farm marks the sample as sent. */
+export async function sendSample(contractId: string) {
+    const { data } = await supabase.from("deliveries").select("id").eq("contract_id", contractId).eq("is_sample", true).single();
+    if (data) await supabase.from("deliveries").update({ status: "delivered" }).eq("id", data.id);
+}
+
+/** Buyer accepts the sample → the full committed term begins. */
+export async function acceptSample(contract: Contract, meId: string) {
+    const { data } = await supabase.from("deliveries").select("id").eq("contract_id", contract.id).eq("is_sample", true).single();
+    if (data) await supabase.from("deliveries").update({ status: "confirmed" }).eq("id", data.id);
+    await activateContract(contract);
+    await supabase.from("negotiation_messages").insert({
+        contract_id: contract.id, sender_id: meId, kind: "accept", body: "Sample accepted — the committed term is now active.",
+    });
+}
+
+/** Buyer declines the sample → reopen negotiation (nothing is locked in). */
+export async function rejectSample(contract: Contract, meId: string, note?: string) {
+    await supabase.from("contracts").update({ status: "countered", farm_confirmed: false, buyer_confirmed: false }).eq("id", contract.id);
+    await supabase.from("negotiation_messages").insert({
+        contract_id: contract.id, sender_id: meId, kind: "system", body: note || "Sample didn't meet spec — terms reopened.",
     });
 }
 
 async function generateScheduleAndBoard(contract: Contract) {
-    // deliveries
-    const { count } = await supabase.from("deliveries").select("*", { count: "exact", head: true }).eq("contract_id", contract.id);
+    // deliveries (committed only — the sample is separate)
+    const { count } = await supabase.from("deliveries").select("*", { count: "exact", head: true }).eq("contract_id", contract.id).eq("is_sample", false);
     if (!count) {
         const rows = buildSchedule(contract.terms).map((d) => ({
             contract_id: contract.id, seq: d.seq, scheduled_date: d.date, quantity: d.quantity, status: "scheduled" as const,

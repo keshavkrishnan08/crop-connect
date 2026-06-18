@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { type ContractStatus, CONTRACT_FLOW, CONTRACT_STATUS_META } from "@/lib/types";
-import { Pen, Sparkle, Handshake, Check, Pulse, Repeat } from "@/components/icons";
+import { Pen, Sparkle, Handshake, Check, Pulse, Repeat, Crate } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const ICONS: Partial<Record<ContractStatus, React.ComponentType<{ size?: number }>>> = {
-    draft: Pen, proposed: Sparkle, countered: Sparkle, agreed: Handshake, active: Pulse, completed: Check,
+    draft: Pen, proposed: Sparkle, countered: Sparkle, agreed: Handshake, sampling: Crate, active: Pulse, completed: Check,
 };
 
 /** Horizontal lifecycle rail with the current stage glowing. */
