@@ -355,6 +355,11 @@ export async function rescheduleDelivery(id: string, scheduled_date: string) {
     await supabase.from("deliveries").update({ scheduled_date }).eq("id", id);
 }
 
+/** Farm declares the actual amount it will bring this cycle (within the band). */
+export async function declareDelivery(id: string, declared_quantity: number, shortfall_forgiven = false) {
+    await supabase.from("deliveries").update({ declared_quantity, shortfall_forgiven }).eq("id", id);
+}
+
 export async function setDeliveryNote(id: string, note: string | null) {
     await supabase.from("deliveries").update({ note }).eq("id", id);
 }

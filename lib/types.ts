@@ -191,7 +191,9 @@ export interface Delivery {
     contract_id: string;
     seq: number;
     scheduled_date: string;
-    quantity: number;
+    quantity: number; // planned target for this cycle
+    declared_quantity: number | null; // what the farm actually commits this cycle (within band)
+    shortfall_forgiven: boolean; // crop-failure clause invoked — no penalty
     status: DeliveryStatus;
     is_sample: boolean;
     note: string | null;
