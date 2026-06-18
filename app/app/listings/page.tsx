@@ -4,7 +4,7 @@ import * as React from "react";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Badge, Button, LinkButton, EmptyState, Spinner } from "@/components/ui/kit";
-import { Wheat, Storefront, Plus, ArrowRight, Clock, Check } from "@/components/icons";
+import { Wheat, Storefront, Plus, ArrowRight, Clock, Check, Pen } from "@/components/icons";
 import { useAuth } from "@/lib/auth";
 import { getMyListings, setListingStatus } from "@/lib/queries";
 import { contractValueCents, cadenceSummary } from "@/lib/contract";
@@ -154,9 +154,16 @@ function ListingCard({
             </dl>
 
             <div className="mt-5 flex items-center justify-between gap-2 pt-1">
-                <LinkButton href="/app/discover" variant="ghost" size="sm">
-                    View matches <ArrowRight size={15} />
-                </LinkButton>
+                <div className="flex items-center gap-1.5">
+                    <LinkButton href="/app/discover" variant="ghost" size="sm">
+                        Matches <ArrowRight size={15} />
+                    </LinkButton>
+                    {togglable && (
+                        <LinkButton href={`/app/listings/${listing.id}/edit`} variant="ghost" size="sm" aria-label="Edit listing">
+                            <Pen size={15} />
+                        </LinkButton>
+                    )}
+                </div>
 
                 {togglable ? (
                     <Button variant="soft" size="sm" loading={saving} onClick={toggle}>

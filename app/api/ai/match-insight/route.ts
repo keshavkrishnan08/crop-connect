@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { claudeText, aiEnabled } from "@/lib/anthropic";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 
 export const runtime = "nodejs";
 
@@ -12,6 +13,9 @@ interface Body {
 }
 
 export async function POST(req: Request) {
+    if (!rateLimit(`match:${clientKey(req)}`, 30).ok) {
+        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
     let body: Body;
     try {
         body = await req.json();

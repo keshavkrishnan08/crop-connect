@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { claudeText, aiEnabled } from "@/lib/anthropic";
 import { fallbackAgreement, contractValueCents, deliveryCount } from "@/lib/contract";
+import { rateLimit, clientKey } from "@/lib/rate-limit";
 import type { Terms } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -12,6 +13,9 @@ interface Body {
 }
 
 export async function POST(req: Request) {
+    if (!rateLimit(`draft:${clientKey(req)}`, 15).ok) {
+        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
     let body: Body;
     try {
         body = await req.json();
