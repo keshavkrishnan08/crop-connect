@@ -34,7 +34,24 @@ SUPABASE_SERVICE_ROLE_KEY=...
 UBER_DIRECT_CUSTOMER_ID=...
 UBER_DIRECT_CLIENT_ID=...
 UBER_DIRECT_CLIENT_SECRET=...
+
+# Optional — real escrow payments via Stripe Connect.
+# Without these, the contract still works; the per-delivery "Fund" button just reports
+# payments aren't enabled. SUPABASE_SERVICE_ROLE_KEY is required for the webhook to mark
+# a delivery funded.
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...            # from `stripe listen` or the dashboard webhook
+NEXT_PUBLIC_APP_URL=http://localhost:3000  # used for Connect onboarding + Checkout return URLs
 ```
+
+## Payments (Stripe Connect escrow)
+
+1. Add the Stripe keys above + `SUPABASE_SERVICE_ROLE_KEY`.
+2. Point a webhook at `POST /api/stripe/webhook` for the `checkout.session.completed` event
+   (locally: `stripe listen --forward-to localhost:3000/api/stripe/webhook`).
+3. Flow: a farm connects payouts (Stripe Connect Express) from an active contract → the buyer
+   funds each delivery into escrow (Checkout) → confirming the delivery releases the funds to
+   the farm minus a 5% platform fee.
 
 ## 3. Run
 

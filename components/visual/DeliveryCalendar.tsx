@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { type Delivery, type DeliveryStatus } from "@/lib/types";
-import { formatDate, clamp } from "@/lib/utils";
-import { Check, Truck, Clock, X, Pen, Calendar as CalIcon, Leaf } from "@/components/icons";
+import { formatDate, clamp, formatMoney } from "@/lib/utils";
+import { Check, Truck, Clock, X, Pen, Calendar as CalIcon, Leaf, Scale } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const STATUS: Record<DeliveryStatus, { label: string; cls: string; icon: React.ComponentType<{ size?: number }> }> = {
@@ -24,7 +24,7 @@ export interface DeliveryHandlers {
 }
 
 export function DeliveryCalendar({
-    deliveries, unit, editable, isFarm, band, cropFailure, handlers = {},
+    deliveries, unit, editable, isFarm, band, cropFailure, paymentsOn, unitPriceCents, onFund, handlers = {},
 }: {
     deliveries: Delivery[];
     unit: string;
@@ -32,6 +32,9 @@ export function DeliveryCalendar({
     isFarm?: boolean;
     band?: { min: number; max: number } | null;
     cropFailure?: boolean;
+    paymentsOn?: boolean;
+    unitPriceCents?: number;
+    onFund?: (id: string) => void;
     handlers?: DeliveryHandlers;
 }) {
     const [openId, setOpenId] = React.useState<string | null>(null);
@@ -82,6 +85,7 @@ export function DeliveryCalendar({
                                                 <span>{d.quantity} {unit}</span>
                                             )}
                                         </p>
+                                        <PaymentBit d={d} paymentsOn={paymentsOn} isBuyer={!isFarm} unitPriceCents={unitPriceCents} onFund={onFund} />
                                     </div>
                                     {editable && next ? (
                                         <button onClick={() => handlers.onAdvance?.(d.id, next)} className="btn-soft btn-sm">
@@ -126,6 +130,28 @@ export function DeliveryCalendar({
             )}
         </div>
     );
+}
+
+function PaymentBit({ d, paymentsOn, isBuyer, unitPriceCents, onFund }: {
+    d: Delivery; paymentsOn?: boolean; isBuyer?: boolean; unitPriceCents?: number; onFund?: (id: string) => void;
+}) {
+    if (d.is_sample) return null;
+    if (d.payment_status === "released") {
+        return <span className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold text-forest-600"><Check size={12} /> Paid out</span>;
+    }
+    if (d.payment_status === "funded") {
+        return <span className="mt-1 inline-flex items-center gap-1 text-2xs font-semibold text-sky"><Scale size={12} /> Held in escrow</span>;
+    }
+    if (!paymentsOn) return null;
+    const amount = d.amount_cents ?? Math.round((d.declared_quantity ?? d.quantity) * (unitPriceCents ?? 0));
+    if (isBuyer && d.status !== "missed") {
+        return (
+            <button onClick={() => onFund?.(d.id)} className="btn-soft btn-sm mt-1.5">
+                <Scale size={13} /> Fund {formatMoney(amount)}
+            </button>
+        );
+    }
+    return <span className="mt-1 inline-flex items-center gap-1 text-2xs text-ink-faint"><Clock size={11} /> awaiting payment</span>;
 }
 
 /** The farm declares the actual amount for this cycle — bounded by the band, with a forgiven weather short. */
