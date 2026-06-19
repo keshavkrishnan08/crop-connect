@@ -18,6 +18,8 @@ import {
 import { contractValueCents, fallbackAgreement } from "@/lib/contract";
 import { qtyLabel } from "@/lib/display";
 import { ReliabilityBadge } from "@/components/contract/ReliabilityBadge";
+import { PaymentsPanel } from "@/components/contract/PaymentsPanel";
+import { fundDelivery, releaseDelivery } from "@/lib/payments";
 import { formatMoney, formatDate, relativeTime, cn } from "@/lib/utils";
 import { Avatar, Button, Spinner, GlassCard } from "@/components/ui/kit";
 import { StatusBadge } from "@/components/contract/StatusBadge";
@@ -215,8 +217,23 @@ export function ContractWorkspace({ id }: { id: string }) {
     };
 
     const advanceDelivery = async (did: string, next: DeliveryStatus) => {
+        const prev = contract?.deliveries?.find((d) => d.id === did);
         setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, status: next } : d) } : c);
         await setDeliveryStatus(did, next);
+        // confirming a funded delivery releases the escrow to the farm
+        if (next === "confirmed" && prev?.payment_status === "funded") {
+            const res = await releaseDelivery(did);
+            if (res.released) {
+                setContract((c) => c ? { ...c, deliveries: c.deliveries?.map((d) => d.id === did ? { ...d, payment_status: "released" } : d) } : c);
+                toast.success("Payment released", "Funds are on the way to the farm.");
+            }
+        }
+    };
+
+    const doFund = async (did: string) => {
+        const res = await fundDelivery(did);
+        if (res.url) { window.location.href = res.url; return; }
+        toast.error(res.error === "Payments not configured" ? "Payments aren't enabled on this deployment yet" : (res.error || "Couldn't start payment"));
     };
 
     const deliveryHandlers = {
@@ -338,6 +355,9 @@ export function ContractWorkspace({ id }: { id: string }) {
                             isFarm={isFarm}
                             band={hasBand(t) ? { min: t.quantity_min as number, max: t.quantity_max as number } : null}
                             cropFailure={t.crop_failure_clause}
+                            paymentsOn={!!contract.farm?.stripe_payouts_enabled}
+                            unitPriceCents={t.unit_price_cents}
+                            onFund={doFund}
                             handlers={deliveryHandlers}
                         />
                     )}
@@ -409,6 +429,8 @@ export function ContractWorkspace({ id }: { id: string }) {
                     </GlassCard>
 
                     <LogisticsPanel contract={contract} />
+
+                    {(boardEditable || sampling) && <PaymentsPanel contract={contract} isFarm={isFarm} />}
 
                     {completions.length > 0 && (
                         <GlassCard className="p-5">
