@@ -104,6 +104,8 @@ export interface Profile {
     renewed_contracts: number;
     deliveries_confirmed: number;
     deliveries_missed: number;
+    stripe_account_id: string | null;
+    stripe_payouts_enabled: boolean;
     created_at: string;
 }
 
@@ -198,8 +200,12 @@ export interface Delivery {
     shortfall_forgiven: boolean; // crop-failure clause invoked — no penalty
     status: DeliveryStatus;
     is_sample: boolean;
+    payment_status: PaymentStatus;
+    amount_cents: number | null;
     note: string | null;
 }
+
+export type PaymentStatus = "unpaid" | "funded" | "released";
 
 export interface BoardNode {
     id: string;
