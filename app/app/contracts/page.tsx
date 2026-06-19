@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { PageHeader } from "@/components/app/PageHeader";
 import { LinkButton, Spinner, EmptyState } from "@/components/ui/kit";
 import { ContractCard } from "@/components/contract/ContractCard";
+import { BringRelationshipButton } from "@/components/contract/BringRelationship";
 import { useAuth } from "@/lib/auth";
 import { getMyContracts } from "@/lib/queries";
 import { cn } from "@/lib/utils";
@@ -52,9 +53,12 @@ export default function ContractsPage() {
     );
 
     const findMatches = (
-        <LinkButton href="/app/discover" variant="primary">
-            <Compass size={16} /> Find matches
-        </LinkButton>
+        <>
+            <BringRelationshipButton variant="ghost" />
+            <LinkButton href="/app/discover" variant="primary">
+                <Compass size={16} /> Find matches
+            </LinkButton>
+        </>
     );
 
     return (

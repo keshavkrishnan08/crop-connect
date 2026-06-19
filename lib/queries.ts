@@ -2,7 +2,7 @@ import { supabase } from "@/lib/supabase";
 import {
     type Profile, type Listing, type ListingType, type Contract, type Terms,
     type ContractStatus, type NegotiationMessage, type BoardNode, type BoardEdge,
-    type Delivery, type NodeType, type NodeStatus,
+    type Delivery, type NodeType, type NodeStatus, type Role,
 } from "@/lib/types";
 import { buildSchedule, defaultBoard, DEFAULT_EDGES, contractValueCents, sampleQuantity } from "@/lib/contract";
 
@@ -131,6 +131,64 @@ export async function proposeContract(input: {
         body: `Contract proposed for ${input.terms.crop}.`, version_ref: 1,
     });
     return contract;
+}
+
+/** Search profiles by name / org / email (for bringing a known relationship online). */
+export async function searchProfiles(q: string, excludeId: string, role?: Role) {
+    const term = q.replace(/[%,]/g, "").trim();
+    if (term.length < 2) return [];
+    let query = supabase
+        .from("profiles")
+        .select("*")
+        .or(`full_name.ilike.%${term}%,org_name.ilike.%${term}%,email.ilike.%${term}%`)
+        .neq("id", excludeId)
+        .limit(8);
+    if (role) query = query.eq("role", role);
+    const { data } = await query;
+    return (data ?? []) as Profile[];
+}
+
+/** Create a contract directly with a known counterparty (no listing needed). */
+export async function createDirectContract(input: { meId: string; meRole: Role; counterpartyId: string; terms: Terms; note?: string }) {
+    const farm_id = input.meRole === "farm" ? input.meId : input.counterpartyId;
+    const buyer_id = input.meRole === "buyer" ? input.meId : input.counterpartyId;
+    const { data, error } = await supabase
+        .from("contracts")
+        .insert({ farm_id, buyer_id, terms: input.terms, status: "proposed", current_version: 1 })
+        .select()
+        .single();
+    if (error) throw error;
+    const contract = data as Contract;
+    await supabase.from("contract_versions").insert({ contract_id: contract.id, version: 1, terms: input.terms, proposed_by: input.meId, note: input.note ?? null });
+    await supabase.from("negotiation_messages").insert({ contract_id: contract.id, sender_id: input.meId, kind: "system", body: "Contract proposed to bring your relationship online.", version_ref: 1 });
+    return contract;
+}
+
+/** Create a shareable invite for a counterparty who isn't on CropConnect yet. */
+export async function createInvite(input: { meId: string; meRole: Role; email?: string; name?: string; terms: Terms; note?: string }) {
+    const { data, error } = await supabase
+        .from("contract_invites")
+        .insert({ inviter_id: input.meId, inviter_role: input.meRole, counterparty_email: input.email ?? null, counterparty_name: input.name ?? null, terms: input.terms, note: input.note ?? null })
+        .select("token")
+        .single();
+    if (error) throw error;
+    return (data as { token: string }).token;
+}
+
+export interface InviteView {
+    id: string; inviter_id: string; inviter_role: Role; inviter_name: string; inviter_org: string | null;
+    terms: Terms; note: string | null; status: string; contract_id: string | null;
+}
+
+export async function getInvite(token: string): Promise<InviteView | null> {
+    const { data } = await supabase.rpc("get_contract_invite", { p_token: token });
+    return Array.isArray(data) && data[0] ? (data[0] as InviteView) : null;
+}
+
+export async function claimInvite(token: string): Promise<string> {
+    const { data, error } = await supabase.rpc("claim_contract_invite", { p_token: token });
+    if (error) throw error;
+    return data as string;
 }
 
 /** Counter — push a new version and flip status to countered. */

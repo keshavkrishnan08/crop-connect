@@ -9,6 +9,7 @@ import { contractValueCents } from "@/lib/contract";
 import { formatMoney, formatDate } from "@/lib/utils";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ContractCard } from "@/components/contract/ContractCard";
+import { BringRelationshipButton } from "@/components/contract/BringRelationship";
 import { LinkButton, GlassCard, Spinner, EmptyState } from "@/components/ui/kit";
 import { CountUp } from "@/components/ui/CountUp";
 import {
@@ -56,7 +57,12 @@ export default function DashboardPage() {
                 eyebrow={profile.role === "farm" ? "Farm dashboard" : "Buyer dashboard"}
                 title={greeting}
                 subtitle="Your committed supply, at a glance."
-                actions={<LinkButton href="/app/discover"><Compass size={18} /> Find matches</LinkButton>}
+                actions={
+                    <>
+                        <BringRelationshipButton variant="ghost" />
+                        <LinkButton href="/app/discover"><Compass size={18} /> Find matches</LinkButton>
+                    </>
+                }
             />
 
             {/* stats */}
