@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
 import { LinkButton } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
+import { DemoBoard } from "@/components/landing/DemoBoard";
 import {
     Wheat, Compass, Handshake, Pen, Truck, Repeat, Sparkle, Nodes, Shield, Scale,
     Barn, Storefront, ArrowRight, Check, Pulse, Crate, MapPin, Leaf, Calendar, Clock,
@@ -15,6 +16,7 @@ export default function Landing() {
             <LogoBand />
             <Flexibility />
             <ContractLoop />
+            <Demo />
             <Reliability />
             <Features />
             <Audience />
@@ -69,7 +71,7 @@ function Hero() {
                     <Reveal delay={0.18}>
                         <div className="mt-8 flex flex-wrap items-center gap-3">
                             <LinkButton href="/signup" size="lg">Start a contract <ArrowRight size={17} /></LinkButton>
-                            <a href="#loop" className="btn-ghost btn-lg">See how it works</a>
+                            <a href="#demo" className="btn-ghost btn-lg">Try it live — no signup</a>
                         </div>
                     </Reveal>
                     <Reveal delay={0.24}>
@@ -279,6 +281,42 @@ const FEATURES = [
     { Icon: Scale, title: "Bands you can see", body: "A quantity range × price × cadence becomes a committed value range that accrues across the term. Negotiate the band with the numbers right in front of you." },
     { Icon: Shield, title: "Reliability that follows you", body: "Every fulfilled and missed delivery feeds a reliability score you can check before committing. A renewed contract — not a one-off match — is the real proof of demand." },
 ];
+
+function Demo() {
+    return (
+        <section id="demo" className="relative overflow-hidden border-y border-line bg-paper-warm/50 py-20">
+            <div className="pointer-events-none absolute inset-0 bg-aurora opacity-60" />
+            <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
+                <Reveal>
+                    <div className="mx-auto max-w-2xl text-center">
+                        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-forest-600 backdrop-blur">
+                            <Nodes size={13} /> Live — no signup
+                        </span>
+                        <h2 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl">
+                            Don't take our word for it. <span className="text-gradient italic">Try the board.</span>
+                        </h2>
+                        <p className="mt-4 text-lg text-ink-muted">
+                            Drag the steps. Connect them. Click a step to move where the product is right now. This is the real thing — go ahead, break it.
+                        </p>
+                    </div>
+                </Reveal>
+
+                <Reveal delay={0.1} y={28}>
+                    <div className="mt-10">
+                        <DemoBoard />
+                    </div>
+                </Reveal>
+
+                <Reveal delay={0.15}>
+                    <div className="mt-8 flex flex-col items-center gap-3">
+                        <p className="text-sm text-ink-muted">That's one feature. The whole contract runs like this.</p>
+                        <LinkButton href="/signup" size="lg">Start free — it takes a minute <ArrowRight size={17} /></LinkButton>
+                    </div>
+                </Reveal>
+            </div>
+        </section>
+    );
+}
 
 function Features() {
     return (
