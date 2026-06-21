@@ -36,7 +36,7 @@ export function ChatAgent() {
 
     return (
         <>
-            {/* launcher — a quiet round avatar, hidden while open */}
+            {/* launcher. a quiet round avatar, hidden while open */}
             {!open && (
                 <button onClick={() => setOpen(true)} aria-label={`Ask ${AGENT_NAME}`} title={`Ask ${AGENT_NAME}`}
                     className="group fixed bottom-5 left-5 z-[80] grid h-12 w-12 place-items-center rounded-full border border-line bg-canvas-soft/80 shadow-card backdrop-blur transition-all duration-200 hover:scale-105 hover:bg-canvas-soft hover:shadow-lift">

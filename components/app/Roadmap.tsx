@@ -17,7 +17,7 @@ export function Roadmap() {
     const nextId = steps.find((s) => !s.done)?.id;
 
     return (
-        <Card className="mb-6 overflow-hidden p-0">
+        <Card className="overflow-hidden p-0 transition-shadow duration-200 hover:shadow-lift">
             <div className="flex items-center justify-between border-b border-line bg-gradient-to-br from-brand-50/50 to-transparent px-5 py-4">
                 <div className="flex items-center gap-2">
                     <Sparkle size={17} className="text-brand-600" />
