@@ -30,7 +30,7 @@ export function ChatAgent() {
         setTimeout(() => {
             const r = respond(query, getState());
             setTyping(false);
-            setMsgs((m) => [...m, { role: "agent", ...r }]);
+            setMsgs((m) => [...m, r]);
         }, 550);
     }
 
