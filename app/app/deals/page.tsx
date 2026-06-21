@@ -12,8 +12,8 @@ export default function DealsPage() {
 
     return (
         <div className="animate-fade-up">
-            <PageHeader eyebrow="Deals" title="Local supply, surfaced for you"
-                subtitle="Sage watches the farms near you for surplus crops and standing offers. Grab one and we run the sourcing, the contract, and the delivery." />
+            <PageHeader eyebrow="Deals" title="Deals"
+                subtitle="Surplus crops near you. Tap to source." />
 
             <div className="mb-5 flex items-center gap-2 rounded-2xl border border-brand-200 bg-brand-50/60 px-4 py-3 text-[13px] font-medium text-brand-700">
                 <Sparkle size={16} /> {deals.filter((d) => !d.sourced).length} fresh deals near you this week, refreshed by your agent.

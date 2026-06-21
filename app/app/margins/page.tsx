@@ -22,7 +22,7 @@ export default function MarginsPage() {
 
     return (
         <div className="animate-fade-up">
-            <PageHeader eyebrow="Margin Studio" title="What local is worth to you" subtitle="A live model of the margin you capture by featuring local dishes. Every number is an editable estimate — a range, never a promise." />
+            <PageHeader eyebrow="Margin Studio" title="What local is worth to you" subtitle="A live model of the margin you capture by featuring local dishes. Every number is an editable estimate. a range, never a promise." />
 
             {/* headline + realized */}
             <div className="mb-6 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
@@ -57,7 +57,7 @@ export default function MarginsPage() {
             {/* levers */}
             <Card className="mb-6 p-5 sm:p-6">
                 <h3 className="mb-1 font-display text-xl text-ink">Assumptions</h3>
-                <p className="mb-5 text-[13px] text-ink-muted">Drag these to your reality. Conservative defaults — everything recomputes live.</p>
+                <p className="mb-5 text-[13px] text-ink-muted">Drag these to your reality. Conservative defaults. everything recomputes live.</p>
                 <div className="grid gap-6 sm:grid-cols-3">
                     <Lever label="Story price lift" hint="$ added to a featured dish" value={levers.priceLift} min={0} max={8} step={0.5} fmt={(v) => usd(v)} onChange={(v) => actions.setLevers({ priceLift: v })} />
                     <Lever label="Added produce cost" hint="$ extra per dish" value={levers.produceCostDelta} min={0} max={4} step={0.25} fmt={(v) => usd(v)} onChange={(v) => actions.setLevers({ produceCostDelta: v })} />
@@ -70,7 +70,7 @@ export default function MarginsPage() {
 
             {/* per-dish */}
             <Card className="overflow-hidden p-0">
-                <div className="border-b border-line px-5 py-3.5"><h3 className="font-display text-lg text-ink">Per-dish breakdown <span className="text-sm font-normal text-ink-faint">— click to feature</span></h3></div>
+                <div className="border-b border-line px-5 py-3.5"><h3 className="font-display text-lg text-ink">Per-dish breakdown <span className="text-sm font-normal text-ink-faint">,  click to feature</span></h3></div>
                 <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                         <thead>
@@ -120,8 +120,8 @@ function DishRow({ dish, levers, onToggle }: { dish: Dish; levers: import("@/lib
             </td>
             <td className="px-3 py-3 text-right font-mono text-ink-soft tnum">{usd(dish.price)}</td>
             <td className="px-3 py-3 text-right font-mono text-ink-muted tnum">{pct(cur.marginPct)}</td>
-            <td className="px-3 py-3 text-right font-mono tnum">{dish.featured ? <span className="text-harvest-500">{pct(mod.newMarginPct)}</span> : <span className="text-ink-faint">—</span>}</td>
-            <td className="px-5 py-3 text-right font-mono tnum">{dish.featured ? <span className="value-pos">+{usd(mod.incrementalGp)}</span> : <span className="text-ink-faint">—</span>}</td>
+            <td className="px-3 py-3 text-right font-mono tnum">{dish.featured ? <span className="text-harvest-500">{pct(mod.newMarginPct)}</span> : <span className="text-ink-faint">, </span>}</td>
+            <td className="px-5 py-3 text-right font-mono tnum">{dish.featured ? <span className="value-pos">+{usd(mod.incrementalGp)}</span> : <span className="text-ink-faint">, </span>}</td>
         </tr>
     );
 }

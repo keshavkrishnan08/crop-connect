@@ -68,7 +68,7 @@ export default function ItemPage({ params }: { params: { id: string } }) {
                     {item.stage === "matched" && farm && (
                         <Card className="p-6">
                             <div className="mb-4 flex items-center gap-2"><Pen size={18} className="text-brand-600" /><h2 className="font-display text-xl text-ink">Supply agreement</h2></div>
-                            <p className="mb-4 text-sm leading-relaxed text-ink-muted">A clear, standing agreement with <span className="font-semibold text-ink">{farm.name}</span> — no lawyer, no haggling. Confirm to lock the terms and generate the delivery schedule.</p>
+                            <p className="mb-4 text-sm leading-relaxed text-ink-muted">A clear, standing agreement with <span className="font-semibold text-ink">{farm.name}</span>. no lawyer, no haggling. Confirm to lock the terms and generate the delivery schedule.</p>
                             <dl className="mb-5 grid grid-cols-2 gap-x-6 gap-y-3 rounded-xl bg-canvas px-4 py-4 text-sm">
                                 <Row k="Crop" v={item.crop} />
                                 <Row k="Quantity" v={`${item.qtyPerWeek} ${item.unit} / week`} />

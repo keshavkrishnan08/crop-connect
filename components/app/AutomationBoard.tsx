@@ -25,7 +25,7 @@ function nodesFor(item: SourcingItem) {
 type Mode = { type: "node"; key: string; sx: number; sy: number; bx: number; by: number } | { type: "pan"; sx: number; sy: number; bx: number; by: number } | null;
 
 /**
- * A live model of what the agent is doing. The agent owns the graph — the user
+ * A live model of what the agent is doing. The agent owns the graph. the user
  * cannot create or edit nodes, only drag them around / pan to inspect the flow.
  */
 export function AutomationBoard({ items, fill = false }: { items: SourcingItem[]; fill?: boolean }) {

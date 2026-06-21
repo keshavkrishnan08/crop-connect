@@ -4,11 +4,12 @@ import * as React from "react";
 import Link from "next/link";
 import { useStore, STAGES, STAGE_LABEL, farmById, orderEscrow, ESCROW_LABEL, type SourcingItem } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
-import { Card, Badge, EmptyState, LinkButton } from "@/components/ui/kit";
+import { Card, EmptyState, LinkButton } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
 import { Receipt, Plus, MapPin, Check, Shield } from "@/components/icons";
 
-const ESC_TONE: Record<string, string> = { pending: "bg-canvas-sunk text-ink-faint", funded: "bg-brand-50 text-brand-600", held: "bg-harvest-400/15 text-harvest-600", releasing: "bg-brand-50 text-brand-600" };
+const ESC_TONE: Record<string, string> = { pending: "bg-canvas-sunk text-ink-faint", funded: "bg-sky-50 text-sky-600", held: "bg-violet-50 text-violet-600", releasing: "bg-brand-50 text-brand-600" };
+const STAGE_TONE: Record<string, string> = { requested: "bg-canvas-sunk text-ink-soft", matched: "bg-sky-50 text-sky-600", agreed: "bg-violet-50 text-violet-600", delivering: "bg-harvest-400/15 text-harvest-500", live: "bg-brand-50 text-brand-600" };
 
 export default function OrdersPage() {
     const items = useStore((s) => s.items);
@@ -16,8 +17,7 @@ export default function OrdersPage() {
 
     return (
         <div className="animate-fade-up">
-            <PageHeader eyebrow="Orders" title="Track every order"
-                subtitle="Each sourced ingredient, from request to plate, with its delivery progress and escrow status."
+            <PageHeader eyebrow="Orders" title="Orders" subtitle="Every order, request to plate."
                 actions={<LinkButton href="/app/sourcing/new"><Plus size={18} /> New order</LinkButton>} />
 
             {items.length === 0
@@ -43,7 +43,7 @@ function OrderRow({ item }: { item: SourcingItem }) {
                     <p className="text-[13px] text-ink-muted">{item.dishName}{farm && <> · <span className="inline-flex items-center gap-1 text-brand-600"><MapPin size={11} /> {farm.name}</span></>}</p>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                    <Badge tone="brand" dot>{STAGE_LABEL[item.stage]}</Badge>
+                    <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-2xs font-semibold", STAGE_TONE[item.stage])}><span className="h-1.5 w-1.5 rounded-full bg-current" /> {STAGE_LABEL[item.stage]}</span>
                     <span className={cn("inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-2xs font-semibold", ESC_TONE[esc.status])}><Shield size={11} /> {ESCROW_LABEL[esc.status]}</span>
                 </div>
             </div>
