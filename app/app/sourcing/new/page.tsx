@@ -6,6 +6,7 @@ import { actions, useStore } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card, Button, Field, Select, FieldGroup } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
+import { AutonomousRun } from "@/components/app/AutonomousRun";
 import { ArrowRight, Leaf } from "@/components/icons";
 
 const UNITS = ["lb", "case", "bunch", "flat", "dozen", "each"];
@@ -23,19 +24,21 @@ export default function NewNeedPage() {
     const [ceiling, setCeiling] = React.useState(4);
     const [season, setSeason] = React.useState("Seasonal");
     const [saving, setSaving] = React.useState(false);
+    const [run, setRun] = React.useState<{ id: string; crop: string } | null>(null);
 
     const valid = crop.trim() && qty > 0;
 
     const submit = () => {
         if (!valid) { toast.error("Add a crop and a weekly quantity"); return; }
         setSaving(true);
-        const id = actions.createNeed({ crop: crop.trim(), unit, qtyPerWeek: qty, priceCeiling: ceiling, dishName: dishName || `${crop} dish`, harvestWindow: season });
-        toast.success("Request created", "We're matching local farms now.");
-        router.push(`/app/sourcing/${id}`);
+        const c = crop.trim();
+        const id = actions.createNeed({ crop: c, unit, qtyPerWeek: qty, priceCeiling: ceiling, dishName: dishName || `${c} dish`, harvestWindow: season });
+        setRun({ id, crop: c });
     };
 
     return (
         <div className="animate-fade-up">
+            {run && <AutonomousRun itemId={run.id} crop={run.crop} onDone={() => { toast.success("Sourced", "It's running on your board now."); router.push("/app"); }} />}
             <PageHeader eyebrow="New request" title="Source an ingredient" subtitle="Tell us one thing you'd like to bring local. We'll match nearby farms and run the contract, deliveries, and story from there." />
             <Card className="max-w-2xl p-6">
                 <div className="grid gap-5">
@@ -63,11 +66,11 @@ export default function NewNeedPage() {
                     </FieldGroup>
 
                     <div className="flex items-center justify-between rounded-xl bg-brand-50/60 px-4 py-3">
-                        <span className="flex items-center gap-2 text-[13px] font-medium text-brand-700"><Leaf size={16} /> No commitment yet — you'll pick the farm and confirm terms next.</span>
+                        <span className="flex items-center gap-2 text-[13px] font-medium text-brand-700"><Leaf size={16} /> Hit go and we match the farm, draft the agreement, and schedule deliveries for you.</span>
                     </div>
 
                     <div className="flex justify-end">
-                        <Button onClick={submit} loading={saving} disabled={!valid}>Find local farms <ArrowRight size={16} /></Button>
+                        <Button onClick={submit} loading={saving} disabled={!valid}>Source it for me <ArrowRight size={16} /></Button>
                     </div>
                 </div>
             </Card>
