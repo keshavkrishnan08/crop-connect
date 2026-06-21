@@ -26,6 +26,13 @@ export default function NewNeedPage() {
     const [saving, setSaving] = React.useState(false);
     const [run, setRun] = React.useState<{ id: string; crop: string } | null>(null);
 
+    React.useEffect(() => {
+        const q = new URLSearchParams(window.location.search);
+        const c = q.get("crop"); if (c) setCrop(c);
+        const u = q.get("unit"); if (u) setUnit(u);
+        const p = q.get("price"); if (p && !Number.isNaN(Number(p))) setCeiling(Number(p));
+    }, []);
+
     const valid = crop.trim() && qty > 0;
 
     const submit = () => {

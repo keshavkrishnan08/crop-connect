@@ -6,6 +6,7 @@ import { useStore, marginRollup, farmById, getState, type Activity, type Activit
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
 import { AgentDock, AGENT_NAME } from "@/components/app/AgentDock";
+import { Roadmap } from "@/components/app/Roadmap";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { CountUp } from "@/components/ui/CountUp";
 import { usd, cn } from "@/lib/utils";
@@ -32,6 +33,7 @@ export default function Dashboard() {
 
             {/* the agent running it all */}
             <AgentDock />
+            <Roadmap />
 
             {/* done-for-you strip */}
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
