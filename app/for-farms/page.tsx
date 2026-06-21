@@ -176,12 +176,13 @@ export default function ForFarmsPage() {
                                 The spot market pays you to gamble. We pay you to grow. Here is what changes when a kitchen commits to your crop for a season.
                             </p>
                         </Reveal>
-                        <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            {BENEFITS.map((b) => (
+                        <Stagger className="mt-14 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                            {BENEFITS.map((b, i) => (
                                 <StaggerItem key={b.title}>
-                                    <Card className="h-full p-7">
-                                        <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-500/10 text-brand-600">{b.icon}</span>
-                                        <h3 className="mt-5 text-lg font-semibold text-ink">{b.title}</h3>
+                                    <Card className="group relative h-full overflow-hidden p-7 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift">
+                                        <span className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 bg-gradient-to-r from-brand-400 to-harvest-400 transition-transform duration-300 group-hover:scale-x-100" />
+                                        <span className={`grid h-12 w-12 place-items-center rounded-2xl text-white shadow-brand ${i % 3 === 1 ? "bg-gradient-to-br from-harvest-400 to-harvest-500" : "bg-gradient-to-br from-brand-500 to-brand-700"}`}>{b.icon}</span>
+                                        <h3 className="mt-5 font-display text-xl text-ink">{b.title}</h3>
                                         <p className="mt-2 text-[14.5px] leading-relaxed text-ink-muted">{b.body}</p>
                                     </Card>
                                 </StaggerItem>
