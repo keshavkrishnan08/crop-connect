@@ -28,7 +28,7 @@ type Mode = { type: "node"; key: string; sx: number; sy: number; bx: number; by:
  * A live model of what the agent is doing. The agent owns the graph — the user
  * cannot create or edit nodes, only drag them around / pan to inspect the flow.
  */
-export function AutomationBoard({ items }: { items: SourcingItem[] }) {
+export function AutomationBoard({ items, fill = false }: { items: SourcingItem[]; fill?: boolean }) {
     const lanes = items.length;
     const baseW = PAD * 2 + NODE_W * 5 + GAP_X * 4;
     const baseH = Math.max(LANE_H, lanes * LANE_H) + 12;
@@ -64,19 +64,29 @@ export function AutomationBoard({ items }: { items: SourcingItem[] }) {
     if (lanes === 0) return null;
 
     return (
-        <div className="relative">
-            <div className="mb-2.5 flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-1.5 text-2xs font-medium text-ink-faint">
-                    <Shield size={12} className="text-brand-500" /> Built and run by {AGENT_NAME} · view only · drag to arrange
-                </span>
-                {touched && <button onClick={reset} className="text-2xs font-semibold text-brand-600 hover:underline">Reset layout</button>}
-            </div>
+        <div className={fill ? "relative h-full" : "relative"}>
+            {!fill && (
+                <div className="mb-2.5 flex items-center justify-between gap-3">
+                    <span className="inline-flex items-center gap-1.5 text-2xs font-medium text-ink-faint">
+                        <Shield size={12} className="text-brand-500" /> Built and run by {AGENT_NAME} · view only · drag to arrange
+                    </span>
+                    {touched && <button onClick={reset} className="text-2xs font-semibold text-brand-600 hover:underline">Reset layout</button>}
+                </div>
+            )}
 
             <div
-                className="relative touch-none select-none overflow-hidden rounded-3xl border border-line bg-white bg-dots cursor-grab active:cursor-grabbing"
-                style={{ height: viewH }}
+                className={cn("relative touch-none select-none overflow-hidden bg-white bg-dots cursor-grab active:cursor-grabbing", fill ? "h-full w-full" : "rounded-3xl border border-line")}
+                style={{ height: fill ? "100%" : viewH }}
                 onPointerDown={onBgDown} onPointerMove={onMove} onPointerUp={onUp} onPointerLeave={onUp}
             >
+                {fill && (
+                    <div className="pointer-events-none absolute left-4 top-4 z-20 flex items-center gap-2">
+                        <span className="pointer-events-auto inline-flex items-center gap-1.5 rounded-full border border-line bg-white/90 px-3 py-1.5 text-2xs font-medium text-ink-faint shadow-sm backdrop-blur">
+                            <Shield size={12} className="text-brand-500" /> Built and run by {AGENT_NAME} · drag to arrange
+                        </span>
+                        {touched && <button onClick={reset} className="pointer-events-auto rounded-full border border-line bg-white/90 px-3 py-1.5 text-2xs font-semibold text-brand-600 shadow-sm backdrop-blur hover:bg-white">Reset layout</button>}
+                    </div>
+                )}
                 <div className="absolute inset-0" style={{ transform: `translate(${pan.x}px, ${pan.y}px)` }}>
                     {/* edges */}
                     <svg className="absolute left-0 top-0 overflow-visible" style={{ width: baseW, height: baseH }}>
