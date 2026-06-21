@@ -3,7 +3,8 @@
 import * as React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { actions } from "@/lib/store";
-import { Search, Shield, Pen, Truck, StoryTag, Check, Leaf, ArrowRight, Sparkle } from "@/components/icons";
+import { AgentAvatar, AGENT_NAME } from "@/components/app/AgentDock";
+import { Search, Shield, Pen, Truck, StoryTag, Check, ArrowRight, Sparkle } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
@@ -33,13 +34,10 @@ export function AutonomousRun({ itemId, crop, onDone }: { itemId: string; crop: 
             <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="w-full max-w-md overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-lift">
                 <div className="relative border-b border-line bg-gradient-to-br from-brand-50/70 to-transparent p-6">
                     <div className="flex items-center gap-3">
-                        <span className="relative grid h-11 w-11 place-items-center rounded-2xl bg-brand-600 text-white">
-                            <Leaf size={22} />
-                            {!done && <span className="absolute -inset-1 rounded-2xl ring-2 ring-brand-400/50 animate-pulse" />}
-                        </span>
+                        <AgentAvatar size={44} active={!done} />
                         <div>
-                            <p className="font-display text-xl leading-tight text-ink">{done ? "It's sourcing itself now" : `Sourcing your ${crop}`}</p>
-                            <p className="text-[13px] text-ink-muted">{done ? "Everything below is handled." : "Sit back. We are doing it for you."}</p>
+                            <p className="font-display text-xl leading-tight text-ink">{done ? `${AGENT_NAME} handled it` : `${AGENT_NAME} is sourcing your ${crop}`}</p>
+                            <p className="text-[13px] text-ink-muted">{done ? "Everything below is done. You did not lift a finger." : "Your agent is on it. Sit back."}</p>
                         </div>
                     </div>
                     <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-canvas-sunk">
