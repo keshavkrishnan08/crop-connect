@@ -16,3 +16,4 @@ supabase/
 pitch-deck.html
 /*.png
 test.txt
+.env*.bak
