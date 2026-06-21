@@ -6,6 +6,8 @@ import { Plus } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const ITEMS: { q: string; a: string }[] = [
+    { q: "Will my guests actually pay more?", a: "Yes, when the value is on the plate and on the menu. A named local farm and a fresher product give people a reason to pick the dish and feel good about the price. You set the prices. We give you the proof to stand behind them." },
+    { q: "How fast can I start?", a: "About ten minutes. You share your menu, pick one ingredient to begin with, and we take it from there. No installs, no integrations, no training your staff." },
     { q: "Do you mark up the food?", a: "No. We are not a distributor. You pay a flat fee for the service. The price you agree with the farm is the price you pay." },
     { q: "Do you take a cut of our sales?", a: "No. Every extra dollar your menu earns is yours to keep." },
     { q: "What if a crop comes up short?", a: "A backup farm covers you. There is no penalty and no scramble. You are never left without it." },
