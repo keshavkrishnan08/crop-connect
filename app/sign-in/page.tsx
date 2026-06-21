@@ -51,7 +51,7 @@ export default function SignInPage() {
         <div className="relative grid min-h-screen place-items-center overflow-hidden bg-aura px-5 py-12">
             <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.5] [mask-image:radial-gradient(60%_50%_at_50%_30%,black,transparent)]" />
             <div className="relative w-full max-w-sm">
-                <div className="mb-8 flex justify-center"><Link href="/"><Logo /></Link></div>
+                <div className="mb-8 flex justify-center"><Logo href="/" /></div>
 
                 <div className="card p-7">
                     <h1 className="font-display text-2xl text-ink">{mode === "signin" ? "Welcome back" : "Create your account"}</h1>
