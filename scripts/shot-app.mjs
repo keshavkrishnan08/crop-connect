@@ -1,0 +1,13 @@
+import { chromium } from "playwright";
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1280, height: 1000 } });
+await p.goto("http://localhost:3000/sign-in", { waitUntil: "networkidle" });
+await p.locator('button:has-text("Create account")').first().click();
+await p.fill('input[type="email"]', `shot+${Date.now()}@cropconnect.test`);
+await p.fill('input[type="password"]', "test123456");
+await p.locator('button[type="submit"]').click();
+await p.waitForURL("**/app", { timeout: 20000 });
+await p.waitForLoadState("networkidle");
+await p.waitForTimeout(2500);
+await p.screenshot({ path: "scripts/app-dashboard.png" });
+await b.close(); console.log("done");
