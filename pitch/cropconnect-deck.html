@@ -71,6 +71,17 @@
   table.cmp td.m{font-family:'JetBrains Mono',monospace;color:var(--ink-soft);white-space:nowrap}
   table.cmp tr.us td{background:var(--brand-50);font-weight:600;color:var(--ink)}
   table.cmp td b{color:var(--ink)}
+  .cstack{display:flex;flex-direction:column;gap:13px;margin-top:4px}
+  .ci{padding:13px 15px;border:1px solid var(--line);border-radius:11px;background:var(--canvas-soft)}
+  .ci .cn{font-weight:700;font-size:15.5px;color:var(--ink)}
+  .ci .cd{font-size:13px;line-height:1.4;color:var(--ink-muted);margin-top:3px}
+  .ci.us{background:var(--brand-50);border-color:var(--brand-200)}
+  .ci.us .cn{color:var(--brand)}
+  .lstack{display:flex;flex-direction:column;gap:12px;margin-top:6px}
+  .li .ln{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:15.5px;color:#fff}
+  .li .ln span{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--harvest);font-weight:600}
+  .li .ld{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.72);margin-top:2px}
+  .lesson{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14);font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.9)}
   /* cover */
   .cover .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
   .logo-lg{width:74px;height:74px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand-900));display:grid;place-items:center}
@@ -121,7 +132,7 @@
         </div></div>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">Source: National Restaurant Association; industry P&amp;L benchmarks</span><span class="pagenum">02</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">02</span></div>
   </section>
 
   <!-- 3 · PRODUCT -->
@@ -156,7 +167,7 @@
         <div class="col" style="flex:.92"><ul class="bullets">
           <li>TAM: <b class="data">$1.1T</b> US foodservice across <b class="data">1M+</b> outlets.</li>
           <li>SAM: <b class="data">34,000+</b> full-service restaurants where local moves the check.</li>
-          <li>SOM: one dense metro of pilots, then expand city by city.</li>
+          <li>SOM: the Indianapolis area first, then expand city by city.</li>
           <li>We bill the service layer, so revenue recurs and grows per location.</li>
         </ul></div>
         <div class="col"><div class="panel">
@@ -174,7 +185,7 @@
         </div></div>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">Source: Fortune Business Insights; National Restaurant Association (2024–25)</span><span class="pagenum">04</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">04</span></div>
   </section>
 
   <!-- 5 · BUSINESS MODEL (spreadsheet) -->
@@ -205,35 +216,35 @@
         </table>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">Illustrative. Food funded separately at cost; figures exclude it.</span><span class="pagenum">05</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">05</span></div>
   </section>
 
   <!-- 6 · COMPETITION -->
   <section class="slide">
     <div class="pad">
       <h2 class="title">Competition</h2>
-      <p class="sub">Big money has chased local food before. The winners and the wrecks teach the same two lessons.</p>
-      <div class="body" style="margin-top:14px">
-        <div class="col" style="flex:1.35"><div class="panel" style="padding:6px 22px 14px">
-          <table class="cmp">
-            <tr><th>Player</th><th>Model</th><th>Reported raise</th><th>The lesson</th></tr>
-            <tr><td><b>Sysco · US Foods</b></td><td>Broadline distribution</td><td class="m">Public, $40B+</td><td>Markup hidden in food. No local story.</td></tr>
-            <tr><td><b>Misfits Market</b></td><td>DTC produce boxes</td><td class="m">~$525M, ~$2B val</td><td>Owns warehouses and trucks. Capex heavy.</td></tr>
-            <tr><td><b>Good Eggs</b></td><td>Local grocery delivery</td><td class="m">~$190M</td><td>Over-expanded geographies. Logistics nearly sank it.</td></tr>
-            <tr><td><b>Full Harvest · ProducePay</b></td><td>B2B produce marketplace</td><td class="m">$45M–$350M+</td><td>A marketplace, not a done-for-you service.</td></tr>
-            <tr class="us"><td><b>CropConnect</b></td><td>Agent-run sourcing service</td><td class="m">Pre-seed</td><td>Asset-light. Regional. We own no trucks.</td></tr>
-          </table>
+      <div class="body" style="margin-top:18px;align-items:stretch">
+        <div class="col"><div class="panel" style="height:100%">
+          <div class="ptitle">Who we go up against</div>
+          <div class="cstack">
+            <div class="ci"><div class="cn">Market Wagon</div><div class="cd">Online local farmers market, Indianapolis-born. Fragmented consumer orders, and the kitchen still has to source.</div></div>
+            <div class="ci"><div class="cn">Sysco · US Foods</div><div class="cd">Broadline scale and trucks, but no local story and the markup is hidden in the food.</div></div>
+            <div class="ci"><div class="cn">Doing it yourself</div><div class="cd">Calling farms and chasing trucks. The second full-time job we take away.</div></div>
+            <div class="ci us"><div class="cn">CropConnect</div><div class="cd">Done-for-you B2B local sourcing for restaurants. Committed volume, run by an agent.</div></div>
+          </div>
         </div></div>
-        <div class="col"><div class="panel" style="background:var(--brand-900);border-color:var(--brand-900);color:#fff">
-          <div class="ptitle" style="color:rgba(255,255,255,.55)">What we learned</div>
-          <p style="font-size:17px;line-height:1.5;color:rgba(255,255,255,.92)">The two things that broke the highest-valued players were the same:</p>
-          <p style="font-size:16px;line-height:1.5;color:#fff;margin-top:12px"><b style="color:var(--harvest)">1. Physical distribution.</b> Owning trucks and warehouses crushed margins.</p>
-          <p style="font-size:16px;line-height:1.5;color:#fff;margin-top:8px"><b style="color:var(--harvest)">2. Leaving the region.</b> Expanding markets too early broke the model.</p>
-          <p style="font-size:15px;line-height:1.5;color:rgba(255,255,255,.8);margin-top:12px">We do neither. An agent orchestrates third-party logistics, and we stay dense in one metro before we add the next.</p>
+        <div class="col"><div class="panel" style="height:100%;background:var(--brand-900);border-color:var(--brand-900);color:#fff">
+          <div class="ptitle" style="color:rgba(255,255,255,.55)">Who came before, and what we learned</div>
+          <div class="lstack">
+            <div class="li"><div class="ln">Afresh<span>$148M</span></div><div class="ld">AI for grocery fresh ordering. Proves AI works here, but it sells software, not a done-for-you service.</div></div>
+            <div class="li"><div class="ln">Good Eggs<span>~$190M</span></div><div class="ld">Over-expanded geographies. Owning logistics nearly sank it.</div></div>
+            <div class="li"><div class="ln">Misfits Market<span>~$2B val</span></div><div class="ld">Owns warehouses and trucks. Capex crushed the margin.</div></div>
+          </div>
+          <div class="lesson"><b style="color:var(--harvest)">The lesson:</b> physical distribution and leaving the region broke them. We own no trucks and stay dense in Indianapolis first.</div>
         </div></div>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">Raises and valuations as publicly reported. For positioning only.</span><span class="pagenum">06</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">06</span></div>
   </section>
 
   <!-- 7 · WHY NOW -->
@@ -264,37 +275,37 @@
         </div></div>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">Source: National Restaurant Association; USDA AMS. Trend illustrative.</span><span class="pagenum">07</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">07</span></div>
   </section>
 
   <!-- 8 · THE ASK -->
   <section class="slide">
     <div class="pad">
       <h2 class="title">The ask</h2>
-      <p class="sub">Raising a $50K to $100K SAFE to prove the model in one metro. Almost every dollar goes to early validation.</p>
+      <p class="sub">Raising a $50K to $100K SAFE to onboard the first restaurants and farms in Indianapolis. Almost every dollar buys live customers.</p>
       <div class="body">
         <div class="col">
           <ul class="bullets">
-            <li><b>$50K–$100K SAFE.</b> Enough to run real sourcing for the first cohort.</li>
-            <li>Goal: <b class="data">10 to 15</b> paying restaurants with proven margin lift.</li>
-            <li><b class="data">95%</b> of the raise goes straight to validation, not overhead.</li>
-            <li>The proof, not the polish, unlocks the pre-seed.</li>
+            <li>$50K to $100K SAFE, with 95 percent spent onboarding both sides of the market.</li>
+            <li>We run sourcing and delivery at cost for the first month, so a kitchen has no reason to say no.</li>
+            <li>Goal: 10 to 15 paying restaurants and the farms that supply them, live with proven margin lift.</li>
+            <li>That proof, not polish, unlocks the pre-seed.</li>
           </ul>
         </div>
         <div class="col"><div class="panel" style="padding:8px 22px 16px">
           <table class="sheet">
             <caption>Use of funds · ~$75K midpoint</caption>
             <tr><th>Where it goes</th><th>Share</th><th>Amount</th></tr>
-            <tr><td>Pilot sourcing &amp; delivery</td><td>55%</td><td>$41K</td></tr>
-            <tr><td>Founder runway (hands-on sourcing)</td><td>25%</td><td>$19K</td></tr>
-            <tr><td>Part-time ops help</td><td>15%</td><td>$11K</td></tr>
-            <tr class="tot"><td>Early validation</td><td>95%</td><td>$71K</td></tr>
-            <tr><td>Tools, infra, legal</td><td>5%</td><td>$4K</td></tr>
+            <tr><td>Onboard restaurants</td><td>45%</td><td>$34K</td></tr>
+            <tr><td>Onboard farms</td><td>25%</td><td>$19K</td></tr>
+            <tr><td>Delivery, first month at cost</td><td>25%</td><td>$19K</td></tr>
+            <tr class="tot"><td>Live customers</td><td>95%</td><td>$72K</td></tr>
+            <tr><td>Tools, infra, legal</td><td>5%</td><td>$3K</td></tr>
           </table>
         </div></div>
       </div>
     </div>
-    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="src">SAFE, post-money cap to be set. Allocation illustrative.</span><span class="pagenum">08</span></div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">08</span></div>
   </section>
 
 </div>
