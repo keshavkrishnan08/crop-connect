@@ -194,7 +194,7 @@ function BusinessModel() {
     return (
         <Section>
             <Head eyebrow="Pricing" title="You fund the food at cost."
-                body="We are not a distributor, so we make nothing on your food. You pay the farm price and nothing more, with no cut of your sales. On top of that is one monthly service fee. It scales with how much we run for you, the number of farms and items, and it drops the longer you commit." />
+                body="We are not a distributor, so we make nothing on your food. You pay the farm price and nothing more, with no cut of your sales. On top of that is one monthly service fee. It scales only with the number of items we run, never the farms, and it drops the longer you commit." />
             <Reveal delay={0.1}><div className="mt-14"><MoneyFlow /></div></Reveal>
             <Reveal delay={0.14}><div className="mt-10 text-center"><LinkButton href="/pricing" variant="ghost">See pricing and build your plan <ArrowRight size={16} /></LinkButton></div></Reveal>
         </Section>

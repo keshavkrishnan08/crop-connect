@@ -71,17 +71,16 @@
   table.cmp td.m{font-family:'JetBrains Mono',monospace;color:var(--ink-soft);white-space:nowrap}
   table.cmp tr.us td{background:var(--brand-50);font-weight:600;color:var(--ink)}
   table.cmp td b{color:var(--ink)}
-  .cstack{display:flex;flex-direction:column;gap:13px;margin-top:4px}
-  .ci{padding:13px 15px;border:1px solid var(--line);border-radius:11px;background:var(--canvas-soft)}
-  .ci .cn{font-weight:700;font-size:15.5px;color:var(--ink)}
-  .ci .cd{font-size:13px;line-height:1.4;color:var(--ink-muted);margin-top:3px}
-  .ci.us{background:var(--brand-50);border-color:var(--brand-200)}
-  .ci.us .cn{color:var(--brand)}
-  .lstack{display:flex;flex-direction:column;gap:12px;margin-top:6px}
-  .li .ln{display:flex;justify-content:space-between;align-items:baseline;font-weight:700;font-size:15.5px;color:#fff}
-  .li .ln span{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--harvest);font-weight:600}
-  .li .ld{font-size:12.5px;line-height:1.4;color:rgba(255,255,255,.72);margin-top:2px}
-  .lesson{margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.14);font-size:14.5px;line-height:1.5;color:rgba(255,255,255,.9)}
+  .basiclist{display:flex;flex-direction:column}
+  .bi{font-size:14.5px;line-height:1.45;color:var(--ink-soft);padding:13px 0;border-bottom:1px solid var(--line)}
+  .bi:first-child{padding-top:2px}
+  .bi b{color:var(--ink)}
+  .catgroup{display:flex;flex-direction:column}
+  .cat{font-size:10.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);margin-top:13px;margin-bottom:2px}
+  .catgroup .cat:first-child{margin-top:0}
+  .pr{display:flex;justify-content:space-between;align-items:baseline;font-size:14px;color:var(--ink-soft);padding:6px 0;border-bottom:1px solid var(--line)}
+  .pr .v{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--ink);white-space:nowrap;padding-left:14px}
+  .takeaway{margin-top:16px;font-size:14.5px;line-height:1.5;color:var(--ink);font-weight:600}
   /* cover */
   .cover .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
   .logo-lg{width:74px;height:74px;border-radius:20px;background:linear-gradient(135deg,var(--brand),var(--brand-900));display:grid;place-items:center}
@@ -192,25 +191,24 @@
   <section class="slide" style="background:var(--canvas-soft)">
     <div class="pad">
       <h2 class="title">Business model</h2>
-      <p class="sub">Food passes through at cost. We earn a recurring monthly service fee that scales with usage. The model on one sheet.</p>
+      <p class="sub">Food passes through at cost. We earn a recurring monthly fee per item we run, never per farm. We handle the farms for free. The model on one sheet.</p>
       <div style="flex:1;display:flex;gap:28px;align-items:center;margin-top:18px">
         <table class="sheet" style="flex:1">
           <caption>Fee per account, monthly</caption>
           <tr><th>Line item</th><th>Unit</th><th>Monthly</th></tr>
-          <tr><td>Base platform</td><td>1</td><td>$149</td></tr>
-          <tr><td>Farms managed</td><td>2 × $60</td><td>$120</td></tr>
-          <tr><td>Items live</td><td>4 × $30</td><td>$120</td></tr>
-          <tr class="tot"><td>ARPA</td><td>—</td><td>$389</td></tr>
-          <tr><td>Annual run-rate</td><td>×12</td><td>$4,668</td></tr>
-          <tr><td>12-month term</td><td>−20%</td><td>$311</td></tr>
+          <tr><td>Base service</td><td>1</td><td>$149</td></tr>
+          <tr><td>Items live</td><td>3 × $30</td><td>$90</td></tr>
+          <tr class="tot"><td>ARPA (3 items)</td><td>—</td><td>$239</td></tr>
+          <tr><td>Annual run-rate</td><td>×12</td><td>$2,868</td></tr>
+          <tr><td>12-month term</td><td>−20%</td><td>$191</td></tr>
         </table>
         <table class="sheet" style="flex:1.25">
-          <caption>Recurring revenue by stage</caption>
+          <caption>Recurring revenue by stage · 3 items each</caption>
           <tr><th>Metric</th><th>Pilot</th><th>Year 1</th><th>Year 2</th></tr>
           <tr><td>Accounts</td><td>10</td><td>50</td><td>200</td></tr>
-          <tr><td>ARPA / mo</td><td>$389</td><td>$389</td><td>$420</td></tr>
-          <tr class="tot"><td>MRR</td><td>$3.9K</td><td>$19.5K</td><td>$84K</td></tr>
-          <tr><td>ARR</td><td>$47K</td><td>$233K</td><td>$1.0M</td></tr>
+          <tr><td>ARPA / mo</td><td>$239</td><td>$239</td><td>$250</td></tr>
+          <tr class="tot"><td>MRR</td><td>$2.4K</td><td>$12K</td><td>$50K</td></tr>
+          <tr><td>ARR</td><td>$29K</td><td>$143K</td><td>$600K</td></tr>
           <tr><td>Food markup</td><td>$0</td><td>$0</td><td>$0</td></tr>
           <tr><td>Cut of sales</td><td>$0</td><td>$0</td><td>$0</td></tr>
         </table>
@@ -223,25 +221,31 @@
   <section class="slide">
     <div class="pad">
       <h2 class="title">Competition</h2>
-      <div class="body" style="margin-top:18px;align-items:stretch">
-        <div class="col"><div class="panel" style="height:100%">
-          <div class="ptitle">Who we go up against</div>
-          <div class="cstack">
-            <div class="ci"><div class="cn">Market Wagon</div><div class="cd">Online local farmers market, Indianapolis-born. Fragmented consumer orders, and the kitchen still has to source.</div></div>
-            <div class="ci"><div class="cn">Sysco · US Foods</div><div class="cd">Broadline scale and trucks, but no local story and the markup is hidden in the food.</div></div>
-            <div class="ci"><div class="cn">Doing it yourself</div><div class="cd">Calling farms and chasing trucks. The second full-time job we take away.</div></div>
-            <div class="ci us"><div class="cn">CropConnect</div><div class="cd">Done-for-you B2B local sourcing for restaurants. Committed volume, run by an agent.</div></div>
+      <div class="body" style="margin-top:16px;align-items:flex-start;gap:64px">
+        <div class="col">
+          <div class="ptitle">Competitors</div>
+          <div class="basiclist">
+            <div class="bi"><b>Market Wagon</b> — Indianapolis local food marketplace. Direct to consumer and fragmented; the kitchen still has to source.</div>
+            <div class="bi"><b>Sysco · US Foods</b> — Broadline distribution. No local story, and the markup hides in the food.</div>
+            <div class="bi"><b>Doing it yourself</b> — Calling farms and chasing trucks. The full-time job we take away.</div>
           </div>
-        </div></div>
-        <div class="col"><div class="panel" style="height:100%;background:var(--brand-900);border-color:var(--brand-900);color:#fff">
-          <div class="ptitle" style="color:rgba(255,255,255,.55)">Who came before, and what we learned</div>
-          <div class="lstack">
-            <div class="li"><div class="ln">Afresh<span>$148M</span></div><div class="ld">AI for grocery fresh ordering. Proves AI works here, but it sells software, not a done-for-you service.</div></div>
-            <div class="li"><div class="ln">Good Eggs<span>~$190M</span></div><div class="ld">Over-expanded geographies. Owning logistics nearly sank it.</div></div>
-            <div class="li"><div class="ln">Misfits Market<span>~$2B val</span></div><div class="ld">Owns warehouses and trucks. Capex crushed the margin.</div></div>
+        </div>
+        <div class="col">
+          <div class="ptitle">Precursors</div>
+          <div class="catgroup">
+            <div class="cat">Software and AI · asset-light</div>
+            <div class="pr"><span>Choco — restaurant supply software</span><span class="v">$1.2B val</span></div>
+            <div class="pr"><span>Afresh — AI for fresh ordering</span><span class="v">$148M raised</span></div>
+            <div class="cat">Delivery and logistics · capex heavy</div>
+            <div class="pr"><span>Misfits Market — DTC produce</span><span class="v">~$2B val</span></div>
+            <div class="pr"><span>Imperfect Foods — produce boxes</span><span class="v">~$229M raised</span></div>
+            <div class="pr"><span>Good Eggs — local grocery</span><span class="v">~$190M raised</span></div>
+            <div class="cat">B2B produce marketplaces</div>
+            <div class="pr"><span>ProducePay — produce trade</span><span class="v">$300M+ raised</span></div>
+            <div class="pr"><span>Full Harvest — surplus produce</span><span class="v">$45M raised</span></div>
           </div>
-          <div class="lesson"><b style="color:var(--harvest)">The lesson:</b> physical distribution and leaving the region broke them. We own no trucks and stay dense in Indianapolis first.</div>
-        </div></div>
+          <div class="takeaway">Software and AI earn the valuations. Trucks and warehouses burned the cash. We are the software side.</div>
+        </div>
       </div>
     </div>
     <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">06</span></div>

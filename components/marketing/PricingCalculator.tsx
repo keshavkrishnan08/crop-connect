@@ -2,10 +2,9 @@
 
 import * as React from "react";
 import { motion } from "framer-motion";
-import { Farm, Leaf, Minus, Plus, Check } from "@/components/icons";
+import { Leaf, Minus, Plus, Check } from "@/components/icons";
 
 const BASE = 149;
-const PER_FARM = 60;
 const PER_ITEM = 30;
 const TERMS = [
     { label: "Monthly", disc: 0, note: "No commitment" },
@@ -14,11 +13,10 @@ const TERMS = [
 ];
 
 export function PricingCalculator() {
-    const [farms, setFarms] = React.useState(2);
-    const [items, setItems] = React.useState(4);
+    const [items, setItems] = React.useState(3);
     const [term, setTerm] = React.useState(0);
     const t = TERMS[term];
-    const gross = BASE + farms * PER_FARM + items * PER_ITEM;
+    const gross = BASE + items * PER_ITEM;
     const net = Math.round(gross * (1 - t.disc));
     const saved = gross - net;
 
@@ -26,8 +24,7 @@ export function PricingCalculator() {
         <div className="grid gap-4 overflow-hidden rounded-3xl border border-line bg-canvas-soft p-5 shadow-card sm:p-7 lg:grid-cols-[1.1fr_1fr]">
             {/* controls */}
             <div className="space-y-5">
-                <Stepper icon={<Farm size={17} />} label="Farms we source from" hint="More farms, more relationships to run." value={farms} min={1} max={8} onChange={setFarms} />
-                <Stepper icon={<Leaf size={17} />} label="Items on the program" hint="Each ingredient we keep live for you." value={items} min={1} max={15} onChange={setItems} />
+                <Stepper icon={<Leaf size={17} />} label="Items on the program" hint="Each ingredient we keep live for you. We handle the farms, free." value={items} min={1} max={15} onChange={setItems} />
                 <div>
                     <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Commitment</p>
                     <div className="grid grid-cols-3 gap-2">
@@ -39,6 +36,9 @@ export function PricingCalculator() {
                             </button>
                         ))}
                     </div>
+                </div>
+                <div className="flex items-start gap-2 rounded-xl bg-brand-50/60 px-3.5 py-3 text-[13px] text-brand-700">
+                    <Check size={15} className="mt-0.5 shrink-0 text-brand-500" /> We handle every farm, delivery, and contract. You are never charged per farm.
                 </div>
             </div>
 
@@ -53,7 +53,6 @@ export function PricingCalculator() {
 
                 <div className="mt-5 space-y-1.5 border-t border-line pt-4 font-mono text-[13px] text-ink-muted tnum">
                     <Row label="Base service" value={`$${BASE}`} />
-                    <Row label={`${farms} ${farms === 1 ? "farm" : "farms"}`} value={`$${farms * PER_FARM}`} />
                     <Row label={`${items} ${items === 1 ? "item" : "items"}`} value={`$${items * PER_ITEM}`} />
                     {t.disc > 0 && <Row label={`${t.label} discount`} value={`-$${saved}`} accent />}
                 </div>

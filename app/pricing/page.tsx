@@ -10,7 +10,7 @@ import { Check, X, ArrowRight, Receipt, Shield, Truck, Handshake, Leaf, Route, C
 
 export const metadata: Metadata = {
     title: "Pricing — CropConnect",
-    description: "You fund the food at cost. We charge a monthly service fee that scales with your farms and items, and drops the longer you commit.",
+    description: "You fund the food at cost. We charge a monthly service fee that scales with the number of items you run, and drops the longer you commit.",
 };
 
 const INCLUDED: { icon: ReactNode; label: string; sub: string }[] = [
@@ -51,7 +51,7 @@ export default function PricingPage() {
                         <Reveal><Eyebrow>The model</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Three simple parts.</h2></Reveal>
                         <Stagger className="mt-12 grid gap-6 md:grid-cols-3">
                             <StaggerItem><ModelCard icon={<Receipt size={20} />} title="Food at cost" body="You pay the farm price and nothing more. We make zero on the food itself, and we never take a cut of your sales." /></StaggerItem>
-                            <StaggerItem><ModelCard icon={<Leaf size={20} />} title="A modular service fee" body="One monthly fee for the work. It scales with the number of farms we manage and items we keep live. Pay for what you use." /></StaggerItem>
+                            <StaggerItem><ModelCard icon={<Leaf size={20} />} title="A modular service fee" body="One monthly fee for the work. It scales with the number of items we keep live. We handle every farm at no extra charge. Pay for what you use." /></StaggerItem>
                             <StaggerItem><ModelCard icon={<Handshake size={20} />} title="Discounts for commitment" body="The longer the term you agree to, the lower your monthly rate. Up to 20 percent off on a full year." featured /></StaggerItem>
                         </Stagger>
                     </div>
@@ -60,7 +60,7 @@ export default function PricingPage() {
                 {/* Calculator */}
                 <section className="border-b border-line">
                     <div className="mx-auto max-w-5xl px-5 py-24 lg:px-8 lg:py-32">
-                        <Reveal><Eyebrow>Build your plan</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Size the fee to your kitchen.</h2><p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-muted">Set how many farms and items you want us to run, pick a term, and see the monthly service fee. The food is funded separately, at cost.</p></Reveal>
+                        <Reveal><Eyebrow>Build your plan</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Size the fee to your kitchen.</h2><p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-muted">Set how many items you want us to run, pick a term, and see the monthly service fee. The food is funded separately, at cost.</p></Reveal>
                         <Reveal delay={0.1}><div className="mt-10"><PricingCalculator /></div></Reveal>
                     </div>
                 </section>
