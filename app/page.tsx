@@ -1,11 +1,13 @@
-// Landing — landing-page-guide-v2 framework (all 11 elements).
-// Aesthetic: refined B2B-premium. Fraunces display + Hanken body + JetBrains mono.
-// Palette: garden green (brand) + honey (harvest) on warm canvas. Tall sections, human copy.
+// Landing — landing-page-guide-v2 framework (all 11 elements), standard reasoning arc:
+// Hook -> Problem -> Promise/Result -> How it works -> The service -> Proof it's real ->
+// Recap -> Pricing -> Social proof -> Objections -> Close.
+// Aesthetic: refined B2B-premium. Fraunces + Hanken + JetBrains mono. Garden green + honey.
 import Link from "next/link";
 import { MarketingNav } from "@/components/marketing/Nav";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { ServiceFlow } from "@/components/marketing/ServiceFlow";
-import { MarginSliver, ResultMeter, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
+import { MarginSliver, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
+import { MenuRepricing } from "@/components/marketing/MenuRepricing";
 import { SocialProof } from "@/components/marketing/SocialProof";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
@@ -20,10 +22,13 @@ export default function Landing() {
             <MarketingNav />
             <main>
                 <Hero />
-                <Media />
-                <Produce />
                 <Problem />
-                <Benefits />
+                <Result />
+                <HowItWorks />
+                <Sourcing />
+                <Delivery />
+                <Produce />
+                <FullService />
                 <BusinessModel />
                 <Voices />
                 <Questions />
@@ -34,7 +39,7 @@ export default function Landing() {
     );
 }
 
-/* ---------- Hero ---------- */
+/* ---------- 1. Hook ---------- */
 function Hero() {
     return (
         <section className="relative overflow-hidden bg-aura">
@@ -62,31 +67,7 @@ function Word({ children, delay, className }: { children: React.ReactNode; delay
     return <span className={`inline-block animate-fade-up opacity-0 ${className ?? ""}`} style={{ animationDelay: `${delay}s` }}>{children}</span>;
 }
 
-/* ---------- Media ---------- */
-function Media() {
-    return (
-        <Section className="pt-20">
-            <div className="mx-auto max-w-2xl text-center">
-                <Reveal><h2 className="font-display text-4xl leading-tight sm:text-[3.4rem]">We handle every step for you.</h2></Reveal>
-                <Reveal delay={0.06}><p className="mt-5 text-lg leading-relaxed text-ink-muted">Tell us one ingredient you want on the menu. From there it is on us. We find the farm, sign the deal, deliver it every week, and hand you the proof of where it came from. Here is the whole loop.</p></Reveal>
-            </div>
-            <Reveal delay={0.1} y={28}><div className="mx-auto mt-14 max-w-3xl"><ServiceFlow /></div></Reveal>
-        </Section>
-    );
-}
-
-/* ---------- Produce — real photos, the good stuff ---------- */
-function Produce() {
-    return (
-        <Section tint>
-            <Head eyebrow="Fresh produce" title="Produce from farms near you."
-                body="Real food from farms near you, picked this week and brought to your door. Tomatoes that taste like tomatoes. Greens cut a few days ago. The kind of produce a guest notices on the first bite." />
-            <Reveal delay={0.1} y={24}><div className="mx-auto mt-14 max-w-4xl"><ProduceGallery /></div></Reveal>
-        </Section>
-    );
-}
-
-/* ---------- Problem (centered, tall) ---------- */
+/* ---------- 2. Problem ---------- */
 function Problem() {
     return (
         <Section tint>
@@ -97,70 +78,99 @@ function Problem() {
     );
 }
 
-/* ---------- Benefits (alternating, tall) ---------- */
-function Benefits() {
+/* ---------- 3. Promise / result — the menu reprices ---------- */
+function Result() {
     return (
-        <>
-            <Section>
-                <Split reverse
-                    text={<Benefit icon={<MarginUp size={22} />} eyebrow="The result" title="Local food lets you charge more."
-                        body="When a dish comes from a named farm down the road, people will pay more for it and feel good doing it. Your food cost barely moves. The menu price does. On a business this thin, that gap is almost pure profit."
-                        href="/demo" cta="See it on your menu" />}
-                    visual={<ResultMeter />}
-                />
-            </Section>
-            <Section tint>
-                <Split
-                    text={<Benefit icon={<Farm size={22} />} eyebrow="Sourcing" title="We find and vet the farms."
-                        body="We already know the growers near you. We rank them by distance, track record, and price, and we check each one before we ever put them in front of you. You see a short list and pick the one you like. No cold calls. No tasting through ten vendors. No guessing who will actually show up." />}
-                    visual={<FarmVetCard />}
-                />
-            </Section>
-            <Section>
-                <Split reverse
-                    text={<Benefit icon={<Truck size={22} />} eyebrow="Delivery" title="We deliver it every week."
-                        body="This is the part every chef dreads, so we own it end to end. We schedule the farm, book the courier, and confirm each drop before it lands. If a crop comes up short one week, a backup farm fills in without you lifting a finger. It simply arrives, on the same rhythm, every week." />}
-                    visual={<DeliverySchedule />}
-                />
-            </Section>
-            <Section tint>
-                <Head eyebrow="Full service" title="We do everything but the cooking."
-                    body="We take the entire job off your plate. You say what you want, and you put it on the menu. Everything in between is ours." />
-                <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-[1.5fr_1fr]">
-                    <Reveal>
-                        <Card className="h-full p-8">
-                            <p className="mb-5 text-2xs font-semibold uppercase tracking-wide text-brand-600">We handle</p>
-                            <Stagger className="grid gap-3.5 sm:grid-cols-2">
-                                {["Find the farms", "Vet and negotiate", "Hold the contract", "Deliver every week", "Cover shortfalls", "Hand you the proof"].map((w) => (
-                                    <StaggerItem key={w}><div className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="shrink-0 text-brand-500" /> {w}</div></StaggerItem>
-                                ))}
-                            </Stagger>
-                        </Card>
-                    </Reveal>
-                    <Reveal delay={0.08}>
-                        <Card className="flex h-full flex-col justify-center gap-4 p-8">
-                            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">You handle</p>
-                            {["Say what you want", "Put it on the menu"].map((y) => <div key={y} className="flex items-center gap-2.5 text-lg font-medium text-ink"><Leaf size={17} className="shrink-0 text-brand-600" /> {y}</div>)}
-                        </Card>
-                    </Reveal>
-                </div>
-            </Section>
-        </>
-    );
-}
-function Benefit({ icon, eyebrow, title, body, href, cta }: { icon: React.ReactNode; eyebrow: string; title: string; body: string; href?: string; cta?: string }) {
-    return (
-        <>
-            <span className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</span>
-            <Eyebrow>{eyebrow}</Eyebrow>
-            <h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.2rem]">{title}</h2>
-            <p className="mt-5 text-lg leading-relaxed text-ink-muted">{body}</p>
-            {href && cta && <div className="mt-8"><LinkButton href={href}>{cta} <ArrowRight size={16} /></LinkButton></div>}
-        </>
+        <Section>
+            <Split reverse
+                text={<Benefit icon={<MarginUp size={22} />} eyebrow="The result" title="Local food lets you charge more."
+                    body="When a dish comes from a named farm down the road, guests will pay more for it and feel good doing it. Your food cost barely moves. The menu price does. On a business this thin, that gap is almost pure profit."
+                    href="/demo" cta="See it on your menu" />}
+                visual={<MenuRepricing />}
+            />
+        </Section>
     );
 }
 
-/* ---------- Business model (centered, tall) ---------- */
+/* ---------- 4. How it works ---------- */
+function HowItWorks() {
+    return (
+        <Section tint className="pt-24">
+            <div className="mx-auto max-w-2xl text-center">
+                <Reveal><div className="flex justify-center"><Eyebrow>How it works</Eyebrow></div><h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.4rem]">We handle every step for you.</h2></Reveal>
+                <Reveal delay={0.06}><p className="mt-5 text-lg leading-relaxed text-ink-muted">Tell us one ingredient you want on the menu. From there it is on us. We find the farm, sign the deal, deliver it every week, and hand you the proof of where it came from. Here is the whole loop.</p></Reveal>
+            </div>
+            <Reveal delay={0.1} y={28}><div className="mx-auto mt-14 max-w-3xl"><ServiceFlow /></div></Reveal>
+        </Section>
+    );
+}
+
+/* ---------- 5a. Sourcing ---------- */
+function Sourcing() {
+    return (
+        <Section>
+            <Split
+                text={<Benefit icon={<Farm size={22} />} eyebrow="Sourcing" title="We find and vet the farms."
+                    body="We already know the growers near you. We rank them by distance, track record, and price, and we check each one before we ever put them in front of you. You see a short list and pick the one you like. No cold calls. No tasting through ten vendors. No guessing who will actually show up." />}
+                visual={<FarmVetCard />}
+            />
+        </Section>
+    );
+}
+
+/* ---------- 5b. Delivery ---------- */
+function Delivery() {
+    return (
+        <Section tint>
+            <Split reverse
+                text={<Benefit icon={<Truck size={22} />} eyebrow="Delivery" title="We deliver it every week."
+                    body="This is the part every chef dreads, so we own it end to end. We schedule the farm, book the courier, and confirm each drop before it lands. If a crop comes up short one week, a backup farm fills in without you lifting a finger. It simply arrives, on the same rhythm, every week." />}
+                visual={<DeliverySchedule />}
+            />
+        </Section>
+    );
+}
+
+/* ---------- 6. Proof it's real — photos ---------- */
+function Produce() {
+    return (
+        <Section>
+            <Head eyebrow="Fresh produce" title="Produce from farms near you."
+                body="Real food from farms near you, picked this week and brought to your door. Tomatoes that taste like tomatoes. Greens cut a few days ago. The kind of produce a guest notices on the first bite." />
+            <Reveal delay={0.1} y={24}><div className="mx-auto mt-14 max-w-4xl"><ProduceGallery /></div></Reveal>
+        </Section>
+    );
+}
+
+/* ---------- 7. Recap ---------- */
+function FullService() {
+    return (
+        <Section tint>
+            <Head eyebrow="Full service" title="We do everything but the cooking."
+                body="We take the entire job off your plate. You say what you want, and you put it on the menu. Everything in between is ours." />
+            <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-[1.5fr_1fr]">
+                <Reveal>
+                    <Card className="h-full p-8">
+                        <p className="mb-5 text-2xs font-semibold uppercase tracking-wide text-brand-600">We handle</p>
+                        <Stagger className="grid gap-3.5 sm:grid-cols-2">
+                            {["Find the farms", "Vet and negotiate", "Hold the contract", "Deliver every week", "Cover shortfalls", "Hand you the proof"].map((w) => (
+                                <StaggerItem key={w}><div className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="shrink-0 text-brand-500" /> {w}</div></StaggerItem>
+                            ))}
+                        </Stagger>
+                    </Card>
+                </Reveal>
+                <Reveal delay={0.08}>
+                    <Card className="flex h-full flex-col justify-center gap-4 p-8">
+                        <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">You handle</p>
+                        {["Say what you want", "Put it on the menu"].map((y) => <div key={y} className="flex items-center gap-2.5 text-lg font-medium text-ink"><Leaf size={17} className="shrink-0 text-brand-600" /> {y}</div>)}
+                    </Card>
+                </Reveal>
+            </div>
+        </Section>
+    );
+}
+
+/* ---------- 8. Pricing ---------- */
 function BusinessModel() {
     return (
         <Section>
@@ -172,7 +182,7 @@ function BusinessModel() {
     );
 }
 
-/* ---------- Testimonials ---------- */
+/* ---------- 9. Social proof ---------- */
 function Voices() {
     return (
         <Section tint>
@@ -184,7 +194,7 @@ function Voices() {
     );
 }
 
-/* ---------- FAQ ---------- */
+/* ---------- 10. Objections ---------- */
 function Questions() {
     return (
         <Section>
@@ -195,7 +205,7 @@ function Questions() {
     );
 }
 
-/* ---------- Final CTA ---------- */
+/* ---------- 11. Close ---------- */
 function FinalCta() {
     return (
         <Section>
@@ -216,12 +226,23 @@ function FinalCta() {
     );
 }
 
-/* ---------- layout primitives (taller) ---------- */
+/* ---------- layout primitives ---------- */
 function Section({ children, tint, className }: { children: React.ReactNode; tint?: boolean; className?: string }) {
     return <section className={`${tint ? "bg-canvas-soft" : ""} border-t border-line/60 py-28 sm:py-36 ${className ?? ""}`}><div className="mx-auto max-w-6xl px-5 lg:px-8">{children}</div></section>;
 }
-function Head({ eyebrow, title, body, line }: { eyebrow: string; title: string; body?: string; line?: string }) {
-    return <div className="mx-auto max-w-2xl text-center"><Reveal><div className="flex justify-center"><Eyebrow>{eyebrow}</Eyebrow></div><h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.4rem]">{title}</h2>{(body || line) && <p className="mt-5 text-lg leading-relaxed text-ink-muted">{body || line}</p>}</Reveal></div>;
+function Head({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
+    return <div className="mx-auto max-w-2xl text-center"><Reveal><div className="flex justify-center"><Eyebrow>{eyebrow}</Eyebrow></div><h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.4rem]">{title}</h2>{body && <p className="mt-5 text-lg leading-relaxed text-ink-muted">{body}</p>}</Reveal></div>;
+}
+function Benefit({ icon, eyebrow, title, body, href, cta }: { icon: React.ReactNode; eyebrow: string; title: string; body: string; href?: string; cta?: string }) {
+    return (
+        <>
+            <span className="mb-5 grid h-12 w-12 place-items-center rounded-2xl bg-brand-50 text-brand-600">{icon}</span>
+            <Eyebrow>{eyebrow}</Eyebrow>
+            <h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.2rem]">{title}</h2>
+            <p className="mt-5 text-lg leading-relaxed text-ink-muted">{body}</p>
+            {href && cta && <div className="mt-8"><LinkButton href={href}>{cta} <ArrowRight size={16} /></LinkButton></div>}
+        </>
+    );
 }
 function Split({ text, visual, reverse }: { text: React.ReactNode; visual: React.ReactNode; reverse?: boolean }) {
     return <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20"><Reveal className={reverse ? "lg:order-2" : ""}>{text}</Reveal><Reveal delay={0.1} className={reverse ? "lg:order-1" : ""}>{visual}</Reveal></div>;
