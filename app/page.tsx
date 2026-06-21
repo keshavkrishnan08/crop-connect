@@ -9,6 +9,7 @@ import { MarginSliver, ResultMeter, FarmVetCard, DeliverySchedule, MoneyFlow } f
 import { SocialProof } from "@/components/marketing/SocialProof";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
+import { ProduceGallery } from "@/components/marketing/ProduceGallery";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { LinkButton, Card, Eyebrow } from "@/components/ui/kit";
 import { ArrowRight, Check, Leaf, MarginUp, Farm, Truck } from "@/components/icons";
@@ -20,6 +21,7 @@ export default function Landing() {
             <main>
                 <Hero />
                 <Media />
+                <Produce />
                 <Problem />
                 <Benefits />
                 <BusinessModel />
@@ -41,7 +43,7 @@ function Hero() {
                 <Reveal><span className="badge-brand"><Leaf size={13} /> Local sourcing, done for you</span></Reveal>
                 <h1 className="mt-7 font-display text-[3.1rem] leading-[0.93] tracking-tight sm:text-[5.2rem]">
                     <Word delay={0.04}>Make</Word> <Word delay={0.1}>your</Word> <Word delay={0.16}>menu</Word>{" "}
-                    <span className="ink-grad"><Word delay={0.24}>more</Word> <Word delay={0.3}>profitable.</Word></span>
+                    <Word delay={0.24} className="ink-grad">more</Word> <Word delay={0.3} className="ink-grad">profitable.</Word>
                 </h1>
                 <Reveal delay={0.42}><p className="mx-auto mt-7 max-w-xl text-xl leading-relaxed text-ink-muted">You run the kitchen. We run the supply. Local ingredients let you raise prices and stand out, but sourcing them is a job most kitchens never have time for. We do the whole thing for you.</p></Reveal>
                 <Reveal delay={0.5}>
@@ -56,8 +58,8 @@ function Hero() {
         </section>
     );
 }
-function Word({ children, delay }: { children: React.ReactNode; delay: number }) {
-    return <span className="inline-block animate-fade-up opacity-0" style={{ animationDelay: `${delay}s` }}>{children}</span>;
+function Word({ children, delay, className }: { children: React.ReactNode; delay: number; className?: string }) {
+    return <span className={`inline-block animate-fade-up opacity-0 ${className ?? ""}`} style={{ animationDelay: `${delay}s` }}>{children}</span>;
 }
 
 /* ---------- Media ---------- */
@@ -69,6 +71,17 @@ function Media() {
                 <Reveal delay={0.06}><p className="mt-5 text-lg leading-relaxed text-ink-muted">Tell us one ingredient you want on the menu. From there it is on us. We find the farm, sign the deal, deliver it every week, and hand you the proof of where it came from. Here is the whole loop.</p></Reveal>
             </div>
             <Reveal delay={0.1} y={28}><div className="mx-auto mt-14 max-w-3xl"><ServiceFlow /></div></Reveal>
+        </Section>
+    );
+}
+
+/* ---------- Produce — real photos, the good stuff ---------- */
+function Produce() {
+    return (
+        <Section tint>
+            <Head eyebrow="Fresh produce" title="We get you the good stuff."
+                body="Real food from farms near you, picked this week and brought to your door. Tomatoes that taste like tomatoes. Greens cut a few days ago. The kind of produce a guest notices on the first bite." />
+            <Reveal delay={0.1} y={24}><div className="mx-auto mt-14 max-w-4xl"><ProduceGallery /></div></Reveal>
         </Section>
     );
 }
