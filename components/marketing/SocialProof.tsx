@@ -2,12 +2,12 @@
 
 import * as React from "react";
 
-/** Honest, non-money proof points. Counts up on view. No invented user counts. */
-const STATS: { to: number; suffix?: string; prefix?: string; label: string }[] = [
-    { to: 97, suffix: "%", label: "of a restaurant's revenue is cost" },
-    { to: 2, label: "steps you actually do" },
+/** Honest, non-money proof points. Counts up on view. */
+const STATS: { to: number; suffix?: string; label: string }[] = [
+    { to: 97, suffix: "%", label: "of revenue is cost" },
+    { to: 2, label: "steps for you" },
     { to: 0, label: "to set up" },
-    { to: 1, label: "ingredient to start" },
+    { to: 1, label: "dish to start" },
 ];
 
 export function SocialProof() {
@@ -19,11 +19,11 @@ export function SocialProof() {
         o.observe(el); return () => o.disconnect();
     }, []);
     return (
-        <div ref={ref} className="grid grid-cols-2 gap-px overflow-hidden rounded-2xl border border-line bg-line sm:grid-cols-4">
-            {STATS.map((s) => (
-                <div key={s.label} className="bg-canvas-soft px-5 py-6 text-center">
-                    <p className="font-display text-4xl text-ink tnum">{s.prefix}{show ? <Counter to={s.to} /> : 0}{s.suffix}</p>
-                    <p className="mt-1.5 text-[12.5px] leading-snug text-ink-muted">{s.label}</p>
+        <div ref={ref} className="flex flex-wrap items-stretch justify-center">
+            {STATS.map((s, i) => (
+                <div key={s.label} className="min-w-[112px] flex-1 border-l border-line/70 px-6 first:border-l-0">
+                    <p className="font-display text-[2.6rem] leading-none text-ink tnum">{show ? <Counter to={s.to} /> : 0}<span className="text-harvest-500">{s.suffix}</span></p>
+                    <p className="mt-2 text-[13px] text-ink-muted">{s.label}</p>
                 </div>
             ))}
         </div>
