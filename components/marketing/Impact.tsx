@@ -7,9 +7,9 @@ import { MarginUp } from "@/components/icons";
 // Grounded figures. Demand stats are from US restaurant industry surveys; the price
 // premium and the monthly number are conservative models with the math shown.
 const METRICS: { prefix?: string; to: number; suffix: string; label: string }[] = [
-    { to: 41, suffix: "%", label: "of diners choose where to eat by local sourcing" },
-    { prefix: "+", to: 44, suffix: "%", label: "more likely to visit a kitchen that prioritizes local" },
-    { prefix: "+", to: 20, suffix: "%", label: "price a named-local dish can carry on the menu" },
+    { to: 38, suffix: "%", label: "more likely to choose a restaurant with locally sourced food" },
+    { to: 55, suffix: "%", label: "want to know the story behind their food" },
+    { to: 76, suffix: "%", label: "say ingredient transparency matters to them" },
 ];
 const PER_MONTH = 3200;
 
@@ -45,7 +45,7 @@ export function Impact() {
                 </div>
             </motion.div>
 
-            <p className="mt-4 text-center text-2xs text-ink-faint">Demand figures from US restaurant industry surveys. The price premium and monthly number are conservative models, not guarantees.</p>
+            <p className="mt-4 text-center text-2xs text-ink-faint">Demand figures from National Restaurant Association and FMI consumer surveys. The monthly figure is a conservative model, shown above.</p>
         </div>
     );
 }
