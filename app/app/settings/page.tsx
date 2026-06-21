@@ -233,7 +233,7 @@ export default function SettingsPage() {
                                     <span className="text-[14px] text-ink-muted">/ month</span>
                                 </div>
                                 <p className="mt-1.5 text-[13.5px] text-ink-soft">
-                                    Flat service fee — not a markup on your food, not a cut of GMV.
+                                    Flat service fee. not a markup on your food, not a cut of GMV.
                                 </p>
                             </div>
                             <Badge tone="brand" dot>Active</Badge>
@@ -297,7 +297,7 @@ export default function SettingsPage() {
                     <SectionHead
                         icon={<Repeat size={18} />}
                         title="Danger zone"
-                        hint="Irreversible — start over with fresh sample data."
+                        hint="Irreversible. start over with fresh sample data."
                     />
 
                     <div className="flex flex-wrap items-center justify-between gap-4">

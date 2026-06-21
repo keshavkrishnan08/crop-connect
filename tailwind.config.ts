@@ -20,6 +20,9 @@ const config: Config = {
                 },
                 // Harvest — warm honey, reserved for value/margin
                 harvest: { 300: "#EFC97E", 400: "#E0A436", 500: "#C6881F" },
+                // small functional accents (status / category pops, used sparingly)
+                violet: { 50: "#f2effb", 400: "#8b5cf6", 500: "#7c3aed", 600: "#6b27cf" },
+                sky: { 50: "#ecf5fc", 400: "#38a8e6", 500: "#1f8fd1", 600: "#1577b3" },
                 danger: "#B4452F",
                 line: "rgba(22, 36, 28, 0.10)",
                 "line-strong": "rgba(22, 36, 28, 0.17)",

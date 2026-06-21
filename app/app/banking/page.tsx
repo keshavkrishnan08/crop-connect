@@ -20,8 +20,8 @@ export default function BankingPage() {
 
     return (
         <div className="animate-fade-up">
-            <PageHeader eyebrow="Banking" title="Escrow, payouts, and contracts"
-                subtitle="We hold the food payment in escrow and release it to the farm only after a delivery is confirmed. You never prepay a no-show." />
+            <PageHeader eyebrow="Banking" title="Banking"
+                subtitle="Escrow, payouts, and contracts." />
 
             {/* summary */}
             <div className="mb-6 grid gap-4 sm:grid-cols-3">

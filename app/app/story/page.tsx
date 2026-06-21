@@ -9,13 +9,13 @@ import { usd, pct, cn } from "@/lib/utils";
 import { useStore, farmById, type SourcingItem, type Farm as FarmModel } from "@/lib/store";
 
 // ---------------------------------------------------------------------------
-// Menu-copy generation — pure templating, no LLM. We pull a single clean clause
+// Menu-copy generation. pure templating, no LLM. We pull a single clean clause
 // from the farm's narrative fields and stitch a chef-ready provenance sentence.
 // ---------------------------------------------------------------------------
 
 function leadClause(farm: FarmModel): string {
     // Prefer a tight clause from the farm's story; fall back to its first practice.
-    const sentence = (farm.story || "").split(/[.;—]/)[0].trim();
+    const sentence = (farm.story || "").split(/[.;, ]/)[0].trim();
     if (sentence) {
         // Lowercase the lead so it reads as a continuation of our sentence.
         return sentence.charAt(0).toLowerCase() + sentence.slice(1);
@@ -26,7 +26,7 @@ function leadClause(farm: FarmModel): string {
 
 function menuCopy(item: SourcingItem, farm: FarmModel): string {
     const crop = item.crop.charAt(0).toUpperCase() + item.crop.slice(1);
-    return `${crop} from ${farm.name}, ${farm.distanceMi} miles up the road — ${leadClause(farm)}.`;
+    return `${crop} from ${farm.name}, ${farm.distanceMi} miles up the road. ${leadClause(farm)}.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -52,7 +52,7 @@ function StoryCard({ item, farm }: { item: SourcingItem; farm: FarmModel }) {
     return (
         <Card className="animate-fade-up p-6 sm:p-7">
             <div className="flex flex-col gap-6 lg:flex-row lg:gap-8">
-                {/* main column — the story */}
+                {/* main column. the story */}
                 <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2.5">
                         <Badge tone="brand"><Shield size={13} />Verified Local</Badge>
@@ -100,7 +100,7 @@ function StoryCard({ item, farm }: { item: SourcingItem; farm: FarmModel }) {
                     </div>
                 </div>
 
-                {/* side column — diner QR */}
+                {/* side column. diner QR */}
                 <div className="lg:w-[180px] lg:shrink-0">
                     <div className="flex flex-col items-center rounded-xl border border-dashed border-line-strong bg-canvas px-5 py-6 text-center">
                         <div className="grid h-28 w-28 place-items-center rounded-lg border border-line bg-white text-ink-faint shadow-card">
@@ -179,7 +179,7 @@ export default function StoryStudioPage() {
             <PageHeader
                 eyebrow="Story Studio"
                 title="Your local story, ready to use"
-                subtitle="Every locally-sourced ingredient becomes provenance you can put to work — menu copy, pricing math, and a diner-facing page that lets you charge for the source, not just the dish."
+                subtitle="Every locally-sourced ingredient becomes provenance you can put to work. menu copy, pricing math, and a diner-facing page that lets you charge for the source, not just the dish."
                 actions={
                     storyItems.length > 0 ? (
                         <LinkButton href="/app/sourcing" variant="ghost" size="sm">
@@ -194,7 +194,7 @@ export default function StoryStudioPage() {
                 <EmptyState
                     icon={<StoryTag size={24} />}
                     title="No stories to tell yet"
-                    description="Once an ingredient is delivering or live on your menu, its farm story shows up here — ready to copy onto the menu and price up."
+                    description="Once an ingredient is delivering or live on your menu, its farm story shows up here. ready to copy onto the menu and price up."
                     action={
                         <LinkButton href="/app/sourcing" variant="primary" size="sm">
                             Go to sourcing

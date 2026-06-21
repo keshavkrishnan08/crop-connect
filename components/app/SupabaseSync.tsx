@@ -9,7 +9,7 @@ import { getState, hydrateRemote, setRemoteSink, type AppState } from "@/lib/sto
 export function SupabaseSync() {
     React.useEffect(() => {
         const supabase = getBrowserClient();
-        if (!supabase) return; // not configured — local demo mode
+        if (!supabase) return; // not configured. local demo mode
         let active = true;
 
         (async () => {
