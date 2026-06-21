@@ -2,6 +2,7 @@ import { MarketingNav } from "@/components/marketing/Nav";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { LinkButton, Card, Badge, Eyebrow } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
+import { SplitScale, SageWeek, StatCountUp } from "@/components/marketing/WhatWeHandleViz";
 import {
     Search,
     Truck,
@@ -11,29 +12,16 @@ import {
     ArrowRight,
     Plate,
     Pen,
+    Handshake,
+    StoryTag,
+    MarginUp,
+    Sparkle,
 } from "@/components/icons";
 
 export const metadata = {
     title: "What we handle · CropConnect",
-    description: "CropConnect runs the entire local supply chain for your restaurant. You say what you want and put it on the menu.",
+    description: "Sage runs the entire local supply chain for your restaurant. You say what you want and put it on the menu. Here is everything in between.",
 };
-
-const WE_HANDLE = [
-    "Finding the farms",
-    "Vetting quality and reliability",
-    "Negotiating the price",
-    "The contract and the paperwork",
-    "Weekly delivery and logistics",
-    "Backup farms when a crop fails",
-    "Provenance and menu copy",
-    "Margin tracking per dish",
-    "Renewals each season",
-];
-
-const YOU_HANDLE = [
-    "Tell us what you want",
-    "Put it on the menu",
-];
 
 export default function WhatWeHandlePage() {
     return (
@@ -42,7 +30,10 @@ export default function WhatWeHandlePage() {
             <main>
                 <Hero />
                 <Contrast />
+                <Stats />
                 <DeepDive />
+                <Week />
+                <NeverDo />
                 <CloseBand />
             </main>
             <MarketingFooter />
@@ -63,12 +54,12 @@ function Hero() {
                 </Reveal>
                 <Reveal delay={0.05}>
                     <h1 className="mt-5 max-w-2xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
-                        We handle all of it.
+                        Sage handles all of it.
                     </h1>
                 </Reveal>
                 <Reveal delay={0.1}>
                     <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
-                        Local sourcing is a job. Finding farms. Checking them. Setting prices. Driving the route. We took the whole job. You keep two small parts.
+                        Local sourcing is a real job. Finding farms. Vetting them. Setting prices. Driving the route. Sage is the agent that took the whole job. You keep two small parts.
                     </p>
                 </Reveal>
                 <Reveal delay={0.15}>
@@ -94,60 +85,51 @@ function Contrast() {
         <section className="border-b border-line bg-canvas-soft">
             <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
                 <Reveal>
-                    <h2 className="max-w-2xl text-3xl sm:text-4xl">The whole list is on us.</h2>
+                    <Eyebrow>The whole list</Eyebrow>
+                    <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">One column is Sage. One is you.</h2>
                     <p className="mt-4 max-w-md text-[15px] leading-relaxed text-ink-muted">
-                        One column is ours. One is yours. Look at the size of each.
+                        Look at the size of each. That gap is the point.
                     </p>
                 </Reveal>
+                <Reveal delay={0.1}>
+                    <div className="mt-12">
+                        <SplitScale />
+                    </div>
+                </Reveal>
+            </div>
+        </section>
+    );
+}
 
-                <div className="mt-12 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-                    <Reveal>
-                        <Card className="h-full p-7">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl">What we handle</h3>
-                                <Badge tone="brand">
-                                    {WE_HANDLE.length} things
-                                </Badge>
-                            </div>
-                            <ul className="mt-6 space-y-3">
-                                {WE_HANDLE.map((item) => (
-                                    <li key={item} className="flex items-center gap-3">
-                                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500 text-white">
-                                            <Check size={14} strokeWidth={2.2} />
-                                        </span>
-                                        <span className="text-[15px] text-ink">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                        </Card>
-                    </Reveal>
+/* ----------------------------------------------------------------- Stats */
 
-                    <Reveal delay={0.08}>
-                        <Card className="flex h-full flex-col p-7">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xl">What you handle</h3>
-                                <Badge tone="harvest">
-                                    {YOU_HANDLE.length} things
-                                </Badge>
-                            </div>
-                            <ul className="mt-6 space-y-3">
-                                {YOU_HANDLE.map((item) => (
-                                    <li key={item} className="flex items-center gap-3">
-                                        <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-harvest-400 text-ink">
-                                            <Check size={14} strokeWidth={2.2} />
-                                        </span>
-                                        <span className="text-[15px] font-medium text-ink">{item}</span>
-                                    </li>
-                                ))}
-                            </ul>
-                            <div className="mt-auto pt-8">
-                                <p className="text-[13px] leading-relaxed text-ink-faint">
-                                    That is the entire ask. You stay in the kitchen. We run the supply.
+function Stats() {
+    const stats = [
+        { to: 12, prefix: "", suffix: "", label: "jobs Sage runs for you", sub: "From the first farm call to the last invoice." },
+        { to: 2, prefix: "", suffix: "", label: "things left to you", sub: "Say what you want. Put it on the menu." },
+        { to: 10, prefix: "", suffix: " min", label: "to set the whole thing up", sub: "No installs. No training. No integrations." },
+        { to: 0, prefix: "$", suffix: "", label: "to start your first item", sub: "First local item runs free for a week." },
+    ];
+    return (
+        <section className="border-b border-line">
+            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                <Reveal>
+                    <div className="flex justify-center"><Eyebrow>The shape of it</Eyebrow></div>
+                    <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl sm:text-4xl">A lot off your plate. Almost nothing on it.</h2>
+                </Reveal>
+                <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+                    {stats.map((s) => (
+                        <StaggerItem key={s.label}>
+                            <Card className="h-full p-7 text-center">
+                                <p className="font-display text-5xl text-brand-600">
+                                    <StatCountUp to={s.to} prefix={s.prefix} suffix={s.suffix} className="tnum" />
                                 </p>
-                            </div>
-                        </Card>
-                    </Reveal>
-                </div>
+                                <p className="mt-3 text-[15px] font-semibold text-ink">{s.label}</p>
+                                <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">{s.sub}</p>
+                            </Card>
+                        </StaggerItem>
+                    ))}
+                </Stagger>
             </div>
         </section>
     );
@@ -158,39 +140,54 @@ function Contrast() {
 const LIFTS = [
     {
         icon: <Search size={22} />,
-        title: "Sourcing",
-        body: "We keep a vetted bench of local farms. We match each item to the best one by distance, price, and track record. We taste before we buy. You never make a call.",
-        points: ["Ranked farm matches", "Taste and quality checks", "Volume confirmed up front"],
+        title: "Sourcing and vetting",
+        body: "Sage keeps a vetted bench of local farms. It matches each item to the best one by distance, price, and track record, and confirms the volume before it commits.",
+        points: ["Ranked farm matches", "Safety and practice checks", "Volume confirmed up front"],
+    },
+    {
+        icon: <Handshake size={22} />,
+        title: "Contracts and pricing",
+        body: "One standing agreement per item at a fixed seasonal price. Sage drafts the terms, holds the paperwork, and renews it each season. No haggling, no surprise line items.",
+        points: ["Fixed seasonal pricing", "Drafted and held for you", "Auto renewal each season"],
     },
     {
         icon: <Truck size={22} />,
-        title: "Logistics",
-        body: "We plan the route, pack the cooler, and set a fixed delivery day. It lands at your door the same time every week. You build a menu you can count on.",
+        title: "Delivery and logistics",
+        body: "Sage plans the route, packs the cold chain, and sets a fixed delivery day. It lands at your door the same time every week. You build a menu you can count on.",
         points: ["Fixed weekly drop", "Cold chain handled", "One door, one schedule"],
     },
     {
         icon: <Shield size={22} />,
-        title: "Reliability",
-        body: "Crops fail. Weather turns. When a farm comes up short, a backup farm fills the order before you notice. Your dish stays on the menu.",
+        title: "Reliability and backups",
+        body: "Crops fail and weather turns. When a farm comes up short, a backup farm fills the order before you notice. Your dish stays on the menu either way.",
         points: ["Backup farm on standby", "Gaps filled automatically", "No 86'd items"],
     },
     {
+        icon: <StoryTag size={22} />,
+        title: "Provenance and menu copy",
+        body: "Sage hands you the farm name and the miles, ready for the plate. The proof is what lets you charge a little more for the same dish.",
+        points: ["Farm names and miles", "Menu-ready lines", "Refreshed each season"],
+    },
+    {
         icon: <Receipt size={22} />,
-        title: "Paperwork",
-        body: "One standing contract per item at a fixed seasonal price. We handle the terms, the invoices, and the renewals. No haggling. No surprise line items.",
-        points: ["Fixed seasonal pricing", "Invoices handled", "Auto renewal each season"],
+        title: "Invoices and margin",
+        body: "One bill, not a pile of vendor invoices. Sage tracks what each local dish earns over the old spec so you can see the lift per cover.",
+        points: ["One clean invoice", "Margin tracked per dish", "Lift per cover, in view"],
     },
 ];
 
 function DeepDive() {
     return (
-        <section className="border-b border-line">
+        <section className="border-b border-line bg-canvas-soft">
             <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
                 <Reveal>
                     <Eyebrow>The heavy lifts</Eyebrow>
-                    <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The work we take off your plate.</h2>
+                    <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The work Sage takes off your plate.</h2>
+                    <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-muted">
+                        Six jobs that would eat a manager&apos;s week. Sage runs every one of them in the background.
+                    </p>
                 </Reveal>
-                <Stagger className="mt-12 grid gap-6 sm:grid-cols-2">
+                <Stagger className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                     {LIFTS.map((lift) => (
                         <StaggerItem key={lift.title}>
                             <Card hover className="h-full p-7">
@@ -216,39 +213,98 @@ function DeepDive() {
     );
 }
 
+/* ------------------------------------------------------------------ Week */
+
+function Week() {
+    return (
+        <section className="border-b border-line">
+            <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8 lg:py-24">
+                <Reveal>
+                    <div className="flex justify-center"><Eyebrow>Behind the scenes</Eyebrow></div>
+                    <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl sm:text-4xl">What a week looks like for Sage.</h2>
+                    <p className="mx-auto mt-4 max-w-xl text-center text-[15px] leading-relaxed text-ink-muted">
+                        You never see any of this. It runs while you cook.
+                    </p>
+                </Reveal>
+                <Reveal delay={0.1}>
+                    <div className="mt-12">
+                        <SageWeek />
+                    </div>
+                </Reveal>
+            </div>
+        </section>
+    );
+}
+
+/* --------------------------------------------------------------- NeverDo */
+
+function NeverDo() {
+    const items = [
+        "Cold-call a single farm",
+        "Negotiate a price",
+        "Chase a late delivery",
+        "Sort through vendor invoices",
+        "Cover a crop that failed",
+        "Write a provenance line from scratch",
+    ];
+    return (
+        <section className="border-b border-line bg-canvas-soft">
+            <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8 lg:py-24">
+                <Reveal>
+                    <Eyebrow>Off your plate for good</Eyebrow>
+                    <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Things you never do again.</h2>
+                </Reveal>
+                <Stagger className="mt-10 grid gap-x-8 gap-y-4 sm:grid-cols-2">
+                    {items.map((it) => (
+                        <StaggerItem key={it}>
+                            <div className="flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4">
+                                <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-brand-50 text-brand-600">
+                                    <Check size={15} strokeWidth={2.4} />
+                                </span>
+                                <span className="text-[15px] text-ink">{it}</span>
+                            </div>
+                        </StaggerItem>
+                    ))}
+                </Stagger>
+            </div>
+        </section>
+    );
+}
+
 /* ------------------------------------------------------------ Close band */
 
 function CloseBand() {
     return (
-        <section className="relative overflow-hidden border-b border-line bg-canvas-soft">
+        <section className="relative overflow-hidden border-b border-line">
             <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
             <div className="mx-auto max-w-3xl px-5 py-24 text-center sm:px-8">
                 <Reveal>
-                    <Badge tone="harvest" className="mx-auto">
-                        Free to start
-                    </Badge>
-                    <h2 className="mt-6 text-balance text-3xl sm:text-4xl">You say it. We run it.</h2>
+                    <Badge tone="harvest" className="mx-auto"><Sparkle size={12} /> Free to start</Badge>
+                    <h2 className="mt-6 text-balance text-3xl sm:text-4xl">You say it. Sage runs it.</h2>
                     <div className="mx-auto mt-8 grid max-w-xl gap-4 sm:grid-cols-2">
                         <Card className="flex items-center gap-3 p-5 text-left">
-                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
-                                <Plate size={20} />
+                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-harvest-400/15 text-harvest-500">
+                                <Pen size={20} />
                             </span>
                             <p className="text-[15px] font-medium text-ink">Say what you want.</p>
                         </Card>
                         <Card className="flex items-center gap-3 p-5 text-left">
-                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
-                                <Pen size={20} />
+                            <span className="grid h-11 w-11 place-items-center rounded-xl bg-harvest-400/15 text-harvest-500">
+                                <Plate size={20} />
                             </span>
                             <p className="text-[15px] font-medium text-ink">Put it on the menu.</p>
                         </Card>
                     </div>
                     <p className="mx-auto mt-7 max-w-md text-lg leading-relaxed text-ink-muted">
-                        We carry the other nine. Source one item this week and see what it does to the check.
+                        Sage carries the rest. Source one item this week and watch what it does to the check.
                     </p>
-                    <div className="mt-8 flex justify-center">
+                    <div className="mt-8 flex flex-wrap justify-center gap-3">
                         <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
                             See your numbers
                             <ArrowRight size={18} />
+                        </LinkButton>
+                        <LinkButton href="/pricing" variant="ghost" size="lg" className="gap-2">
+                            <MarginUp size={16} /> See pricing
                         </LinkButton>
                     </div>
                 </Reveal>

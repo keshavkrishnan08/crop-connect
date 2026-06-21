@@ -8,10 +8,6 @@ import { MarketingFooter } from "@/components/marketing/Footer";
 import { ServiceFlow } from "@/components/marketing/ServiceFlow";
 import { MarginSliver, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
 import { MenuRepricing } from "@/components/marketing/MenuRepricing";
-import { Metrics } from "@/components/marketing/Metrics";
-import { Outcomes } from "@/components/marketing/Outcomes";
-import { ChargeStats } from "@/components/marketing/ChargeStats";
-import { TrendStats } from "@/components/marketing/TrendStats";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
 import { ProduceGallery } from "@/components/marketing/ProduceGallery";
@@ -25,14 +21,12 @@ export default function Landing() {
             <MarketingNav />
             <main>
                 <Hero />
-                <ResultsBand />
                 <Problem />
                 <Result />
-                <Edge />
+                <Produce />
                 <HowItWorks />
                 <Sourcing />
                 <Delivery />
-                <Produce />
                 <FullService />
                 <BusinessModel />
                 <Voices />
@@ -79,18 +73,6 @@ function Word({ children, delay, className }: { children: React.ReactNode; delay
     return <span className={`inline-block animate-fade-up opacity-0 ${className ?? ""}`} style={{ animationDelay: `${delay}s` }}>{children}</span>;
 }
 
-/* ---------- Outcomes band (near the top) ---------- */
-function ResultsBand() {
-    return (
-        <Section className="!py-16">
-            <div className="mx-auto mb-10 max-w-2xl text-center">
-                <Reveal><div className="flex justify-center"><Eyebrow>What it does for you</Eyebrow></div><h2 className="mt-4 font-display text-3xl leading-tight sm:text-4xl">Run a stronger restaurant.</h2></Reveal>
-            </div>
-            <Reveal delay={0.08}><div className="mx-auto max-w-4xl"><Outcomes /></div></Reveal>
-        </Section>
-    );
-}
-
 /* ---------- 2. Problem ---------- */
 function Problem() {
     return (
@@ -112,29 +94,6 @@ function Result() {
                     href="/demo" cta="See it on your menu" />}
                 visual={<MenuRepricing />}
             />
-            <Reveal delay={0.1}><div className="mx-auto mt-20 max-w-4xl"><ChargeStats /></div></Reveal>
-        </Section>
-    );
-}
-
-/* ---------- 3b. The numbers — Afresh-style comprehensive metrics ---------- */
-function Edge() {
-    return (
-        <Section tint>
-            <Head eyebrow="The numbers" title="The case for a local menu."
-                body="It is not only the price. Demand for local is climbing, and sourcing it lifts your margin, pulls people in, and keeps them coming back. Here is the whole picture in one place." />
-            <Reveal delay={0.08}>
-                <div className="mx-auto mt-14 max-w-5xl">
-                    <p className="mb-5 text-center text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">Where diners are headed</p>
-                    <TrendStats />
-                </div>
-            </Reveal>
-            <Reveal delay={0.12}>
-                <div className="mx-auto mt-10 max-w-5xl">
-                    <p className="mb-5 text-center text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">What it does for your numbers</p>
-                    <Metrics />
-                </div>
-            </Reveal>
         </Section>
     );
 }

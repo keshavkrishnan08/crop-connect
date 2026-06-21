@@ -22,7 +22,7 @@ export function MarketingNav() {
                     {LINKS.map((l) => <Link key={l.href} href={l.href} className="transition hover:text-ink">{l.label}</Link>)}
                 </nav>
                 <div className="flex items-center gap-2.5">
-                    <Link href="/app" className="hidden text-sm font-semibold text-ink-soft transition hover:text-ink sm:block">Sign in</Link>
+                    <Link href="/sign-in" className="hidden text-sm font-semibold text-ink-soft transition hover:text-ink sm:block">Sign in</Link>
                     <Link href="/demo" className="btn-primary btn-sm">See your numbers <ArrowRight size={15} /></Link>
                     <button onClick={() => setOpen((v) => !v)} className="grid h-9 w-9 place-items-center rounded-lg hairline bg-white/70 md:hidden">{open ? <X size={18} /> : <Menu size={18} />}</button>
                 </div>
@@ -30,7 +30,7 @@ export function MarketingNav() {
             {open && (
                 <div className="border-t border-line bg-canvas px-5 py-3 md:hidden">
                     {LINKS.map((l) => <Link key={l.href} href={l.href} onClick={() => setOpen(false)} className="block py-2 text-[15px] font-medium text-ink-soft">{l.label}</Link>)}
-                    <Link href="/app" onClick={() => setOpen(false)} className="block py-2 text-[15px] font-semibold text-ink">Sign in</Link>
+                    <Link href="/sign-in" onClick={() => setOpen(false)} className="block py-2 text-[15px] font-semibold text-ink">Sign in</Link>
                 </div>
             )}
         </header>
