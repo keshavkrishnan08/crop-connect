@@ -271,4 +271,52 @@ export function marginRollup(s: AppState) {
     return { realizedMonthly, modeledMonthly, realizedAnnual: realizedMonthly * 12, liveCount: liveItems.length, modeledCount: modeledItems.length, confirmedDeliveries };
 }
 
+// ---- agent roadmap (custom, recomputed each render) ----
+export interface RoadmapStep { id: string; title: string; detail: string; done: boolean; href: string; cta: string }
+export function agentRoadmap(s: AppState): RoadmapStep[] {
+    const hasItems = s.items.length > 0;
+    const anyAgreed = s.items.some((i) => ["agreed", "delivering", "live"].includes(i.stage));
+    const anyLive = s.items.some((i) => i.stage === "live");
+    const hasMenu = s.dishes.length > 0;
+    const enough = s.items.length >= 3;
+    return [
+        { id: "menu", title: "Connect your menu", detail: "So Sage knows what to price.", done: hasMenu, href: "/app/story", cta: "Open Story Studio" },
+        { id: "first", title: "Source your first ingredient", detail: "Name one thing. The agent runs the rest.", done: hasItems, href: "/app/sourcing/new", cta: "Source it" },
+        { id: "agree", title: "Let the agreement run", detail: "Sage drafted the terms with the farm.", done: anyAgreed, href: "/app/sourcing", cta: "See the board" },
+        { id: "live", title: "Put it on the menu", detail: "Go live and start earning the margin.", done: anyLive, href: "/app/story", cta: "Get the story" },
+        { id: "scale", title: "Add two more ingredients", detail: "Sage runs them in parallel.", done: enough, href: "/app/sourcing/new", cta: "Add more" },
+        { id: "margin", title: "Review your margin lift", detail: "See what local is earning you.", done: anyLive, href: "/app/margins", cta: "Open Margins" },
+    ];
+}
+
+// ---- escrow / order tracking ----
+export type EscrowStatus = "pending" | "funded" | "held" | "releasing";
+export const ESCROW_LABEL: Record<EscrowStatus, string> = { pending: "Not funded", funded: "Funded", held: "Held in escrow", releasing: "Releasing on delivery" };
+export function orderEscrow(item: SourcingItem) {
+    const weekly = (item.qtyPerWeek || 0) * (item.priceCeiling || 0);
+    const confirmed = item.deliveries.filter((d) => d.status === "confirmed").length;
+    const scheduled = item.deliveries.filter((d) => d.status === "scheduled").length;
+    const delivered = item.deliveries.filter((d) => d.status === "delivered").length;
+    let status: EscrowStatus = "pending";
+    if (item.stage === "live") status = "releasing";
+    else if (item.stage === "delivering") status = "held";
+    else if (item.stage === "agreed") status = "funded";
+    return { weekly, released: confirmed * weekly, held: (scheduled + delivered) * weekly, status, confirmed, scheduled, delivered };
+}
+
+// ---- deals (local supply opportunities surfaced by the agent) ----
+export interface Deal { id: string; farmId: string; crop: string; unit: string; price: number; qtyAvail: number; window: string; blurb: string; sourced: boolean }
+export function computeDeals(s: AppState): Deal[] {
+    const sourcedCrops = new Set(s.items.map((i) => i.crop.toLowerCase()));
+    const seeds = [
+        { farmId: "f_teter", crop: "heirloom tomato", unit: "lb", price: 4.2, qty: 120, window: "Jun–Sep", blurb: "Surplus dry-farmed crop, priced under market this week." },
+        { farmId: "f_blue", crop: "salad greens", unit: "lb", price: 5.5, qty: 80, window: "Year-round", blurb: "Standing weekly cut. Lock a season rate now." },
+        { farmId: "f_sunfield", crop: "summer squash", unit: "lb", price: 2.6, qty: 150, window: "Jun–Oct", blurb: "Peak volume. Strong margin on a grilled side." },
+        { farmId: "f_marsh", crop: "beets", unit: "lb", price: 3.0, qty: 90, window: "Sep–Feb", blurb: "Storage crop. Reliable all winter long." },
+        { farmId: "f_emberlu", crop: "specialty mushroom", unit: "lb", price: 9.0, qty: 40, window: "Year-round", blurb: "Oyster and lion's mane. A premium plate driver." },
+        { farmId: "f_rivergate", crop: "stone fruit", unit: "case", price: 28, qty: 30, window: "Jun–Aug", blurb: "Tree-ripened peaches. Short window, high demand." },
+    ];
+    return seeds.map((d, i) => ({ id: "deal_" + i, farmId: d.farmId, crop: d.crop, unit: d.unit, price: d.price, qtyAvail: d.qty, window: d.window, blurb: d.blurb, sourced: sourcedCrops.has(d.crop.toLowerCase()) }));
+}
+
 export { computeUplift };
