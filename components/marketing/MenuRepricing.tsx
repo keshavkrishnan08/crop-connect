@@ -4,10 +4,10 @@ import { motion } from "framer-motion";
 import { MapPin, ArrowUpRight } from "@/components/icons";
 
 const ROWS: { name: string; farm: string; old: number; now: number }[] = [
-    { name: "Heirloom tomato salad", farm: "Teter Farm", old: 16, now: 19 },
-    { name: "Roasted beets and citrus", farm: "Marsh Hollow", old: 14, now: 16 },
-    { name: "Grilled summer squash", farm: "Sunfield Acres", old: 15, now: 18 },
-    { name: "Market greens", farm: "Blue Oak", old: 12, now: 14 },
+    { name: "Heirloom tomato salad", farm: "Teter Farm", old: 16, now: 24 },
+    { name: "Roasted beets and citrus", farm: "Marsh Hollow", old: 14, now: 21 },
+    { name: "Grilled summer squash", farm: "Sunfield Acres", old: 15, now: 23 },
+    { name: "Market greens", farm: "Blue Oak", old: 12, now: 18 },
 ];
 
 /** A real menu: old prices struck out, new local prices in. Shows the whole value prop. */
