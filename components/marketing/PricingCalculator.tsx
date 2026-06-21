@@ -4,8 +4,12 @@ import * as React from "react";
 import { motion } from "framer-motion";
 import { Leaf, Minus, Plus, Check } from "@/components/icons";
 
-const BASE = 149;
-const PER_ITEM = 30;
+const BASE = 299;
+const TIERS = [
+    { label: "Small kitchen", per: 99, hint: "Lower weekly volume" },
+    { label: "Mid-size", per: 199, hint: "Typical full-service" },
+    { label: "High volume", per: 349, hint: "Busy or multi-location" },
+];
 const TERMS = [
     { label: "Monthly", disc: 0, note: "No commitment" },
     { label: "6 months", disc: 0.1, note: "Save 10%" },
@@ -14,17 +18,30 @@ const TERMS = [
 
 export function PricingCalculator() {
     const [items, setItems] = React.useState(3);
+    const [tier, setTier] = React.useState(1);
     const [term, setTerm] = React.useState(0);
+    const perItem = TIERS[tier].per;
     const t = TERMS[term];
-    const gross = BASE + items * PER_ITEM;
+    const gross = BASE + items * perItem;
     const net = Math.round(gross * (1 - t.disc));
     const saved = gross - net;
 
     return (
         <div className="grid gap-4 overflow-hidden rounded-3xl border border-line bg-canvas-soft p-5 shadow-card sm:p-7 lg:grid-cols-[1.1fr_1fr]">
-            {/* controls */}
             <div className="space-y-5">
                 <Stepper icon={<Leaf size={17} />} label="Items on the program" hint="Each ingredient we keep live for you. We handle the farms, free." value={items} min={1} max={15} onChange={setItems} />
+                <div>
+                    <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Your weekly volume</p>
+                    <div className="grid grid-cols-3 gap-2">
+                        {TIERS.map((x, i) => (
+                            <button key={x.label} onClick={() => setTier(i)}
+                                className={`rounded-xl border px-2 py-2.5 text-center transition ${i === tier ? "border-brand-500 bg-brand-50 text-brand-700" : "border-line bg-white text-ink-soft hover:border-line-strong"}`}>
+                                <span className="block text-[13px] font-semibold leading-tight">{x.label}</span>
+                                <span className={`mt-0.5 block text-2xs ${i === tier ? "text-brand-600" : "text-ink-faint"}`}>{x.hint}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
                 <div>
                     <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Commitment</p>
                     <div className="grid grid-cols-3 gap-2">
@@ -37,27 +54,23 @@ export function PricingCalculator() {
                         ))}
                     </div>
                 </div>
-                <div className="flex items-start gap-2 rounded-xl bg-brand-50/60 px-3.5 py-3 text-[13px] text-brand-700">
-                    <Check size={15} className="mt-0.5 shrink-0 text-brand-500" /> We handle every farm, delivery, and contract. You are never charged per farm.
-                </div>
             </div>
 
-            {/* result */}
             <div className="flex flex-col rounded-2xl border border-brand-200 bg-white p-6 shadow-sm ring-1 ring-brand-100">
                 <p className="text-2xs font-semibold uppercase tracking-wide text-brand-600">Your service fee</p>
                 <div className="mt-1 flex items-end gap-1">
-                    <motion.span key={net} initial={{ opacity: 0.4, y: 4 }} animate={{ opacity: 1, y: 0 }} className="font-display text-6xl leading-none text-ink tnum">${net}</motion.span>
+                    <motion.span key={net} initial={{ opacity: 0.4, y: 4 }} animate={{ opacity: 1, y: 0 }} className="font-display text-6xl leading-none text-ink tnum">${net.toLocaleString()}</motion.span>
                     <span className="mb-1.5 text-lg text-ink-muted">/mo</span>
                 </div>
                 {saved > 0 && <p className="mt-1.5 text-[13px] font-medium text-harvest-500">You save ${saved}/mo on a {t.label.toLowerCase()} term</p>}
 
                 <div className="mt-5 space-y-1.5 border-t border-line pt-4 font-mono text-[13px] text-ink-muted tnum">
                     <Row label="Base service" value={`$${BASE}`} />
-                    <Row label={`${items} ${items === 1 ? "item" : "items"}`} value={`$${items * PER_ITEM}`} />
-                    {t.disc > 0 && <Row label={`${t.label} discount`} value={`-$${saved}`} accent />}
+                    <Row label={`${items} ${items === 1 ? "item" : "items"} × $${perItem}`} value={`$${(items * perItem).toLocaleString()}`} />
+                    {t.disc > 0 && <Row label={`${t.label} discount`} value={`-$${saved.toLocaleString()}`} accent />}
                 </div>
                 <div className="mt-4 flex items-start gap-2 rounded-xl bg-brand-50/60 px-3 py-2.5 text-[12.5px] text-brand-700">
-                    <Check size={15} className="mt-0.5 shrink-0 text-brand-500" /> You fund the food separately, at cost. No markup, no cut of your sales.
+                    <Check size={15} className="mt-0.5 shrink-0 text-brand-500" /> You fund the food separately, at cost. No markup, no cut of your sales, no per-farm charge.
                 </div>
             </div>
         </div>
