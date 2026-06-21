@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { actions, useStore } from "@/lib/store";
+import { actions, useStore, flushRemote } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card, Button, Field, Select, FieldGroup } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
@@ -38,7 +38,7 @@ export default function NewNeedPage() {
 
     return (
         <div className="animate-fade-up">
-            {run && <AutonomousRun itemId={run.id} crop={run.crop} onDone={() => { toast.success("Sourced", "It's running on your board now."); router.push("/app"); }} />}
+            {run && <AutonomousRun itemId={run.id} crop={run.crop} onDone={async () => { await flushRemote(); toast.success("Sourced", "It's running on your board now."); router.push("/app"); }} />}
             <PageHeader eyebrow="New request" title="Source an ingredient" subtitle="Tell us one thing you'd like to bring local. We'll match nearby farms and run the contract, deliveries, and story from there." />
             <Card className="max-w-2xl p-6">
                 <div className="grid gap-5">

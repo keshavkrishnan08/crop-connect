@@ -59,7 +59,7 @@ export interface AppState {
 }
 
 // ---- seed ----
-const SEED_FARMS: Farm[] = [
+export const SEED_FARMS: Farm[] = [
     { id: "f_teter", name: "Teter Farm", farmer: "Maria Teter", location: "Sebastopol, CA", distanceMi: 12, practices: ["Certified Organic", "No-till"], crops: ["heirloom tomato", "tomato", "greens", "pepper"], reliability: 98, priceIndex: 1.05, story: "Third-generation family farm growing dry-farmed heirloom tomatoes on the Sonoma coast." },
     { id: "f_blue", name: "Blue Oak Gardens", farmer: "Devon Hale", location: "Petaluma, CA", distanceMi: 18, practices: ["Regenerative", "Certified Naturally Grown"], crops: ["greens", "salad", "arugula", "herb"], reliability: 95, priceIndex: 1.0, story: "Small-scale market garden specializing in tender salad greens and culinary herbs." },
     { id: "f_marsh", name: "Marsh Hollow", farmer: "Ana Ruiz", location: "Healdsburg, CA", distanceMi: 22, practices: ["Organic"], crops: ["beet", "carrot", "root", "squash"], reliability: 92, priceIndex: 0.96, story: "Root crops and winter squash grown along the Russian River floodplain." },
@@ -135,8 +135,23 @@ let hydrated = false;
 const listeners = new Set<() => void>();
 
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* noop */ } }
+
+// ---- remote persistence (Supabase, per authenticated account) ----
+let remoteSink: ((s: AppState) => Promise<void> | void) | null = null;
+let pushTimer: ReturnType<typeof setTimeout> | null = null;
+function scheduleRemotePush() {
+    if (!remoteSink) return;
+    if (pushTimer) clearTimeout(pushTimer);
+    pushTimer = setTimeout(() => { pushTimer = null; remoteSink?.(state); }, 600);
+}
+/** Register a sink that persists state to the signed-in account. Pass null to detach. */
+export function setRemoteSink(fn: ((s: AppState) => Promise<void> | void) | null) { remoteSink = fn; }
+/** Load state pulled from the account into the store without echoing it back. */
+export function hydrateRemote(s: AppState) { state = s; persist(); emit(); }
+/** Push the latest state to the account right now (e.g. before navigating away). */
+export function flushRemote() { if (pushTimer) { clearTimeout(pushTimer); pushTimer = null; } return remoteSink?.(state); }
 function emit() { listeners.forEach((l) => l()); }
-function set(updater: (s: AppState) => AppState) { state = updater(state); persist(); emit(); }
+function set(updater: (s: AppState) => AppState) { state = updater(state); persist(); emit(); scheduleRemotePush(); }
 function pushActivity(text: string, kind: ActivityKind, itemId?: string) {
     set((s) => ({ ...s, activity: [{ id: uid("a"), text, kind, itemId, ts: Date.now() }, ...s.activity].slice(0, 40) }));
 }

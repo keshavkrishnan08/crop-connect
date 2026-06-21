@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
+import { getBrowserClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
-import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin } from "@/components/icons";
+import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -18,8 +19,16 @@ const NAV = [
 
 export function AppShell({ children }: { children: React.ReactNode }) {
     const pathname = usePathname();
+    const router = useRouter();
     const restaurant = useStore((s) => s.restaurant);
     const [open, setOpen] = React.useState(false);
+
+    async function signOut() {
+        const supabase = getBrowserClient();
+        if (supabase) await supabase.auth.signOut();
+        router.push("/");
+        router.refresh();
+    }
 
     const Side = (
         <>
@@ -40,10 +49,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <Link href="/app/sourcing/new" onClick={() => setOpen(false)} className="btn-primary mb-3 w-full"><Plus size={18} /> Source an ingredient</Link>
                 <div className="flex items-center gap-2.5 rounded-xl border border-line bg-white/70 p-2.5">
                     <span className="grid h-9 w-9 place-items-center rounded-lg bg-ink font-display text-sm text-white">{restaurant.name.slice(0, 2)}</span>
-                    <div className="min-w-0">
+                    <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold text-ink">{restaurant.name}</p>
                         <p className="flex items-center gap-1 text-2xs text-ink-faint"><MapPin size={11} /> {restaurant.location}</p>
                     </div>
+                    <button onClick={signOut} title="Sign out" className="grid h-8 w-8 shrink-0 place-items-center rounded-lg text-ink-faint transition hover:bg-canvas hover:text-danger"><Logout size={16} /></button>
                 </div>
             </div>
         </>
