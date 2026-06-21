@@ -8,6 +8,7 @@ import { MarketingFooter } from "@/components/marketing/Footer";
 import { ServiceFlow } from "@/components/marketing/ServiceFlow";
 import { MarginSliver, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
 import { MenuRepricing } from "@/components/marketing/MenuRepricing";
+import { Impact } from "@/components/marketing/Impact";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
 import { ProduceGallery } from "@/components/marketing/ProduceGallery";
@@ -23,6 +24,7 @@ export default function Landing() {
                 <Hero />
                 <Problem />
                 <Result />
+                <ImpactSection />
                 <Produce />
                 <HowItWorks />
                 <Sourcing />
@@ -94,6 +96,17 @@ function Result() {
                     href="/demo" cta="See it on your menu" />}
                 visual={<MenuRepricing />}
             />
+        </Section>
+    );
+}
+
+/* ---------- Impact — the one numbers gallery ---------- */
+function ImpactSection() {
+    return (
+        <Section tint>
+            <Head eyebrow="The impact" title="What it adds up to."
+                body="A handful of local dishes lifts your margin, your check size, and how often guests come back. Here is what that looks like." />
+            <Reveal delay={0.1}><div className="mx-auto mt-14 max-w-5xl"><Impact /></div></Reveal>
         </Section>
     );
 }
