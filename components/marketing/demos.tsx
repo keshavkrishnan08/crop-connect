@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Check, Shield, Leaf, MapPin, Calendar, Truck, MarginUp, Receipt, ArrowRight } from "@/components/icons";
+import { Check, Shield, Leaf, MapPin, Calendar, Truck, MarginUp, Receipt, Farm, Search, StoryTag, X } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 /* ---------- PROBLEM: the thin sliver of profit ---------- */
@@ -161,28 +161,91 @@ export function DeliverySchedule() {
     );
 }
 
-/* ---------- BUSINESS MODEL: money flow, no figures ---------- */
+/* ---------- BUSINESS MODEL: an intricate flow infographic ---------- */
 export function MoneyFlow() {
     return (
-        <div className="grid items-stretch gap-3 lg:grid-cols-[1fr_auto_1.25fr_auto_1fr]">
-            <Block tone="ink" head="You" big="One flat fee" sub="No markup. No cut of your sales." icon={<Receipt size={22} />} />
-            <Arrow />
-            <Block tone="brand" head="We handle" big="Everything" sub="Sourcing, delivery, the contract." icon={<Truck size={22} />} wide />
-            <Arrow />
-            <Block tone="harvest" head="You keep" big="The upside" sub="Every extra dollar stays yours." icon={<MarginUp size={22} />} />
+        <div className="relative overflow-hidden rounded-[1.75rem] border border-line bg-canvas-soft p-6 shadow-card sm:p-10">
+            <div className="pointer-events-none absolute inset-0 bg-aura" />
+            <div className="relative grid items-stretch gap-5 lg:grid-cols-[1fr_auto_1.15fr_auto_1fr]">
+                <FeeTicket />
+                <Flow />
+                <ServiceHub />
+                <Flow />
+                <Upside />
+            </div>
+            <div className="relative mt-9 flex flex-col items-center gap-3 border-t border-line pt-7 sm:flex-row sm:justify-center sm:gap-4">
+                <span className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">We never touch</span>
+                <div className="flex gap-2.5">
+                    <NeverChip label="Your food cost" />
+                    <NeverChip label="Your sales" />
+                </div>
+            </div>
         </div>
     );
 }
-function Block({ tone, head, big, sub, icon, wide }: { tone: "ink" | "brand" | "harvest"; head: string; big: string; sub: string; icon: React.ReactNode; wide?: boolean }) {
-    const t = tone === "harvest" ? "text-harvest-500" : tone === "brand" ? "text-brand-600" : "text-ink";
-    const bg = tone === "harvest" ? "bg-harvest-400/12 text-harvest-500" : tone === "brand" ? "bg-brand-50 text-brand-600" : "bg-ink/[0.06] text-ink-soft";
+
+function FeeTicket() {
     return (
-        <div className={cn("rounded-3xl border border-line bg-canvas-soft p-7 shadow-card", wide && "ring-1 ring-brand-100")}>
-            <span className={cn("mb-4 grid h-11 w-11 place-items-center rounded-xl", bg)}>{icon}</span>
-            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">{head}</p>
-            <p className={cn("mt-1 font-display text-3xl leading-tight", t)}>{big}</p>
-            <p className="mt-2.5 text-[14px] leading-relaxed text-ink-muted">{sub}</p>
+        <div className="relative flex flex-col justify-between rounded-2xl border border-line bg-white p-6 shadow-sm">
+            <span className="absolute -left-2.5 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full border border-line bg-canvas-soft" />
+            <span className="absolute -right-2.5 top-1/2 h-5 w-5 -translate-y-1/2 rounded-full border border-line bg-canvas-soft" />
+            <div>
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-ink/[0.06] text-ink-soft"><Receipt size={20} /></span>
+                <p className="mt-3 text-2xs font-semibold uppercase tracking-wide text-ink-faint">You pay</p>
+            </div>
+            <div className="mt-5 border-t border-dashed border-line pt-4">
+                <p className="font-display text-3xl leading-none text-ink">One flat fee</p>
+                <p className="mt-1.5 text-sm text-ink-muted">per month, that is it</p>
+            </div>
         </div>
     );
 }
-function Arrow() { return <div className="hidden items-center justify-center lg:flex"><ArrowRight size={22} className="text-ink-faint" /></div>; }
+
+function ServiceHub() {
+    const tiles = [{ i: <Farm size={17} />, t: "Source" }, { i: <Search size={17} />, t: "Vet" }, { i: <Truck size={17} />, t: "Deliver" }, { i: <StoryTag size={17} />, t: "Prove" }];
+    return (
+        <div className="rounded-2xl border border-brand-200 bg-white p-6 shadow-sm ring-1 ring-brand-100">
+            <span className="grid h-10 w-10 place-items-center rounded-xl bg-brand-600 text-white shadow-brand"><Leaf size={20} /></span>
+            <p className="mt-3 text-2xs font-semibold uppercase tracking-wide text-brand-600">We run it all</p>
+            <div className="mt-4 grid grid-cols-2 gap-2.5">
+                {tiles.map((x, i) => (
+                    <motion.div key={x.t} initial={{ opacity: 0, scale: 0.9 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
+                        className="flex items-center gap-2 rounded-xl bg-brand-50/70 px-3 py-2.5">
+                        <span className="text-brand-600">{x.i}</span><span className="text-[13px] font-semibold text-ink-soft">{x.t}</span>
+                    </motion.div>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function Upside() {
+    const bars = [38, 52, 68, 84, 100];
+    return (
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-2xl border border-line bg-white p-6 shadow-sm">
+            <div>
+                <span className="grid h-10 w-10 place-items-center rounded-xl bg-harvest-400/12 text-harvest-500"><MarginUp size={20} /></span>
+                <p className="mt-3 text-2xs font-semibold uppercase tracking-wide text-harvest-500">You keep</p>
+                <p className="mt-1.5 font-display text-3xl leading-none text-ink">The upside</p>
+                <p className="mt-2 text-[13px] text-ink-muted">Every extra dollar stays yours.</p>
+            </div>
+            <div className="mt-4 flex h-14 items-end gap-1.5">
+                {bars.map((h, i) => <motion.span key={i} className="flex-1 rounded-t bg-gradient-to-t from-harvest-300 to-harvest-400" initial={{ height: 0 }} whileInView={{ height: `${h}%` }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.08, duration: 0.5, ease: [0.22, 1, 0.36, 1] }} />)}
+            </div>
+        </div>
+    );
+}
+
+function Flow() {
+    return (
+        <div className="relative hidden w-16 items-center lg:flex">
+            <div className="h-0.5 w-full rounded bg-gradient-to-r from-brand-200 to-brand-300" />
+            <motion.span className="absolute h-2.5 w-2.5 rounded-full bg-brand-500 shadow-brand" style={{ top: "50%", marginTop: -5 }}
+                animate={{ left: ["-4%", "100%"], opacity: [0, 1, 1, 0] }} transition={{ duration: 1.9, repeat: Infinity, ease: "easeInOut" }} />
+        </div>
+    );
+}
+
+function NeverChip({ label }: { label: string }) {
+    return <span className="inline-flex items-center gap-1.5 rounded-full border border-line bg-white px-3 py-1.5 text-[13px] font-medium text-ink-muted"><X size={13} className="text-ink-faint" /> {label}</span>;
+}

@@ -16,16 +16,14 @@ const ACTS = [
 export function ServiceFlow() {
     const reduce = useReducedMotion();
     const [act, setAct] = React.useState(0);
-    const [paused, setPaused] = React.useState(false);
 
     React.useEffect(() => {
-        if (reduce || paused) return;
         const iv = setInterval(() => setAct((a) => (a + 1) % ACTS.length), 2600);
         return () => clearInterval(iv);
-    }, [reduce, paused]);
+    }, []);
 
     return (
-        <div className="glass overflow-hidden rounded-3xl p-2" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+        <div className="glass overflow-hidden rounded-3xl p-2">
             {/* stage */}
             <div className="relative h-[360px] overflow-hidden rounded-2xl border border-line bg-canvas-soft sm:h-[400px]">
                 <div className="pointer-events-none absolute inset-0 bg-dots opacity-50" />
