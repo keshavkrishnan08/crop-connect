@@ -32,6 +32,7 @@ export default function Landing() {
                 <BusinessModel />
                 <Voices />
                 <Questions />
+                <Setup />
                 <FinalCta />
             </main>
             <MarketingFooter />
@@ -58,7 +59,13 @@ function Hero() {
                     </div>
                 </Reveal>
                 <Reveal delay={0.58}><div className="mx-auto mt-16 max-w-2xl"><SocialProof /></div></Reveal>
-                <Reveal delay={0.64}><p className="mt-5 text-[13px] text-ink-faint">Now onboarding our first restaurants. No setup. No commitment.</p></Reveal>
+                <Reveal delay={0.64}>
+                    <div className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[13px] font-medium text-ink-muted">
+                        {["Set up in 10 minutes", "Your first dish free", "Cancel anytime"].map((t) => (
+                            <span key={t} className="inline-flex items-center gap-1.5"><Check size={14} className="text-brand-500" /> {t}</span>
+                        ))}
+                    </div>
+                </Reveal>
             </div>
         </section>
     );
@@ -201,6 +208,35 @@ function Questions() {
             <Head eyebrow="Questions" title="Straight answers before you start."
                 body="The things every owner asks us before they start. Short version: no markups, no hidden cuts, no lock-in." />
             <Reveal delay={0.1}><div className="mt-12"><Faq /></div></Reveal>
+        </Section>
+    );
+}
+
+/* ---------- Getting started fast ---------- */
+function Setup() {
+    const steps = [
+        { n: 1, m: "2 min", t: "Share your menu", d: "Paste a link or upload it. We read it for you." },
+        { n: 2, m: "3 min", t: "Pick one ingredient", d: "We show the local farms that fit. You choose." },
+        { n: 3, m: "Done", t: "We take it from here", d: "Sourcing, the contract, delivery, the proof." },
+    ];
+    return (
+        <Section tint>
+            <Head eyebrow="Getting started" title="Up and running in ten minutes."
+                body="No installs. No integrations. No training your staff. You answer a few questions and we start sourcing this week." />
+            <div className="mx-auto mt-14 grid max-w-4xl gap-4 sm:grid-cols-3">
+                {steps.map((s, i) => (
+                    <Reveal key={s.n} delay={i * 0.08}>
+                        <Card className="h-full p-7">
+                            <div className="flex items-center justify-between">
+                                <span className="grid h-9 w-9 place-items-center rounded-full bg-brand-600 font-mono text-sm font-medium text-white tnum">{s.n}</span>
+                                <span className="rounded-full bg-harvest-400/15 px-2.5 py-1 font-mono text-2xs font-semibold text-harvest-500 tnum">{s.m}</span>
+                            </div>
+                            <p className="mt-4 font-display text-xl text-ink">{s.t}</p>
+                            <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">{s.d}</p>
+                        </Card>
+                    </Reveal>
+                ))}
+            </div>
         </Section>
     );
 }
