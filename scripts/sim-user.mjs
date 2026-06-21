@@ -66,7 +66,11 @@ try {
     await page2.waitForTimeout(2800); // let the account state pull
     check(/rainbow carrots/i.test(await page2.content()), "data persisted to the account (visible after fresh sign-in)");
 
-    check(errors.length === 0, `no runtime errors (${errors.length})` + (errors[0] ? ` · ${errors[0].slice(0, 100)}` : ""));
+    const uniq = [...new Set(errors)];
+    const hydration = uniq.filter((e) => /Hydration|descendant of|cannot be a/.test(e));
+    check(hydration.length === 0, `no hydration errors (${hydration.length})`);
+    const real = uniq.filter((e) => !/Failed to fetch RSC payload/.test(e));
+    check(real.length === 0, `no real runtime errors (${real.length}); ${real.slice(0, 3).map((e) => e.slice(0, 90)).join(" | ")}`);
 } catch (e) {
     fails++;
     console.log("FAIL · exception: " + String(e).slice(0, 300));

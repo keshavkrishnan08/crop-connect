@@ -1,9 +1,7 @@
 import { chromium } from "playwright";
 const b = await chromium.launch();
-const f = await b.newPage({ viewport: { width: 1280, height: 1400 } });
-await f.goto("http://localhost:3000/for-farms", { waitUntil: "networkidle" });
-const h = f.locator('h2', { hasText: "Three steps" }).first();
-await h.scrollIntoViewIfNeeded();
-await f.waitForTimeout(2000);
-await h.locator('xpath=ancestor::section').first().screenshot({ path: "scripts/farms-how.png" });
-await b.close(); console.log("shot done");
+const p = await b.newPage({ viewport: { width: 1280, height: 720 } });
+await p.goto("file:///Users/keshavkrishnan/Claude/CropConnect2/pitch/cropconnect-deck.html", { waitUntil: "networkidle" });
+await p.waitForTimeout(500);
+await p.pdf({ path: "pitch/cropconnect-deck.pdf", width: "1280px", height: "720px", printBackground: true });
+await b.close(); console.log("pdf regenerated");
