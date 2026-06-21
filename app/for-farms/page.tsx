@@ -229,11 +229,8 @@ export default function ForFarmsPage() {
                         <div className="mt-16 grid items-start gap-10 lg:grid-cols-2">
                             <Reveal>
                                 <div className="grid gap-4">
-                                    <Photo q="farmer,portrait,field" alt="A grower standing in the field" seed={35} caption="Tell us what you grow" place="Your farm" className="aspect-[16/10]" />
-                                    <div className="grid grid-cols-2 gap-4">
-                                        <Photo q="leafy,greens,harvest" alt="Freshly cut leafy greens" seed={36} className="aspect-square" />
-                                        <Photo q="chef,kitchen,restaurant" alt="A chef working in a restaurant kitchen" seed={37} className="aspect-square" />
-                                    </div>
+                                    <Photo q="farm,field,crops" alt="Rows of crops on a local farm" seed={62} caption="Tell us what you grow" place="Your farm" className="aspect-[16/10]" />
+                                    <Photo q="vegetable,harvest,basket" alt="A basket of harvested vegetables" seed={64} caption="We match it to nearby kitchens" className="aspect-[16/9]" />
                                 </div>
                             </Reveal>
                             <Reveal delay={0.08}>
