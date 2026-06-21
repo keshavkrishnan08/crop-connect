@@ -11,6 +11,7 @@ import { MenuRepricing } from "@/components/marketing/MenuRepricing";
 import { Metrics } from "@/components/marketing/Metrics";
 import { Outcomes } from "@/components/marketing/Outcomes";
 import { ChargeStats } from "@/components/marketing/ChargeStats";
+import { TrendStats } from "@/components/marketing/TrendStats";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
 import { ProduceGallery } from "@/components/marketing/ProduceGallery";
@@ -121,8 +122,19 @@ function Edge() {
     return (
         <Section tint>
             <Head eyebrow="The numbers" title="The case for a local menu."
-                body="It is not only the price. Sourcing local lifts your margin, pulls people through the door, and keeps them coming back. Here is the whole picture in one place." />
-            <Reveal delay={0.1}><div className="mx-auto mt-14 max-w-5xl"><Metrics /></div></Reveal>
+                body="It is not only the price. Demand for local is climbing, and sourcing it lifts your margin, pulls people in, and keeps them coming back. Here is the whole picture in one place." />
+            <Reveal delay={0.08}>
+                <div className="mx-auto mt-14 max-w-5xl">
+                    <p className="mb-5 text-center text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">Where diners are headed</p>
+                    <TrendStats />
+                </div>
+            </Reveal>
+            <Reveal delay={0.12}>
+                <div className="mx-auto mt-10 max-w-5xl">
+                    <p className="mb-5 text-center text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">What it does for your numbers</p>
+                    <Metrics />
+                </div>
+            </Reveal>
         </Section>
     );
 }
