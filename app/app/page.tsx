@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useStore, marginRollup, farmById, getState, type Activity, type ActivityKind } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
+import { AgentDock, AGENT_NAME } from "@/components/app/AgentDock";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { CountUp } from "@/components/ui/CountUp";
 import { usd, cn } from "@/lib/utils";
@@ -29,6 +30,9 @@ export default function Dashboard() {
                 actions={<LinkButton href="/app/sourcing/new"><Plus size={18} /> Source an ingredient</LinkButton>}
             />
 
+            {/* the agent running it all */}
+            <AgentDock />
+
             {/* done-for-you strip */}
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Stat icon={<Leaf size={20} />} label="Ingredients sourced" value={<span className="font-mono tnum">{sourced}</span>} tone="brand" sub="matched and under contract" />
@@ -45,7 +49,7 @@ export default function Dashboard() {
                             <h2 className="font-display text-xl text-ink">Your sourcing pipeline</h2>
                             <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-600"><span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-500" /></span> Live</span>
                         </div>
-                        <p className="text-[13px] text-ink-muted">Every ingredient, from request to plate. We run each step automatically.</p>
+                        <p className="text-[13px] text-ink-muted">A live model of what {AGENT_NAME} is doing. Every ingredient, from request to plate. Drag to look around — your agent owns the flow.</p>
                     </div>
                     <Link href="/app/sourcing" className="text-sm font-semibold text-brand-600 hover:underline">Open full board</Link>
                 </div>

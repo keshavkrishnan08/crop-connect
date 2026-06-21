@@ -8,7 +8,7 @@ import { MarketingFooter } from "@/components/marketing/Footer";
 import { ServiceFlow } from "@/components/marketing/ServiceFlow";
 import { MarginSliver, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
 import { MenuRepricing } from "@/components/marketing/MenuRepricing";
-import { SocialProof } from "@/components/marketing/SocialProof";
+import { LocalEdge } from "@/components/marketing/LocalEdge";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
 import { ProduceGallery } from "@/components/marketing/ProduceGallery";
@@ -24,6 +24,7 @@ export default function Landing() {
                 <Hero />
                 <Problem />
                 <Result />
+                <Edge />
                 <HowItWorks />
                 <Sourcing />
                 <Delivery />
@@ -58,9 +59,8 @@ function Hero() {
                         <LinkButton href="/how-it-works" variant="ghost" size="lg">How it works</LinkButton>
                     </div>
                 </Reveal>
-                <Reveal delay={0.58}><div className="mx-auto mt-16 max-w-2xl"><SocialProof /></div></Reveal>
-                <Reveal delay={0.64}>
-                    <div className="mt-6 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[13px] font-medium text-ink-muted">
+                <Reveal delay={0.58}>
+                    <div className="mt-9 flex flex-wrap justify-center gap-x-5 gap-y-2 text-[13px] font-medium text-ink-muted">
                         {["Set up in 10 minutes", "Your first dish free", "Cancel anytime"].map((t) => (
                             <span key={t} className="inline-flex items-center gap-1.5"><Check size={14} className="text-brand-500" /> {t}</span>
                         ))}
@@ -95,6 +95,17 @@ function Result() {
                     href="/demo" cta="See it on your menu" />}
                 visual={<MenuRepricing />}
             />
+        </Section>
+    );
+}
+
+/* ---------- 3b. Competitive edge — local wins customers ---------- */
+function Edge() {
+    return (
+        <Section tint>
+            <Head eyebrow="The edge" title="Local is a competitive advantage."
+                body="It is not only the price. Sourcing local pulls people through the door and brings them back. It is the reason a guest picks your place over the chain down the street." />
+            <Reveal delay={0.1}><div className="mx-auto mt-14 max-w-4xl"><LocalEdge /></div></Reveal>
         </Section>
     );
 }
