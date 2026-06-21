@@ -3,7 +3,7 @@
 import * as React from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { Leaf, Check, Truck, MapPin, MarginUp, ArrowRight, Search } from "@/components/icons";
-import { usd, cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 const ACTS = [
     { key: "ask", label: "You tell us", caption: "Say what you want on the menu." },
@@ -27,7 +27,7 @@ export function ServiceFlow() {
     return (
         <div className="glass overflow-hidden rounded-3xl p-2" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
             {/* stage */}
-            <div className="relative h-[320px] overflow-hidden rounded-2xl border border-line bg-canvas-soft sm:h-[300px]">
+            <div className="relative h-[360px] overflow-hidden rounded-2xl border border-line bg-canvas-soft sm:h-[400px]">
                 <div className="pointer-events-none absolute inset-0 bg-dots opacity-50" />
                 <AnimatePresence mode="wait">
                     <motion.div
@@ -125,19 +125,14 @@ function EarnScene() {
         <div className="w-full max-w-sm">
             <p className="mb-3 flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wide text-brand-600"><MarginUp size={12} /> Live on your menu</p>
             <div className="rounded-2xl border border-line bg-white p-5 shadow-sm">
-                <div className="flex items-baseline justify-between"><p className="font-display text-xl text-ink">Tomato salad</p><p className="font-mono text-2xl text-ink tnum">{usd(19)}</p></div>
+                <p className="font-display text-2xl text-ink">Tomato salad</p>
+                <p className="mt-0.5 flex items-center gap-1.5 text-[13px] font-medium text-brand-600"><MapPin size={13} /> Teter Farm</p>
                 <div className="my-4 divider" />
                 <div className="flex items-end justify-between">
-                    <div><p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Added margin</p>
-                        <p className="value-pos text-3xl"><CountTo to={1840} prefix="+$" suffix="/mo" /></p></div>
-                    <div className="flex items-end gap-1">{[40, 60, 75, 90, 100].map((h, i) => <motion.span key={i} className="w-2 rounded-t bg-harvest-400" initial={{ height: 0 }} animate={{ height: h * 0.4 }} transition={{ delay: 0.2 + i * 0.1 }} />)}</div>
+                    <p className="text-sm font-medium text-ink-soft">More margin per plate</p>
+                    <div className="flex items-end gap-1.5">{[40, 58, 72, 88, 100].map((h, i) => <motion.span key={i} className="w-2.5 rounded-t bg-harvest-400" initial={{ height: 0 }} animate={{ height: h * 0.42 }} transition={{ delay: 0.2 + i * 0.1 }} />)}</div>
                 </div>
             </div>
         </div>
     );
-}
-function CountTo({ to, prefix = "", suffix = "" }: { to: number; prefix?: string; suffix?: string }) {
-    const [v, setV] = React.useState(0);
-    React.useEffect(() => { let r = 0; let t0 = 0; const tick = (ts: number) => { if (!t0) t0 = ts; const p = Math.min(1, (ts - t0) / 1100); setV(to * (1 - Math.pow(1 - p, 3))); if (p < 1) r = requestAnimationFrame(tick); }; r = requestAnimationFrame(tick); return () => cancelAnimationFrame(r); }, [to]);
-    return <span className="tnum">{prefix}{Math.round(v).toLocaleString()}<span className="text-base text-ink-muted">{suffix}</span></span>;
 }
