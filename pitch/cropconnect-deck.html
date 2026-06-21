@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CropConnect — Pitch Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --brand:#235C3A; --brand-700:#1c4a2f; --brand-900:#0F2E1D; --brand-50:#eaf1ec;
+    --harvest:#E0A436; --harvest-soft:#f6e6c6;
+    --canvas:#F6F7F2; --canvas-soft:#FBFCF9; --canvas-sunk:#EDEFE7;
+    --ink:#16241C; --ink-soft:#384a3f; --ink-muted:#5b6b60; --ink-faint:#93a097;
+    --line:#e3e6df; --line-strong:#d3d8cf;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Hanken Grotesk',sans-serif;background:#dfe2da;color:var(--ink);-webkit-font-smoothing:antialiased}
+  .deck{display:flex;flex-direction:column;align-items:center;gap:26px;padding:26px}
+  .slide{position:relative;width:1280px;height:720px;background:var(--canvas);overflow:hidden;border-radius:14px;box-shadow:0 18px 50px -20px rgba(15,46,29,.35)}
+  h1,h2,h3{font-family:'Fraunces',serif;font-weight:600;letter-spacing:-.01em;line-height:1.02}
+  .mono{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+  .pad{position:absolute;inset:0;padding:72px 80px;display:flex;flex-direction:column}
+  .eyebrow{font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--brand);display:flex;align-items:center;gap:10px}
+  .eyebrow::before{content:"";width:26px;height:2px;background:var(--harvest);border-radius:2px}
+  .title{font-size:52px;color:var(--ink);margin-top:20px;max-width:14ch}
+  .row{display:flex;gap:56px;flex:1;align-items:center;margin-top:30px}
+  .col{flex:1;min-width:0}
+  ul.bullets{list-style:none;display:flex;flex-direction:column;gap:20px;margin-top:6px}
+  ul.bullets li{position:relative;padding-left:30px;font-size:21px;line-height:1.4;color:var(--ink-soft)}
+  ul.bullets li::before{content:"";position:absolute;left:0;top:9px;width:13px;height:13px;border-radius:4px;background:var(--brand);box-shadow:0 0 0 4px var(--brand-50)}
+  ul.bullets li b{color:var(--ink);font-weight:600}
+  .data{color:var(--harvest);font-weight:700}
+  .foot{position:absolute;left:80px;right:80px;bottom:34px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--ink-faint)}
+  .brandmark{display:flex;align-items:center;gap:10px;font-family:'Fraunces',serif;font-weight:600;color:var(--ink)}
+  .leaf{width:26px;height:26px;border-radius:8px;background:linear-gradient(135deg,var(--brand),var(--brand-900));display:grid;place-items:center}
+  .grid-bg{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:46px 46px;opacity:.5;-webkit-mask-image:radial-gradient(60% 60% at 50% 40%,#000,transparent)}
+  .pagenum{font-family:'JetBrains Mono',monospace;color:var(--ink-faint)}
+  /* visual cards */
+  .card{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 30px -18px rgba(15,46,29,.25)}
+  .chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;padding:5px 11px;border-radius:999px}
+  .chip-brand{background:var(--brand-50);color:var(--brand)}
+  .chip-harvest{background:var(--harvest-soft);color:#9a6b14}
+  .big{font-family:'Fraunces',serif;font-weight:600;line-height:.95}
+  /* cover */
+  .cover{background:radial-gradient(120% 90% at 50% 0%,#eef4ef 0%,var(--canvas) 55%)}
+  .cover .center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 80px}
+  .logo-lg{width:78px;height:78px;border-radius:22px;background:linear-gradient(135deg,var(--brand),var(--brand-900));display:grid;place-items:center;box-shadow:0 16px 40px -16px rgba(35,92,58,.6)}
+  /* pipeline */
+  .pipe{display:flex;align-items:center;gap:0}
+  .node{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:14px 12px;text-align:center;box-shadow:0 8px 20px -16px rgba(15,46,29,.3)}
+  .node .ic{width:34px;height:34px;border-radius:10px;margin:0 auto 8px;display:grid;place-items:center;background:var(--brand-50);color:var(--brand)}
+  .node.done .ic{background:var(--brand);color:#fff}
+  .node .lab{font-size:13px;font-weight:600;color:var(--ink)}
+  .node .sub{font-size:10.5px;color:var(--ink-muted);margin-top:2px}
+  .conn{width:30px;height:2px;background:repeating-linear-gradient(90deg,var(--brand) 0 6px,transparent 6px 11px);flex-shrink:0}
+  /* stat tiles */
+  .tiles{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+  .tile{background:#fff;border:1px solid var(--line);border-radius:16px;padding:22px 24px}
+  .tile .n{font-family:'Fraunces',serif;font-weight:600;font-size:44px;color:var(--ink);line-height:1}
+  .tile .n small{color:var(--harvest)}
+  .tile .l{font-size:14px;color:var(--ink-muted);margin-top:8px;line-height:1.35}
+  /* margin bar */
+  .mbar{height:64px;border-radius:14px;display:flex;overflow:hidden;border:1px solid var(--line)}
+  .mbar .cost{flex:0 0 94%;background:repeating-linear-gradient(135deg,#edefe7,#edefe7 12px,#e7e9e0 12px,#e7e9e0 24px);display:flex;align-items:center;padding-left:22px;font-weight:600;color:var(--ink-soft)}
+  .mbar .keep{flex:1;background:var(--harvest);display:grid;place-items:center;color:#fff;font-weight:700;font-size:12px}
+  /* model flow */
+  .mflow{display:flex;align-items:stretch;gap:14px}
+  .mstep{flex:1;background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+  .mstep.hi{border-color:#cfe0d4;box-shadow:0 0 0 3px var(--brand-50)}
+  .mstep .h{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint)}
+  .mstep .v{font-family:'Fraunces',serif;font-weight:600;font-size:25px;margin-top:8px}
+  .mstep .d{font-size:13px;color:var(--ink-muted);margin-top:8px;line-height:1.4}
+  .arrowm{align-self:center;color:var(--ink-faint);font-size:22px}
+  /* trend chart */
+  .bars{display:flex;align-items:flex-end;gap:14px;height:240px}
+  .bars .b{flex:1;border-radius:8px 8px 0 0;background:linear-gradient(180deg,var(--brand-50),#cfe0d4)}
+  .bars .b.peak{background:linear-gradient(180deg,var(--harvest-soft),var(--harvest))}
+  .bars .bl{font-size:11px;color:var(--ink-faint);text-align:center;margin-top:8px;font-family:'JetBrains Mono',monospace}
+  /* ask */
+  .askcard{background:linear-gradient(135deg,var(--brand-700),var(--brand-900));color:#fff;border-radius:22px;padding:40px}
+  .use{display:flex;flex-direction:column;gap:14px}
+  .use div{display:flex;justify-content:space-between;align-items:center;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,.14);font-size:15px;color:rgba(255,255,255,.85)}
+  .use b{color:#fff}
+  @media print{
+    body{background:#fff}
+    .deck{gap:0;padding:0}
+    .slide{border-radius:0;box-shadow:none;page-break-after:always;break-after:page}
+    @page{size:1280px 720px;margin:0}
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- 1 · COVER -->
+  <section class="slide cover">
+    <div class="grid-bg"></div>
+    <div class="center">
+      <div class="logo-lg"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20v-7"/><path d="M12 13c0-3 2-5 6-5 0 4-2 6-6 5z"/><path d="M12 15c0-2.5-1.8-4.2-5-4 0 3.4 2 4.5 5 4z"/></svg></div>
+      <h1 style="font-size:74px;margin-top:30px">CropConnect</h1>
+      <p style="font-size:25px;color:var(--ink-muted);margin-top:18px;max-width:24ch">Local sourcing, done for you. We make your menu more profitable.</p>
+      <div style="margin-top:30px;display:flex;gap:10px">
+        <span class="chip chip-brand">Restaurant supply</span>
+        <span class="chip chip-harvest">Agent-run</span>
+        <span class="chip chip-brand">Pre-seed</span>
+      </div>
+    </div>
+    <div class="foot"><span>Investor brief · Confidential</span><span class="pagenum">01</span></div>
+  </section>
+
+  <!-- 2 · PROBLEM -->
+  <section class="slide">
+    <div class="pad">
+      <div class="eyebrow">The squeeze</div>
+      <h2 class="title">Cutting costs is a dead end.</h2>
+      <div class="row">
+        <div class="col">
+          <ul class="bullets">
+            <li>Independent kitchens keep <b class="data">3 to 5 cents</b> on every dollar. Full-service averages 3 to 5% net.</li>
+            <li>Every supplier is already squeezed. There is almost nothing left to trim.</li>
+            <li>Local food earns more, but sourcing it means calling farms, chasing trucks, and hoping someone shows up.</li>
+            <li>So most operators never do it, and leave the margin on the table.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="card" style="padding:30px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:14px">Where every dollar goes</div>
+            <div class="mbar"><div class="cost">Costs</div><div class="keep">keep</div></div>
+            <p style="margin-top:16px;font-size:14px;color:var(--ink-muted)">That sliver is the whole business. The only real lever left is to charge more for what is already on the plate.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">02</span></div>
+  </section>
+
+  <!-- 3 · SOLUTION -->
+  <section class="slide">
+    <div class="pad">
+      <div class="eyebrow">The solution</div>
+      <h2 class="title">We do the sourcing. You take the credit.</h2>
+      <div class="row">
+        <div class="col">
+          <ul class="bullets">
+            <li>Tell us one ingredient you want local. An agent runs everything else.</li>
+            <li>It <b>finds and vets farms</b>, <b>signs the agreement</b>, <b>schedules weekly delivery</b>, and hands you the proof for the menu.</li>
+            <li>The restaurant does two things: <b>say what they want</b> and <b>put it on the menu</b>.</li>
+            <li>Set up in about <b class="data">10 minutes</b>. First item runs free.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="card" style="padding:26px">
+            <div style="display:flex;gap:14px;margin-bottom:18px">
+              <div style="flex:1;background:var(--brand);color:#fff;border-radius:14px;padding:18px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;opacity:.8">We handle</div><div style="font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin-top:6px">Everything</div></div>
+              <div style="flex:1;background:var(--canvas-sunk);border-radius:14px;padding:18px"><div style="font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-faint)">You handle</div><div style="font-family:'Fraunces',serif;font-weight:600;font-size:30px;margin-top:6px;color:var(--ink)">Two things</div></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px;font-size:14px;color:var(--ink-soft)">
+              <div>✓ Source · vet · negotiate</div>
+              <div>✓ Contract · deliver · cover shortfalls</div>
+              <div>✓ Provenance · margin tracking</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">03</span></div>
+  </section>
+
+  <!-- 4 · PRODUCT -->
+  <section class="slide" style="background:var(--canvas-soft)">
+    <div class="pad">
+      <div class="eyebrow">The product</div>
+      <h2 class="title">One request in. A better plate out.</h2>
+      <p style="font-size:19px;color:var(--ink-muted);margin-top:16px;max-width:60ch">An autonomous agent runs each ingredient through the same pipeline and shows the work on a live board.</p>
+      <div style="flex:1;display:flex;align-items:center">
+        <div class="pipe" style="width:100%">
+          <div class="node done"><div class="ic">✓</div><div class="lab">Request</div><div class="sub">you ask once</div></div>
+          <div class="conn"></div>
+          <div class="node done"><div class="ic">✓</div><div class="lab">Farm match</div><div class="sub">vetted, ranked</div></div>
+          <div class="conn"></div>
+          <div class="node done"><div class="ic">✓</div><div class="lab">Agreement</div><div class="sub">signed for you</div></div>
+          <div class="conn"></div>
+          <div class="node"><div class="ic">○</div><div class="lab">Delivery</div><div class="sub">weekly, on us</div></div>
+          <div class="conn"></div>
+          <div class="node"><div class="ic">○</div><div class="lab">On the menu</div><div class="sub">earning margin</div></div>
+        </div>
+      </div>
+      <ul class="bullets" style="flex-direction:row;gap:40px;margin-top:0">
+        <li style="font-size:18px">Every step automated end to end.</li>
+        <li style="font-size:18px">A board shows exactly what the agent did.</li>
+        <li style="font-size:18px">Backup farms cover any shortfall.</li>
+      </ul>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">04</span></div>
+  </section>
+
+  <!-- 5 · MARKET -->
+  <section class="slide">
+    <div class="pad">
+      <div class="eyebrow">The opportunity</div>
+      <h2 class="title">A trillion-dollar table.</h2>
+      <div class="row">
+        <div class="col" style="flex:1.05">
+          <ul class="bullets">
+            <li>US foodservice is a <b class="data">$1.1 trillion</b> market across more than <b class="data">1 million</b> outlets.</li>
+            <li>Our wedge: <b class="data">34,000+</b> full-service restaurants where local sourcing actually moves the check.</li>
+            <li><b class="data">41%</b> of diners already choose restaurants by local sourcing.</li>
+            <li>We monetize the service layer, not the food, so revenue compounds per location.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="tiles">
+            <div class="tile"><div class="n">$1.1<small>T</small></div><div class="l">US foodservice sales, 2024</div></div>
+            <div class="tile"><div class="n">1M<small>+</small></div><div class="l">restaurant &amp; foodservice outlets</div></div>
+            <div class="tile"><div class="n">34<small>K+</small></div><div class="l">full-service spots, our beachhead</div></div>
+            <div class="tile"><div class="n">41<small>%</small></div><div class="l">of diners pick by local sourcing</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">05</span></div>
+  </section>
+
+  <!-- 6 · BUSINESS MODEL -->
+  <section class="slide" style="background:var(--canvas-soft)">
+    <div class="pad">
+      <div class="eyebrow">The model</div>
+      <h2 class="title">We make money one way.</h2>
+      <p style="font-size:19px;color:var(--ink-muted);margin-top:16px;max-width:62ch">No markup on food. No cut of sales. One transparent service fee, so our incentives sit with the kitchen.</p>
+      <div style="flex:1;display:flex;align-items:center">
+        <div class="mflow" style="width:100%">
+          <div class="mstep"><div class="h">You fund</div><div class="v">Food at cost</div><div class="d">Pay the farm price and nothing more.</div></div>
+          <div class="arrowm">→</div>
+          <div class="mstep hi"><div class="h">You pay us</div><div class="v">A service fee</div><div class="d">Modular monthly, scales with farms and items. Discounts up to 20% for longer terms.</div></div>
+          <div class="arrowm">→</div>
+          <div class="mstep"><div class="h">You keep</div><div class="v">The upside</div><div class="d">Every extra dollar of margin stays yours.</div></div>
+        </div>
+      </div>
+      <ul class="bullets" style="flex-direction:row;gap:40px;margin-top:0">
+        <li style="font-size:18px"><b>Recurring</b> revenue per location.</li>
+        <li style="font-size:18px"><b>Expands</b> as a kitchen adds items and farms.</li>
+        <li style="font-size:18px"><b>Aligned</b>: we win only if they keep winning.</li>
+      </ul>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">06</span></div>
+  </section>
+
+  <!-- 7 · WHY NOW -->
+  <section class="slide">
+    <div class="pad">
+      <div class="eyebrow">Why now</div>
+      <h2 class="title">The shift is already on the menu.</h2>
+      <div class="row">
+        <div class="col">
+          <ul class="bullets">
+            <li><b class="data">44%</b> of diners are more likely to visit a restaurant that prioritizes local sourcing, and the trend keeps climbing.</li>
+            <li><b class="data">68 cents</b> of every local dollar stays in the community, versus 43 cents otherwise.</li>
+            <li>AI agents finally make true done-for-you service cheap enough to run at scale.</li>
+            <li>Independents need an edge against the chains, and local is theirs to own.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="card" style="padding:28px">
+            <div style="font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px">Diner demand for local</div>
+            <div class="bars">
+              <div style="flex:1"><div class="b" style="height:46%"></div><div class="bl">'21</div></div>
+              <div style="flex:1"><div class="b" style="height:58%"></div><div class="bl">'22</div></div>
+              <div style="flex:1"><div class="b" style="height:70%"></div><div class="bl">'23</div></div>
+              <div style="flex:1"><div class="b" style="height:84%"></div><div class="bl">'24</div></div>
+              <div style="flex:1"><div class="b peak" style="height:100%"></div><div class="bl">'25</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">07</span></div>
+  </section>
+
+  <!-- 8 · ASK -->
+  <section class="slide" style="background:var(--canvas-soft)">
+    <div class="pad">
+      <div class="eyebrow">The ask</div>
+      <h2 class="title">Let's set the table.</h2>
+      <div class="row">
+        <div class="col">
+          <ul class="bullets">
+            <li>Raising a <b>pre-seed round</b> to onboard the first <b class="data">100</b> kitchens in one metro.</li>
+            <li>Proof points: live agent, real per-account product, first paid pilots.</li>
+            <li>Goal: prove repeatable margin lift, then expand metro by metro.</li>
+          </ul>
+        </div>
+        <div class="col">
+          <div class="askcard">
+            <div style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;opacity:.7">Raising</div>
+            <div class="big" style="font-size:62px;margin:8px 0 22px">$1.5M</div>
+            <div class="use">
+              <div><span>Sourcing &amp; ops team</span><b>40%</b></div>
+              <div><span>Agent &amp; product</span><b>35%</b></div>
+              <div><span>First-metro growth</span><b>25%</b></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">08</span></div>
+  </section>
+
+</div>
+</body>
+</html>
