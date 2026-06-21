@@ -67,7 +67,7 @@ function Media() {
     return (
         <Section className="pt-20">
             <div className="mx-auto max-w-2xl text-center">
-                <Reveal><h2 className="font-display text-4xl leading-tight sm:text-[3.4rem]">You ask. We do the rest.</h2></Reveal>
+                <Reveal><h2 className="font-display text-4xl leading-tight sm:text-[3.4rem]">We handle every step for you.</h2></Reveal>
                 <Reveal delay={0.06}><p className="mt-5 text-lg leading-relaxed text-ink-muted">Tell us one ingredient you want on the menu. From there it is on us. We find the farm, sign the deal, deliver it every week, and hand you the proof of where it came from. Here is the whole loop.</p></Reveal>
             </div>
             <Reveal delay={0.1} y={28}><div className="mx-auto mt-14 max-w-3xl"><ServiceFlow /></div></Reveal>
@@ -79,7 +79,7 @@ function Media() {
 function Produce() {
     return (
         <Section tint>
-            <Head eyebrow="Fresh produce" title="We get you the good stuff."
+            <Head eyebrow="Fresh produce" title="Produce from farms near you."
                 body="Real food from farms near you, picked this week and brought to your door. Tomatoes that taste like tomatoes. Greens cut a few days ago. The kind of produce a guest notices on the first bite." />
             <Reveal delay={0.1} y={24}><div className="mx-auto mt-14 max-w-4xl"><ProduceGallery /></div></Reveal>
         </Section>
@@ -90,7 +90,7 @@ function Produce() {
 function Problem() {
     return (
         <Section tint>
-            <Head eyebrow="The problem" title="Margins are brutal."
+            <Head eyebrow="The problem" title="You cannot cut your way to better margins."
                 body="Independent kitchens keep three to five cents on every dollar. You have already called every supplier and trimmed every cost. There is almost nothing left to cut. The only real way to make more is to charge more for what is already on the plate. Local food is how you do that. Sourcing it yourself means calling farms, chasing trucks, and hoping someone shows up." />
             <Reveal delay={0.1} y={22}><div className="mx-auto mt-14 max-w-2xl"><MarginSliver /></div></Reveal>
         </Section>
@@ -103,7 +103,7 @@ function Benefits() {
         <>
             <Section>
                 <Split reverse
-                    text={<Benefit icon={<MarginUp size={22} />} eyebrow="The result" title="Charge more."
+                    text={<Benefit icon={<MarginUp size={22} />} eyebrow="The result" title="Local food lets you charge more."
                         body="When a dish comes from a named farm down the road, people will pay more for it and feel good doing it. Your food cost barely moves. The menu price does. On a business this thin, that gap is almost pure profit."
                         href="/demo" cta="See it on your menu" />}
                     visual={<ResultMeter />}
@@ -111,20 +111,20 @@ function Benefits() {
             </Section>
             <Section tint>
                 <Split
-                    text={<Benefit icon={<Farm size={22} />} eyebrow="Sourcing" title="We find the farms."
+                    text={<Benefit icon={<Farm size={22} />} eyebrow="Sourcing" title="We find and vet the farms."
                         body="We already know the growers near you. We rank them by distance, track record, and price, and we check each one before we ever put them in front of you. You see a short list and pick the one you like. No cold calls. No tasting through ten vendors. No guessing who will actually show up." />}
                     visual={<FarmVetCard />}
                 />
             </Section>
             <Section>
                 <Split reverse
-                    text={<Benefit icon={<Truck size={22} />} eyebrow="Delivery" title="We bring it."
+                    text={<Benefit icon={<Truck size={22} />} eyebrow="Delivery" title="We deliver it every week."
                         body="This is the part every chef dreads, so we own it end to end. We schedule the farm, book the courier, and confirm each drop before it lands. If a crop comes up short one week, a backup farm fills in without you lifting a finger. It simply arrives, on the same rhythm, every week." />}
                     visual={<DeliverySchedule />}
                 />
             </Section>
             <Section tint>
-                <Head eyebrow="Full service" title="You do two things."
+                <Head eyebrow="Full service" title="We do everything but the cooking."
                     body="We take the entire job off your plate. You say what you want, and you put it on the menu. Everything in between is ours." />
                 <div className="mx-auto mt-14 grid max-w-3xl gap-4 sm:grid-cols-[1.5fr_1fr]">
                     <Reveal>
@@ -164,7 +164,7 @@ function Benefit({ icon, eyebrow, title, body, href, cta }: { icon: React.ReactN
 function BusinessModel() {
     return (
         <Section>
-            <Head eyebrow="Pricing" title="One flat fee."
+            <Head eyebrow="Pricing" title="One flat fee with no markups."
                 body="We are not a distributor, so we make nothing on your food. We never touch your sales. You pay one flat monthly fee for the service, and you keep every extra dollar your menu earns. Our incentive is simple. The more you make, the longer you stay." />
             <Reveal delay={0.1}><div className="mt-14"><MoneyFlow /></div></Reveal>
             <Reveal delay={0.14}><div className="mt-10 text-center"><LinkButton href="/pricing" variant="ghost">See pricing <ArrowRight size={16} /></LinkButton></div></Reveal>
@@ -176,7 +176,7 @@ function BusinessModel() {
 function Voices() {
     return (
         <Section tint>
-            <Head eyebrow="Early partners" title="What they tell us."
+            <Head eyebrow="Early partners" title="What early restaurants tell us."
                 body="We are building this with a small group of restaurants in one metro. These are their words, in their roles." />
             <div className="mt-12"><Testimonials /></div>
             <Reveal delay={0.1}><p className="mt-7 text-center text-[12.5px] text-ink-faint">Real names go up here as each partner goes live.</p></Reveal>
@@ -188,7 +188,7 @@ function Voices() {
 function Questions() {
     return (
         <Section>
-            <Head eyebrow="Questions" title="The honest answers."
+            <Head eyebrow="Questions" title="Straight answers before you start."
                 body="The things every owner asks us before they start. Short version: no markups, no hidden cuts, no lock-in." />
             <Reveal delay={0.1}><div className="mt-12"><Faq /></div></Reveal>
         </Section>
