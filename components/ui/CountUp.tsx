@@ -2,30 +2,24 @@
 
 import * as React from "react";
 
-/** Animated number that counts up to `to` once it mounts. Respects reduced motion. */
-export function CountUp({
-    to, duration = 1100, format = (n) => Math.round(n).toString(), className,
-}: {
-    to: number; duration?: number; format?: (n: number) => string; className?: string;
-}) {
-    const [val, setVal] = React.useState(0);
-    const ref = React.useRef<HTMLSpanElement>(null);
-
+/** Animated number — counts up on mount or whenever `to` changes. Respects reduced motion. */
+export function CountUp({ to, duration = 900, format = (n) => Math.round(n).toString(), className }: { to: number; duration?: number; format?: (n: number) => string; className?: string }) {
+    const [val, setVal] = React.useState(to);
+    const from = React.useRef(to);
     React.useEffect(() => {
-        const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
-        if (reduce || to === 0) { setVal(to); return; }
-        let raf = 0;
-        let start = 0;
+        const reduce = typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+        const start = from.current;
+        if (reduce || start === to) { setVal(to); from.current = to; return; }
+        let raf = 0; let t0 = 0;
         const ease = (t: number) => 1 - Math.pow(1 - t, 3);
         const tick = (ts: number) => {
-            if (!start) start = ts;
-            const p = Math.min(1, (ts - start) / duration);
-            setVal(to * ease(p));
-            if (p < 1) raf = requestAnimationFrame(tick);
+            if (!t0) t0 = ts;
+            const p = Math.min(1, (ts - t0) / duration);
+            setVal(start + (to - start) * ease(p));
+            if (p < 1) raf = requestAnimationFrame(tick); else from.current = to;
         };
         raf = requestAnimationFrame(tick);
         return () => cancelAnimationFrame(raf);
     }, [to, duration]);
-
-    return <span ref={ref} className={className}>{format(val)}</span>;
+    return <span className={className}>{format(val)}</span>;
 }
