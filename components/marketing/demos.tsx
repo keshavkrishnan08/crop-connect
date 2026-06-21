@@ -43,30 +43,98 @@ export function ResultMeter() {
     );
 }
 
-/* ---------- SOURCING: a vetting card ---------- */
+/* ---------- SOURCING: an intricate vetting dossier ---------- */
 export function FarmVetCard() {
+    const reduce = useReducedMotion();
     const checks = [
-        { i: <MapPin size={16} />, t: "Close to you" },
-        { i: <Shield size={16} />, t: "Proven record" },
-        { i: <Leaf size={16} />, t: "Practices verified" },
-        { i: <Receipt size={16} />, t: "Price checked" },
+        { i: <MapPin size={15} />, t: "Close to you" },
+        { i: <Shield size={15} />, t: "Proven record" },
+        { i: <Leaf size={15} />, t: "Practices verified" },
+        { i: <Receipt size={15} />, t: "Price in range" },
     ];
     return (
-        <div className="w-full rounded-3xl border border-line bg-canvas-soft p-7 shadow-card">
-            <div className="flex items-center gap-3.5">
-                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-600 font-display text-xl text-white">TF</span>
-                <div><p className="font-display text-2xl text-ink">Teter Farm</p><p className="text-sm text-ink-muted">Maria Teter</p></div>
-                <motion.span className="ml-auto badge-brand" initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.6 }}><Check size={12} /> Vetted</motion.span>
+        <div className="relative w-full overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-card">
+            {/* a scan line that sweeps once on view */}
+            <motion.div className="absolute inset-x-0 top-0 z-10 h-px bg-gradient-to-r from-transparent via-brand-400 to-transparent"
+                initial={{ y: 0, opacity: 0 }} whileInView={reduce ? {} : { y: [0, 360, 0], opacity: [0, 1, 0] }} viewport={{ once: true }} transition={{ duration: 1.6, ease: "easeInOut" }} />
+            {/* header band */}
+            <div className="relative flex items-start gap-4 border-b border-line bg-gradient-to-br from-brand-50/60 to-transparent p-6">
+                <div className="relative">
+                    <span className="grid h-14 w-14 place-items-center rounded-2xl bg-brand-600 font-display text-xl text-white shadow-brand">TF</span>
+                    <motion.span className="absolute -bottom-1 -right-1 grid h-6 w-6 place-items-center rounded-full bg-white" initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.7, type: "spring", stiffness: 300 }}>
+                        <span className="grid h-5 w-5 place-items-center rounded-full bg-brand-500 text-white"><Check size={12} /></span>
+                    </motion.span>
+                </div>
+                <div className="min-w-0 flex-1 pt-0.5">
+                    <p className="font-display text-2xl leading-tight text-ink">Teter Farm</p>
+                    <p className="flex items-center gap-1.5 text-[13px] text-ink-muted"><span className="h-1.5 w-1.5 rounded-full bg-brand-400" /> Maria Teter, grower</p>
+                </div>
+                <VetRing reduce={reduce} />
             </div>
-            <div className="mt-6 grid grid-cols-2 gap-2.5">
+
+            {/* radar + record */}
+            <div className="grid grid-cols-[auto_1fr] items-center gap-5 px-6 py-5">
+                <Radar reduce={reduce} />
+                <div>
+                    <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Track record</p>
+                    <div className="flex gap-1.5">
+                        {Array.from({ length: 7 }).map((_, i) => (
+                            <motion.span key={i} className="h-7 flex-1 rounded-md bg-brand-400" style={{ transformOrigin: "bottom" }}
+                                initial={{ scaleY: 0.15, opacity: 0.35 }} whileInView={{ scaleY: i === 5 ? 0.6 : 1, opacity: 1 }} viewport={{ once: true }} transition={{ delay: 0.2 + i * 0.07, ease: [0.22, 1, 0.36, 1] }} />
+                        ))}
+                    </div>
+                    <p className="mt-2 text-[13px] text-ink-muted">Reliable, week after week.</p>
+                </div>
+            </div>
+
+            {/* checklist */}
+            <div className="grid grid-cols-2 gap-2.5 px-6 pb-5">
                 {checks.map((c, i) => (
-                    <motion.div key={c.t} initial={{ opacity: 0, y: 8 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.12 }} className="flex items-center gap-2.5 rounded-xl bg-white px-3.5 py-3 shadow-sm">
-                        <span className="grid h-8 w-8 place-items-center rounded-lg bg-brand-50 text-brand-600">{c.i}</span>
-                        <span className="text-[14px] font-medium text-ink-soft">{c.t}</span>
-                        <Check size={16} className="ml-auto text-brand-500" />
+                    <motion.div key={c.t} initial={{ opacity: 0, x: -8 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.35 + i * 0.1 }} className="flex items-center gap-2 rounded-xl border border-line bg-white px-3 py-2.5">
+                        <span className="grid h-7 w-7 place-items-center rounded-lg bg-brand-50 text-brand-600">{c.i}</span>
+                        <span className="flex-1 text-[13px] font-medium text-ink-soft">{c.t}</span>
+                        <motion.span initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ delay: 0.55 + i * 0.1, type: "spring", stiffness: 320 }}><Check size={15} className="text-brand-500" /></motion.span>
                     </motion.div>
                 ))}
             </div>
+
+            {/* practices */}
+            <div className="flex flex-wrap gap-1.5 border-t border-line px-6 py-4">
+                {["Certified Organic", "No-till", "Dry-farmed"].map((p) => (
+                    <span key={p} className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-600"><Leaf size={11} /> {p}</span>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function VetRing({ reduce }: { reduce: boolean | null }) {
+    const C = 2 * Math.PI * 20;
+    return (
+        <div className="relative grid h-16 w-16 shrink-0 place-items-center">
+            <svg viewBox="0 0 48 48" className="h-16 w-16 -rotate-90">
+                <circle cx="24" cy="24" r="20" fill="none" strokeWidth="3" className="stroke-brand-100" />
+                <motion.circle cx="24" cy="24" r="20" fill="none" strokeWidth="3" strokeLinecap="round" className="stroke-brand-500"
+                    strokeDasharray={C} initial={{ strokeDashoffset: C }} whileInView={{ strokeDashoffset: 0 }} viewport={{ once: true }} transition={{ duration: reduce ? 0 : 1.1, ease: [0.22, 1, 0.36, 1], delay: 0.1 }} />
+            </svg>
+            <div className="absolute text-center leading-none">
+                <p className="text-[9px] font-semibold uppercase tracking-wide text-brand-600">Vetted</p>
+                <motion.div initial={{ scale: 0 }} whileInView={{ scale: 1 }} viewport={{ once: true }} transition={{ delay: 1.1, type: "spring", stiffness: 300 }}><Check size={16} className="mx-auto text-brand-600" /></motion.div>
+            </div>
+        </div>
+    );
+}
+
+function Radar({ reduce }: { reduce: boolean | null }) {
+    return (
+        <div className="relative grid h-24 w-24 place-items-center rounded-full border border-line bg-white">
+            <div className="absolute h-16 w-16 rounded-full border border-line" />
+            <div className="absolute h-9 w-9 rounded-full border border-line" />
+            {!reduce && <motion.div className="absolute inset-0 rounded-full" style={{ background: "conic-gradient(from 0deg, rgba(35,92,58,0.18), transparent 75%)" }} animate={{ rotate: 360 }} transition={{ duration: 3.2, repeat: Infinity, ease: "linear" }} />}
+            <span className="absolute z-10 h-2 w-2 rounded-full bg-ink" />
+            {/* the farm blip */}
+            <motion.span className="absolute z-10 h-2.5 w-2.5 rounded-full bg-brand-500 ring-4 ring-brand-500/20" style={{ left: "62%", top: "34%" }}
+                animate={reduce ? {} : { scale: [1, 1.35, 1] }} transition={{ duration: 1.6, repeat: Infinity }} />
         </div>
     );
 }
