@@ -292,7 +292,7 @@ function FinalCta() {
 
 /* ---------- layout primitives ---------- */
 function Section({ children, tint, className }: { children: React.ReactNode; tint?: boolean; className?: string }) {
-    return <section className={`${tint ? "bg-canvas-soft" : ""} border-t border-line/60 py-28 sm:py-36 ${className ?? ""}`}><div className="mx-auto max-w-6xl px-5 lg:px-8">{children}</div></section>;
+    return <section className={`${tint ? "bg-canvas-soft" : ""} border-t border-line/60 py-32 sm:py-44 ${className ?? ""}`}><div className="mx-auto max-w-6xl px-5 lg:px-8">{children}</div></section>;
 }
 function Head({ eyebrow, title, body }: { eyebrow: string; title: string; body?: string }) {
     return <div className="mx-auto max-w-2xl text-center"><Reveal><div className="flex justify-center"><Eyebrow>{eyebrow}</Eyebrow></div><h2 className="mt-4 font-display text-4xl leading-tight sm:text-[3.4rem]">{title}</h2>{body && <p className="mt-5 text-lg leading-relaxed text-ink-muted">{body}</p>}</Reveal></div>;

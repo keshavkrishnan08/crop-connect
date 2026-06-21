@@ -1,5 +1,6 @@
 import { MarketingNav } from "@/components/marketing/Nav";
 import { MarketingFooter } from "@/components/marketing/Footer";
+import { Photo } from "@/components/marketing/Photo";
 import { LinkButton, Card, Badge, Eyebrow } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import {
@@ -33,6 +34,7 @@ export default function HowItWorksPage() {
             <MarketingNav />
             <main>
                 <Hero />
+                <PhotoBand />
                 <MeetSage />
                 <Step1 />
                 <Step2 />
@@ -54,22 +56,22 @@ function Hero() {
         <section className="relative overflow-hidden border-b border-line">
             <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
             <div className="bg-grid pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)]" />
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
+            <div className="mx-auto max-w-4xl px-5 py-24 text-center sm:px-8 lg:py-36">
                 <Reveal>
-                    <Eyebrow>How it works</Eyebrow>
+                    <div className="flex justify-center"><Eyebrow>How it works</Eyebrow></div>
                 </Reveal>
                 <Reveal delay={0.05}>
-                    <h1 className="mt-5 max-w-2xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
+                    <h1 className="mx-auto mt-5 max-w-3xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
                         Sage does the sourcing. You run the kitchen.
                     </h1>
                 </Reveal>
                 <Reveal delay={0.1}>
-                    <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
-                        Sage is the agent that runs your local supply. It matches and vets farms, drafts the agreement, schedules every delivery, and prepares the provenance. You do two things. Say what you want, and put it on the menu.
+                    <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
+                        Sage is the agent that runs your local supply. It matches and vets farms, drafts the agreement, and delivers it to your door every week. We handle the trucks, the schedule, and the cold chain. You do two things. Say what you want, and put it on the menu.
                     </p>
                 </Reveal>
                 <Reveal delay={0.15}>
-                    <div className="mt-8 flex flex-wrap items-center gap-3">
+                    <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
                         <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
                             See your numbers
                             <ArrowRight size={18} />
@@ -80,10 +82,26 @@ function Hero() {
                     </div>
                 </Reveal>
                 <Reveal delay={0.22}>
-                    <div className="mt-12">
+                    <div className="mx-auto mt-12 max-w-3xl">
                         <SageFlow />
                     </div>
                 </Reveal>
+            </div>
+        </section>
+    );
+}
+
+/* ------------------------------------------------------------- Photo band */
+function PhotoBand() {
+    return (
+        <section className="border-b border-line">
+            <div className="mx-auto max-w-6xl px-5 py-14 sm:px-8">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                    <Photo q="farmer,harvest,vegetables" alt="A farmer harvesting" seed={41} caption="Vetted farms" className="aspect-[3/4]" />
+                    <Photo q="fresh,vegetables,crate" alt="A crate of fresh produce" seed={42} caption="Picked this week" className="aspect-[3/4]" />
+                    <Photo q="produce,delivery,van" alt="Produce being delivered" seed={43} caption="We deliver it" className="aspect-[3/4]" />
+                    <Photo q="chef,plating,restaurant" alt="A chef plating a dish" seed={44} caption="On your menu" className="aspect-[3/4]" />
+                </div>
             </div>
         </section>
     );
@@ -100,7 +118,7 @@ function MeetSage() {
     ];
     return (
         <section className="border-b border-line bg-canvas-soft">
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <div className="flex items-center gap-3">
                         <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-600 text-white shadow-brand">
@@ -234,7 +252,7 @@ function StepSection({
 }) {
     return (
         <section className={`border-b border-line ${n % 2 === 0 ? "bg-canvas-soft" : ""}`}>
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <div className={`grid items-center gap-12 lg:grid-cols-2 ${flip ? "lg:[&>*:first-child]:order-2" : ""}`}>
                     <Reveal>
                         <div className="flex items-center gap-4">
@@ -269,7 +287,7 @@ function OwnerTag({ owner }: { owner: "you" | "sage" }) {
 function Recap() {
     return (
         <section className="border-b border-line">
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <div className="flex justify-center"><Eyebrow>Start to finish</Eyebrow></div>
                     <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl sm:text-4xl">From a one-line request to a plate that earns more.</h2>
