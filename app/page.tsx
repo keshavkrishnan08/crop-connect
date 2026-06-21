@@ -8,13 +8,15 @@ import { MarketingFooter } from "@/components/marketing/Footer";
 import { ServiceFlow } from "@/components/marketing/ServiceFlow";
 import { MarginSliver, FarmVetCard, DeliverySchedule, MoneyFlow } from "@/components/marketing/demos";
 import { MenuRepricing } from "@/components/marketing/MenuRepricing";
-import { LocalEdge } from "@/components/marketing/LocalEdge";
+import { Metrics } from "@/components/marketing/Metrics";
+import { Outcomes } from "@/components/marketing/Outcomes";
+import { ChargeStats } from "@/components/marketing/ChargeStats";
 import { Testimonials } from "@/components/marketing/Testimonials";
 import { Faq } from "@/components/marketing/Faq";
 import { ProduceGallery } from "@/components/marketing/ProduceGallery";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { LinkButton, Card, Eyebrow } from "@/components/ui/kit";
-import { ArrowRight, Check, Leaf, MarginUp, Farm, Truck } from "@/components/icons";
+import { ArrowRight, Check, Leaf, MarginUp, Farm, Truck, Sparkle } from "@/components/icons";
 
 export default function Landing() {
     return (
@@ -22,6 +24,7 @@ export default function Landing() {
             <MarketingNav />
             <main>
                 <Hero />
+                <ResultsBand />
                 <Problem />
                 <Result />
                 <Edge />
@@ -34,6 +37,7 @@ export default function Landing() {
                 <Voices />
                 <Questions />
                 <Setup />
+                <StartFree />
                 <FinalCta />
             </main>
             <MarketingFooter />
@@ -74,6 +78,18 @@ function Word({ children, delay, className }: { children: React.ReactNode; delay
     return <span className={`inline-block animate-fade-up opacity-0 ${className ?? ""}`} style={{ animationDelay: `${delay}s` }}>{children}</span>;
 }
 
+/* ---------- Outcomes band (near the top) ---------- */
+function ResultsBand() {
+    return (
+        <Section className="!py-16">
+            <div className="mx-auto mb-10 max-w-2xl text-center">
+                <Reveal><div className="flex justify-center"><Eyebrow>What it does for you</Eyebrow></div><h2 className="mt-4 font-display text-3xl leading-tight sm:text-4xl">Run a stronger restaurant.</h2></Reveal>
+            </div>
+            <Reveal delay={0.08}><div className="mx-auto max-w-4xl"><Outcomes /></div></Reveal>
+        </Section>
+    );
+}
+
 /* ---------- 2. Problem ---------- */
 function Problem() {
     return (
@@ -95,17 +111,18 @@ function Result() {
                     href="/demo" cta="See it on your menu" />}
                 visual={<MenuRepricing />}
             />
+            <Reveal delay={0.1}><div className="mx-auto mt-20 max-w-4xl"><ChargeStats /></div></Reveal>
         </Section>
     );
 }
 
-/* ---------- 3b. Competitive edge — local wins customers ---------- */
+/* ---------- 3b. The numbers — Afresh-style comprehensive metrics ---------- */
 function Edge() {
     return (
         <Section tint>
-            <Head eyebrow="The edge" title="Local is a competitive advantage."
-                body="It is not only the price. Sourcing local pulls people through the door and brings them back. It is the reason a guest picks your place over the chain down the street." />
-            <Reveal delay={0.1}><div className="mx-auto mt-14 max-w-4xl"><LocalEdge /></div></Reveal>
+            <Head eyebrow="The numbers" title="The case for a local menu."
+                body="It is not only the price. Sourcing local lifts your margin, pulls people through the door, and keeps them coming back. Here is the whole picture in one place." />
+            <Reveal delay={0.1}><div className="mx-auto mt-14 max-w-5xl"><Metrics /></div></Reveal>
         </Section>
     );
 }
@@ -192,10 +209,10 @@ function FullService() {
 function BusinessModel() {
     return (
         <Section>
-            <Head eyebrow="Pricing" title="One flat fee with no markups."
-                body="We are not a distributor, so we make nothing on your food. We never touch your sales. You pay one flat monthly fee for the service, and you keep every extra dollar your menu earns. Our incentive is simple. The more you make, the longer you stay." />
+            <Head eyebrow="Pricing" title="You fund the food at cost."
+                body="We are not a distributor, so we make nothing on your food. You pay the farm price and nothing more, with no cut of your sales. On top of that is one monthly service fee. It scales with how much we run for you, the number of farms and items, and it drops the longer you commit." />
             <Reveal delay={0.1}><div className="mt-14"><MoneyFlow /></div></Reveal>
-            <Reveal delay={0.14}><div className="mt-10 text-center"><LinkButton href="/pricing" variant="ghost">See pricing <ArrowRight size={16} /></LinkButton></div></Reveal>
+            <Reveal delay={0.14}><div className="mt-10 text-center"><LinkButton href="/pricing" variant="ghost">See pricing and build your plan <ArrowRight size={16} /></LinkButton></div></Reveal>
         </Section>
     );
 }
@@ -248,6 +265,22 @@ function Setup() {
                     </Reveal>
                 ))}
             </div>
+        </Section>
+    );
+}
+
+/* ---------- Start free ---------- */
+function StartFree() {
+    return (
+        <Section>
+            <Reveal>
+                <div className="mx-auto max-w-3xl rounded-4xl border border-harvest-300 bg-gradient-to-br from-harvest-400/10 to-canvas-soft p-10 text-center sm:p-12">
+                    <span className="badge-harvest"><Sparkle size={13} /> No risk to try</span>
+                    <h2 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl">Start free.</h2>
+                    <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-ink-muted">One local item. One week. Free, with no commitment. The first taste is on us, and the value sells the rest.</p>
+                    <div className="mt-8 flex justify-center"><LinkButton href="/demo" size="lg">Start free <ArrowRight size={17} /></LinkButton></div>
+                </div>
+            </Reveal>
         </Section>
     );
 }

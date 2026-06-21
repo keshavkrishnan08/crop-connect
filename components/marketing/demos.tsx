@@ -174,10 +174,10 @@ export function MoneyFlow() {
                 <Upside />
             </div>
             <div className="relative mt-9 flex flex-col items-center gap-3 border-t border-line pt-7 sm:flex-row sm:justify-center sm:gap-4">
-                <span className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">We never touch</span>
+                <span className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">We never add</span>
                 <div className="flex gap-2.5">
-                    <NeverChip label="Your food cost" />
-                    <NeverChip label="Your sales" />
+                    <NeverChip label="Markup on food" />
+                    <NeverChip label="Cut of your sales" />
                 </div>
             </div>
         </div>
@@ -194,8 +194,8 @@ function FeeTicket() {
                 <p className="mt-3 text-2xs font-semibold uppercase tracking-wide text-ink-faint">You pay</p>
             </div>
             <div className="mt-5 border-t border-dashed border-line pt-4">
-                <p className="font-display text-3xl leading-none text-ink">One flat fee</p>
-                <p className="mt-1.5 text-sm text-ink-muted">per month, that is it</p>
+                <p className="font-display text-3xl leading-none text-ink">Service fee</p>
+                <p className="mt-1.5 text-sm text-ink-muted">monthly · food at cost</p>
             </div>
         </div>
     );
