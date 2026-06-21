@@ -3,7 +3,8 @@
 import { useStore, STAGES, STAGE_LABEL, type Stage, type SourcingItem } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { ItemCard } from "@/components/sourcing/ItemCard";
-import { LinkButton, EmptyState } from "@/components/ui/kit";
+import { AutomationBoard } from "@/components/app/AutomationBoard";
+import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { Plus, Route } from "@/components/icons";
 
 export default function SourcingPage() {
@@ -21,11 +22,21 @@ export default function SourcingPage() {
             {items.length === 0 ? (
                 <EmptyState icon={<Route size={24} />} title="Nothing sourcing yet" description="Tell us one ingredient you'd like to bring local. We'll match a farm and run the rest." action={<LinkButton href="/app/sourcing/new"><Plus size={18} /> Source an ingredient</LinkButton>} />
             ) : (
-                <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
-                    {STAGES.map((stage) => (
-                        <Column key={stage} stage={stage} items={items.filter((i) => i.stage === stage)} />
-                    ))}
-                </div>
+                <>
+                    <Card className="mb-6 p-5 sm:p-6">
+                        <h2 className="mb-4 font-display text-xl text-ink">The automation</h2>
+                        <AutomationBoard items={items} />
+                    </Card>
+                    <div className="mb-3 flex items-center justify-between">
+                        <h2 className="font-display text-xl text-ink">By stage</h2>
+                        <span className="text-2xs font-medium uppercase tracking-wide text-ink-faint">Kanban view</span>
+                    </div>
+                    <div className="flex gap-4 overflow-x-auto pb-3 no-scrollbar">
+                        {STAGES.map((stage) => (
+                            <Column key={stage} stage={stage} items={items.filter((i) => i.stage === stage)} />
+                        ))}
+                    </div>
+                </>
             )}
         </div>
     );

@@ -45,6 +45,9 @@ export interface SourcingItem {
     agreedAt?: string;
 }
 
+export type ActivityKind = "match" | "contract" | "delivery" | "story" | "system";
+export interface Activity { id: string; text: string; kind: ActivityKind; itemId?: string; ts: number }
+
 export interface AppState {
     onboarded: boolean;
     restaurant: Restaurant;
@@ -52,6 +55,7 @@ export interface AppState {
     levers: Levers;
     farms: Farm[];
     items: SourcingItem[];
+    activity: Activity[];
 }
 
 // ---- seed ----
@@ -108,7 +112,20 @@ function seed(): AppState {
         levers: DEFAULT_LEVERS,
         farms: SEED_FARMS,
         items: seedItems(),
+        activity: seedActivity(),
     };
+}
+
+function seedActivity(): Activity[] {
+    const now = Date.now();
+    const a = (text: string, kind: ActivityKind, minsAgo: number, itemId?: string): Activity => ({ id: uid("a"), text, kind, itemId, ts: now - minsAgo * 60000 });
+    return [
+        a("Confirmed this week's heirloom tomato delivery", "delivery", 90, "s_tom"),
+        a("Tomato salad is live on your menu", "story", 60 * 26, "s_tom"),
+        a("Scheduled 8 weekly deliveries with Blue Oak", "delivery", 60 * 48, "s_greens"),
+        a("Drafted your supply agreement for salad greens", "contract", 60 * 49, "s_greens"),
+        a("Matched Sunfield Acres for summer squash", "match", 60 * 70, "s_squash"),
+    ];
 }
 
 // ---- store (no deps; useSyncExternalStore) ----
@@ -120,6 +137,9 @@ const listeners = new Set<() => void>();
 function persist() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch { /* noop */ } }
 function emit() { listeners.forEach((l) => l()); }
 function set(updater: (s: AppState) => AppState) { state = updater(state); persist(); emit(); }
+function pushActivity(text: string, kind: ActivityKind, itemId?: string) {
+    set((s) => ({ ...s, activity: [{ id: uid("a"), text, kind, itemId, ts: Date.now() }, ...s.activity].slice(0, 40) }));
+}
 
 function hydrate() {
     if (hydrated || typeof window === "undefined") return;
@@ -154,7 +174,20 @@ export const actions = {
             stage: "requested", lift: 3, deliveries: [], createdAt: new Date().toISOString().slice(0, 10),
         };
         set((s) => ({ ...s, items: [item, ...s.items] }));
+        pushActivity(`New request opened for ${input.crop}`, "system", item.id);
         return item.id;
+    },
+    logActivity(text: string, kind: ActivityKind, itemId?: string) { pushActivity(text, kind, itemId); },
+    /** The autonomous loop: match the best farm, lock the agreement, schedule deliveries. */
+    autoSource(itemId: string) {
+        const item = state.items.find((i) => i.id === itemId);
+        if (!item) return;
+        const best = rankFarms(state.farms, item.crop, item.priceCeiling)[0];
+        if (best) actions.chooseFarm(itemId, best.farm.id);
+        actions.confirmAgreement(itemId);
+        if (best) pushActivity(`Matched ${best.farm.name} for ${item.crop}`, "match", itemId);
+        pushActivity(`Drafted your supply agreement`, "contract", itemId);
+        pushActivity(`Scheduled 8 weekly deliveries`, "delivery", itemId);
     },
     chooseFarm(itemId: string, farmId: string) {
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, farmId, stage: "matched" } : i) }));
