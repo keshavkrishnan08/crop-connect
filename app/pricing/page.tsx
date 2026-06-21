@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { MarketingNav } from "@/components/marketing/Nav";
 import { MarketingFooter } from "@/components/marketing/Footer";
 import { PricingCalculator } from "@/components/marketing/PricingCalculator";
+import { Photo } from "@/components/marketing/Photo";
 import { LinkButton, Card, Badge, Eyebrow } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { Check, X, ArrowRight, Receipt, Shield, Truck, Handshake, Leaf, Route, Calendar, MarginUp, Sparkle } from "@/components/icons";
@@ -36,7 +37,7 @@ export default function PricingPage() {
                 {/* Hero */}
                 <section className="relative overflow-hidden border-b border-line">
                     <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
-                    <div className="mx-auto max-w-3xl px-5 py-20 text-center lg:px-8 lg:py-28">
+                    <div className="mx-auto max-w-3xl px-5 py-24 text-center lg:px-8 lg:py-36">
                         <Reveal><Eyebrow>Pricing</Eyebrow></Reveal>
                         <Reveal delay={0.05}><h1 className="mt-5 text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">Pricing that <span className="ink-grad">scales with you.</span></h1></Reveal>
                         <Reveal delay={0.1}><p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">You fund the food at cost, no markup and no cut of your sales. On top of that is one monthly service fee. It scales with how much we run for you and drops the longer you commit.</p></Reveal>
@@ -46,7 +47,7 @@ export default function PricingPage() {
 
                 {/* The model in three points */}
                 <section className="border-b border-line bg-canvas-soft">
-                    <div className="mx-auto max-w-6xl px-5 py-20 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-6xl px-5 py-24 lg:px-8 lg:py-32">
                         <Reveal><Eyebrow>The model</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Three simple parts.</h2></Reveal>
                         <Stagger className="mt-12 grid gap-6 md:grid-cols-3">
                             <StaggerItem><ModelCard icon={<Receipt size={20} />} title="Food at cost" body="You pay the farm price and nothing more. We make zero on the food itself, and we never take a cut of your sales." /></StaggerItem>
@@ -58,7 +59,7 @@ export default function PricingPage() {
 
                 {/* Calculator */}
                 <section className="border-b border-line">
-                    <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-5xl px-5 py-24 lg:px-8 lg:py-32">
                         <Reveal><Eyebrow>Build your plan</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Size the fee to your kitchen.</h2><p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-muted">Set how many farms and items you want us to run, pick a term, and see the monthly service fee. The food is funded separately, at cost.</p></Reveal>
                         <Reveal delay={0.1}><div className="mt-10"><PricingCalculator /></div></Reveal>
                     </div>
@@ -66,7 +67,7 @@ export default function PricingPage() {
 
                 {/* Term tiers */}
                 <section className="border-b border-line bg-canvas-soft">
-                    <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-5xl px-5 py-24 lg:px-8 lg:py-32">
                         <Reveal><Eyebrow>Commit and save</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The longer you stay, the less you pay.</h2></Reveal>
                         <Stagger className="mt-12 grid gap-6 md:grid-cols-3">
                             {TERMS.map((t) => (
@@ -87,24 +88,37 @@ export default function PricingPage() {
 
                 {/* What the fee covers */}
                 <section className="border-b border-line">
-                    <div className="mx-auto max-w-5xl px-5 py-20 lg:px-8 lg:py-24">
-                        <Reveal><Eyebrow>What the fee covers</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The whole job, handled.</h2></Reveal>
-                        <Stagger className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
-                            {INCLUDED.map((f) => (
-                                <StaggerItem key={f.label}>
-                                    <div className="flex gap-3">
-                                        <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500/10 text-brand-600"><Check size={14} strokeWidth={2.6} /></span>
-                                        <div><p className="text-[15px] font-semibold text-ink">{f.label}</p><p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">{f.sub}</p></div>
+                    <div className="mx-auto max-w-6xl px-5 py-24 lg:px-8 lg:py-32">
+                        <div className="grid items-start gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+                            <Reveal>
+                                <div className="grid gap-4">
+                                    <Photo q="farm,field,harvest" alt="A local farm field at harvest" seed={70} caption="Sourced and vetted" place="Near you" className="aspect-[4/3]" />
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Photo q="produce,delivery,crate" alt="Produce ready for delivery" seed={71} className="aspect-square" />
+                                        <Photo q="chef,restaurant,kitchen" alt="A chef in the kitchen" seed={72} className="aspect-square" />
                                     </div>
-                                </StaggerItem>
-                            ))}
-                        </Stagger>
+                                </div>
+                            </Reveal>
+                            <div>
+                                <Reveal><Eyebrow>What the fee covers</Eyebrow><h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The whole job, handled.</h2></Reveal>
+                                <Stagger className="mt-10 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                                    {INCLUDED.map((f) => (
+                                        <StaggerItem key={f.label}>
+                                            <div className="flex gap-3">
+                                                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-brand-500/10 text-brand-600"><Check size={14} strokeWidth={2.6} /></span>
+                                                <div><p className="text-[15px] font-semibold text-ink">{f.label}</p><p className="mt-0.5 text-[13px] leading-relaxed text-ink-muted">{f.sub}</p></div>
+                                            </div>
+                                        </StaggerItem>
+                                    ))}
+                                </Stagger>
+                            </div>
+                        </div>
                     </div>
                 </section>
 
                 {/* Start free */}
                 <section className="border-b border-line bg-canvas-soft">
-                    <div className="mx-auto max-w-3xl px-5 py-20 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-3xl px-5 py-24 lg:px-8 lg:py-32">
                         <Reveal>
                             <div className="rounded-4xl border border-harvest-300 bg-gradient-to-br from-harvest-400/10 to-canvas p-10 text-center sm:p-12">
                                 <span className="badge-harvest"><Sparkle size={13} /> No risk to try</span>
@@ -118,7 +132,7 @@ export default function PricingPage() {
 
                 {/* FAQ */}
                 <section className="border-b border-line">
-                    <div className="mx-auto max-w-3xl px-5 py-20 lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-3xl px-5 py-24 lg:px-8 lg:py-32">
                         <Reveal><Eyebrow>Questions</Eyebrow><h2 className="mt-4 text-3xl sm:text-4xl">Straight answers.</h2></Reveal>
                         <div className="mt-10 divide-y divide-line border-y border-line">
                             {FAQ.map((f) => (
@@ -133,7 +147,7 @@ export default function PricingPage() {
 
                 {/* Close */}
                 <section className="bg-canvas">
-                    <div className="mx-auto max-w-3xl px-5 py-20 text-center lg:px-8 lg:py-24">
+                    <div className="mx-auto max-w-3xl px-5 py-24 text-center lg:px-8 lg:py-32">
                         <Reveal>
                             <h2 className="text-3xl sm:text-4xl">Start with one dish, free.</h2>
                             <p className="mx-auto mt-4 max-w-md text-[15px] leading-relaxed text-ink-muted">See your numbers, then let us source one ingredient for a week. Build your plan when you are ready.</p>

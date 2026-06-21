@@ -1,5 +1,6 @@
 import { MarketingNav } from "@/components/marketing/Nav";
 import { MarketingFooter } from "@/components/marketing/Footer";
+import { Photo } from "@/components/marketing/Photo";
 import { LinkButton, Card, Badge, Eyebrow } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { SplitScale, SageWeek, StatCountUp } from "@/components/marketing/WhatWeHandleViz";
@@ -48,31 +49,47 @@ function Hero() {
         <section className="relative overflow-hidden border-b border-line">
             <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
             <div className="bg-grid pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)]" />
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-28">
-                <Reveal>
-                    <Eyebrow>The full service</Eyebrow>
-                </Reveal>
-                <Reveal delay={0.05}>
-                    <h1 className="mt-5 max-w-2xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
-                        Sage handles all of it.
-                    </h1>
-                </Reveal>
-                <Reveal delay={0.1}>
-                    <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
-                        Local sourcing is a real job. Finding farms. Vetting them. Setting prices. Driving the route. Sage is the agent that took the whole job. You keep two small parts.
-                    </p>
-                </Reveal>
-                <Reveal delay={0.15}>
-                    <div className="mt-8 flex flex-wrap items-center gap-3">
-                        <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
-                            See your numbers
-                            <ArrowRight size={18} />
-                        </LinkButton>
-                        <LinkButton href="/how-it-works" variant="ghost" size="lg">
-                            How it works
-                        </LinkButton>
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-36">
+                <div className="grid items-center gap-12 lg:grid-cols-[1.05fr_0.95fr]">
+                    <div>
+                        <Reveal>
+                            <Eyebrow>The full service</Eyebrow>
+                        </Reveal>
+                        <Reveal delay={0.05}>
+                            <h1 className="mt-5 max-w-2xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
+                                Sage handles all of it.
+                            </h1>
+                        </Reveal>
+                        <Reveal delay={0.1}>
+                            <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
+                                Local sourcing is a real job. Finding farms. Vetting them. Setting prices. Driving the route. Sage is the agent that took the whole job. You keep two small parts.
+                            </p>
+                        </Reveal>
+                        <Reveal delay={0.15}>
+                            <div className="mt-8 flex flex-wrap items-center gap-3">
+                                <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
+                                    See your numbers
+                                    <ArrowRight size={18} />
+                                </LinkButton>
+                                <LinkButton href="/how-it-works" variant="ghost" size="lg">
+                                    How it works
+                                </LinkButton>
+                            </div>
+                        </Reveal>
                     </div>
-                </Reveal>
+                    <Reveal delay={0.18}>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-4">
+                                <Photo q="farmer,harvest,field" alt="A farmer harvesting in the field" seed={50} caption="The farm" className="aspect-[3/4]" />
+                                <Photo q="delivery,van,produce" alt="Produce loaded for delivery" seed={51} caption="The route" className="aspect-square" />
+                            </div>
+                            <div className="grid gap-4 pt-8">
+                                <Photo q="chef,plating,restaurant" alt="A chef plating a dish" seed={52} caption="The plate" className="aspect-square" />
+                                <Photo q="fresh,vegetables,crate" alt="A crate of fresh vegetables" seed={53} caption="The crop" className="aspect-[3/4]" />
+                            </div>
+                        </div>
+                    </Reveal>
+                </div>
             </div>
         </section>
     );
@@ -83,7 +100,7 @@ function Hero() {
 function Contrast() {
     return (
         <section className="border-b border-line bg-canvas-soft">
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <Eyebrow>The whole list</Eyebrow>
                     <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">One column is Sage. One is you.</h2>
@@ -112,7 +129,7 @@ function Stats() {
     ];
     return (
         <section className="border-b border-line">
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <div className="flex justify-center"><Eyebrow>The shape of it</Eyebrow></div>
                     <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl sm:text-4xl">A lot off your plate. Almost nothing on it.</h2>
@@ -179,7 +196,7 @@ const LIFTS = [
 function DeepDive() {
     return (
         <section className="border-b border-line bg-canvas-soft">
-            <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-6xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <Eyebrow>The heavy lifts</Eyebrow>
                     <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">The work Sage takes off your plate.</h2>
@@ -218,7 +235,7 @@ function DeepDive() {
 function Week() {
     return (
         <section className="border-b border-line">
-            <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-5xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <div className="flex justify-center"><Eyebrow>Behind the scenes</Eyebrow></div>
                     <h2 className="mx-auto mt-4 max-w-2xl text-center text-3xl sm:text-4xl">What a week looks like for Sage.</h2>
@@ -229,6 +246,14 @@ function Week() {
                 <Reveal delay={0.1}>
                     <div className="mt-12">
                         <SageWeek />
+                    </div>
+                </Reveal>
+                <Reveal delay={0.16}>
+                    <div className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+                        <Photo q="farm,call,phone" alt="Lining up the farms" seed={54} caption="Lines up farms" className="aspect-[4/3]" />
+                        <Photo q="produce,packing,boxes" alt="Packing the order" seed={55} caption="Packs the order" className="aspect-[4/3]" />
+                        <Photo q="truck,road,delivery" alt="Running the route" seed={56} caption="Runs the route" className="aspect-[4/3]" />
+                        <Photo q="invoice,paperwork,desk" alt="Settling the invoice" seed={57} caption="Settles the bill" className="aspect-[4/3]" />
                     </div>
                 </Reveal>
             </div>
@@ -249,7 +274,7 @@ function NeverDo() {
     ];
     return (
         <section className="border-b border-line bg-canvas-soft">
-            <div className="mx-auto max-w-5xl px-5 py-20 sm:px-8 lg:py-24">
+            <div className="mx-auto max-w-5xl px-5 py-24 sm:px-8 lg:py-32">
                 <Reveal>
                     <Eyebrow>Off your plate for good</Eyebrow>
                     <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Things you never do again.</h2>
