@@ -64,6 +64,14 @@
   .sheet td:first-child{text-align:left;font-family:'Hanken Grotesk',sans-serif;font-weight:600;color:var(--ink);background:var(--canvas-soft)}
   .sheet tr.tot td{background:var(--brand-50);color:var(--ink);font-weight:700}
   .sheet caption{caption-side:top;text-align:left;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-faint);padding-bottom:8px}
+  .sheet tr.sub td{background:var(--brand-50);font-weight:700;color:var(--ink)}
+  .sheet tr.sub td:first-child{background:var(--brand-50)}
+  .sheet tr.grand td{background:var(--brand);color:#fff;font-weight:700;border-color:var(--brand);font-size:15px}
+  .sheet tr.grand td:first-child{background:var(--brand);color:#fff}
+  .sheet td.cat{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);background:#fff;font-weight:700;padding-top:10px}
+  .terms{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .terms span{font-size:13px;color:var(--ink-soft);background:var(--canvas-sunk);border-radius:8px;padding:7px 13px}
+  .terms span b{color:var(--ink)}
   /* comp table */
   table.cmp{width:100%;border-collapse:collapse;font-size:14px}
   table.cmp th,table.cmp td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
@@ -191,24 +199,24 @@
   <section class="slide" style="background:var(--canvas-soft)">
     <div class="pad">
       <h2 class="title">Business model</h2>
-      <p class="sub">Food passes through at cost. We earn a recurring monthly fee per item we run, never per farm. We handle the farms for free. The model on one sheet.</p>
+      <p class="sub">Food passes through at cost. We earn a recurring monthly fee that scales with the items and the volume we run, never per farm and never a cut of sales.</p>
       <div style="flex:1;display:flex;gap:28px;align-items:center;margin-top:18px">
         <table class="sheet" style="flex:1">
-          <caption>Fee per account, monthly</caption>
+          <caption>Fee per account, monthly · mid-size kitchen</caption>
           <tr><th>Line item</th><th>Unit</th><th>Monthly</th></tr>
-          <tr><td>Base service</td><td>1</td><td>$149</td></tr>
-          <tr><td>Items live</td><td>3 × $30</td><td>$90</td></tr>
-          <tr class="tot"><td>ARPA (3 items)</td><td>—</td><td>$239</td></tr>
-          <tr><td>Annual run-rate</td><td>×12</td><td>$2,868</td></tr>
-          <tr><td>12-month term</td><td>−20%</td><td>$191</td></tr>
+          <tr><td>Base service</td><td>1</td><td>$299</td></tr>
+          <tr><td>Items live</td><td>3 × $199</td><td>$597</td></tr>
+          <tr class="tot"><td>ARPA (3 items)</td><td>—</td><td>$896</td></tr>
+          <tr><td>Annual run-rate</td><td>×12</td><td>$10.7K</td></tr>
+          <tr><td>High-volume account</td><td>6 × $349</td><td>$2.4K</td></tr>
         </table>
         <table class="sheet" style="flex:1.25">
-          <caption>Recurring revenue by stage · 3 items each</caption>
+          <caption>Recurring revenue by stage</caption>
           <tr><th>Metric</th><th>Pilot</th><th>Year 1</th><th>Year 2</th></tr>
           <tr><td>Accounts</td><td>10</td><td>50</td><td>200</td></tr>
-          <tr><td>ARPA / mo</td><td>$239</td><td>$239</td><td>$250</td></tr>
-          <tr class="tot"><td>MRR</td><td>$2.4K</td><td>$12K</td><td>$50K</td></tr>
-          <tr><td>ARR</td><td>$29K</td><td>$143K</td><td>$600K</td></tr>
+          <tr><td>ARPA / mo</td><td>$896</td><td>$896</td><td>$950</td></tr>
+          <tr class="tot"><td>MRR</td><td>$9K</td><td>$45K</td><td>$190K</td></tr>
+          <tr><td>ARR</td><td>$108K</td><td>$538K</td><td>$2.3M</td></tr>
           <tr><td>Food markup</td><td>$0</td><td>$0</td><td>$0</td></tr>
           <tr><td>Cut of sales</td><td>$0</td><td>$0</td><td>$0</td></tr>
         </table>
@@ -286,27 +294,33 @@
   <section class="slide">
     <div class="pad">
       <h2 class="title">The ask</h2>
-      <p class="sub">Raising a $50K to $100K SAFE to onboard the first restaurants and farms in Indianapolis. Almost every dollar buys live customers.</p>
-      <div class="body">
-        <div class="col">
-          <ul class="bullets">
-            <li>$50K to $100K SAFE, with 95 percent spent landing live customers.</li>
-            <li>A part-time insider with restaurant and farm relationships makes onboarding warm intros, not cold outreach. The first cohort is close to guaranteed.</li>
-            <li>We run sourcing and delivery at cost for month one, so a kitchen has no reason to say no.</li>
-            <li>Goal: 10 to 15 paying restaurants and the farms that supply them, live with proven margin lift.</li>
-          </ul>
-        </div>
-        <div class="col"><div class="panel" style="padding:8px 22px 16px">
-          <table class="sheet">
-            <caption>Use of funds · ~$75K midpoint</caption>
-            <tr><th>Where it goes</th><th>Share</th><th>Amount</th></tr>
-            <tr><td>Part-time industry insider</td><td>35%</td><td>$26K</td></tr>
-            <tr><td>Sourcing and delivery, month one at cost</td><td>35%</td><td>$26K</td></tr>
-            <tr><td>Farm onboarding</td><td>25%</td><td>$19K</td></tr>
-            <tr class="tot"><td>Landing customers</td><td>95%</td><td>$71K</td></tr>
-            <tr><td>Tools, infra, legal</td><td>5%</td><td>$4K</td></tr>
-          </table>
-        </div></div>
+      <p class="sub">A small SAFE to land the first Indianapolis customers. Here is exactly where every dollar goes.</p>
+      <div class="terms">
+        <span><b>$50K–$100K</b> raise</span><span>SAFE · post-money</span><span><b>$4M</b> cap</span><span><b>20%</b> discount</span><span>MFN</span><span>converts at the priced seed</span>
+      </div>
+      <div style="flex:1;display:flex;gap:28px;margin-top:16px">
+        <table class="sheet" style="flex:1">
+          <caption>Use of funds · $75K midpoint</caption>
+          <tr><th>Where it goes</th><th>Amount</th><th>Share</th></tr>
+          <tr><td class="cat" colspan="3">Sales &amp; go-to-market</td></tr>
+          <tr><td>Part-time industry insider, 6-mo retainer</td><td>$18K</td><td>24%</td></tr>
+          <tr><td>Sales commissions, first cohort</td><td>$9K</td><td>12%</td></tr>
+          <tr><td>Onboarding visits and tasting samples</td><td>$6K</td><td>8%</td></tr>
+          <tr class="sub"><td>Subtotal</td><td>$33K</td><td>44%</td></tr>
+        </table>
+        <table class="sheet" style="flex:1">
+          <caption>&nbsp;</caption>
+          <tr><th>Where it goes</th><th>Amount</th><th>Share</th></tr>
+          <tr><td class="cat" colspan="3">Sourcing &amp; delivery · month one at cost</td></tr>
+          <tr><td>Pilot food float, purchased at cost</td><td>$12K</td><td>16%</td></tr>
+          <tr><td>Third-party delivery and cold chain</td><td>$10K</td><td>13%</td></tr>
+          <tr><td>Farm vetting and onboarding</td><td>$5K</td><td>7%</td></tr>
+          <tr class="sub"><td>Subtotal</td><td>$27K</td><td>36%</td></tr>
+          <tr><td class="cat" colspan="3">Product, infra, legal</td></tr>
+          <tr><td>Hosting, database, agent compute</td><td>$5K</td><td>7%</td></tr>
+          <tr><td>Tools, SAFE legal, insurance</td><td>$10K</td><td>13%</td></tr>
+          <tr class="grand"><td>Total · 80% to customers</td><td>$75K</td><td>100%</td></tr>
+        </table>
       </div>
     </div>
     <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">08</span></div>

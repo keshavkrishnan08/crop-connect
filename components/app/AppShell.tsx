@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
-import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield } from "@/components/icons";
+import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield, Mark } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -71,7 +71,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <div className="min-h-screen bg-canvas bg-aura">
             {/* desktop rail: collapsed to icons, expands on hover */}
             <aside className="group fixed inset-y-0 left-0 z-40 hidden w-[68px] flex-col overflow-hidden border-r border-line bg-canvas-soft/90 backdrop-blur-xl transition-[width] duration-200 hover:w-[248px] hover:shadow-lift md:flex">
-                <div className="px-[18px] py-5"><Logo size="sm" href="/app" /></div>
+                <Link href="/app" className="flex items-center gap-2.5 px-[18px] py-5">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-xl bg-brand-600 text-white" style={{ boxShadow: "inset 0 1px 0 rgba(255,255,255,.2), 0 8px 18px -10px rgba(35,92,58,.6)" }}><Mark size={20} strokeWidth={1.8} /></span>
+                    <span className="font-display text-lg leading-none tracking-tight text-ink opacity-0 transition-opacity duration-150 group-hover:opacity-100">Crop<span className="text-brand-600">Connect</span></span>
+                </Link>
                 <NavList collapsible />
                 <Footer collapsible />
             </aside>
