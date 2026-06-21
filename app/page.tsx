@@ -1,458 +1,457 @@
 import Link from "next/link";
 import { Logo } from "@/components/ui/Logo";
-import { LinkButton } from "@/components/ui/kit";
+import { LinkButton, Card, Glass, Badge, Eyebrow } from "@/components/ui/kit";
 import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
-import { DemoBoard } from "@/components/landing/DemoBoard";
+import { LivingMenuLine } from "@/components/marketing/LivingMenuLine";
+import { usd } from "@/lib/utils";
 import {
-    Wheat, Compass, Handshake, Pen, Truck, Repeat, Sparkle, Nodes, Shield, Scale,
-    Barn, Storefront, ArrowRight, Check, Pulse, Crate, MapPin, Leaf, Calendar, Clock,
+    Mark,
+    Leaf,
+    Farm,
+    Route,
+    StoryTag,
+    MarginUp,
+    TrendUp,
+    Plate,
+    Truck,
+    Check,
+    ArrowRight,
+    ArrowUpRight,
+    Shield,
+    Sparkle,
+    MapPin,
 } from "@/components/icons";
 
-export default function Landing() {
-    return (
-        <div className="min-h-screen bg-paper text-ink">
-            <Nav />
-            <Hero />
-            <LogoBand />
-            <Flexibility />
-            <ContractLoop />
-            <Demo />
-            <Reliability />
-            <Features />
-            <Audience />
-            <AiSection />
-            <Positioning />
-            <CTA />
-            <Footer />
-        </div>
-    );
-}
+/* The single CTA verb, repeated. */
+const CTA = "See your margin gain";
 
-function Nav() {
+export default function LandingPage() {
     return (
-        <header className="sticky top-0 z-50 border-b border-line/70 bg-paper/70 backdrop-blur-xl">
-            <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-3.5 lg:px-8">
-                <Logo />
-                <nav className="hidden items-center gap-8 text-sm font-medium text-ink-soft md:flex">
-                    <a href="#loop" className="transition hover:text-ink">How it works</a>
-                    <a href="#features" className="transition hover:text-ink">Product</a>
-                    <a href="#who" className="transition hover:text-ink">Who it's for</a>
-                </nav>
-                <div className="flex items-center gap-2.5">
-                    <Link href="/login" className="hidden text-sm font-semibold text-ink-soft transition hover:text-ink sm:block">Sign in</Link>
-                    <LinkButton href="/signup" size="sm">Get started <ArrowRight size={15} /></LinkButton>
-                </div>
-            </div>
-        </header>
-    );
-}
-
-function Hero() {
-    return (
-        <section className="relative overflow-hidden bg-aurora">
-            <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.4] [mask-image:radial-gradient(60%_50%_at_50%_30%,black,transparent)]" />
-            <div className="relative mx-auto grid max-w-6xl gap-12 px-5 py-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:px-8 lg:py-24">
-                <div>
-                    <Reveal>
-                        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-forest-600 backdrop-blur">
-                            <span className="h-1.5 w-1.5 rounded-full bg-forest-500 animate-pulse-ring" /> Committed supply, season-flexible
-                        </span>
-                    </Reveal>
-                    <Reveal delay={0.05}>
-                        <h1 className="mt-6 font-display text-[2.9rem] leading-[0.98] tracking-tight text-ink sm:text-6xl">
-                            Committed local supply that <span className="text-gradient italic">flexes with your season</span>.
-                        </h1>
-                    </Reveal>
-                    <Reveal delay={0.12}>
-                        <p className="mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">
-                            A handshake breaks. A rigid PO punishes a bad harvest. CropConnect contracts use quantity bands, a crop-failure clause, and an opt-out window — so farms get revenue certainty without yield risk, and buyers get reliable local supply without lock-in. You commit to a relationship, not a brittle number.
-                        </p>
-                    </Reveal>
-                    <Reveal delay={0.18}>
-                        <div className="mt-8 flex flex-wrap items-center gap-3">
-                            <LinkButton href="/signup" size="lg">Start a contract <ArrowRight size={17} /></LinkButton>
-                            <a href="#demo" className="btn-ghost btn-lg">Try it live — no signup</a>
+        <div className="relative min-h-screen bg-canvas text-ink">
+            {/* ---------------------------------------------------------------- Nav */}
+            <header className="sticky top-0 z-50">
+                <div className="glass border-b border-line">
+                    <nav className="mx-auto flex h-16 max-w-6xl items-center justify-between px-5 sm:px-8">
+                        <Logo />
+                        <div className="hidden items-center gap-8 text-sm text-ink-soft md:flex">
+                            <Link href="#how" className="transition-colors hover:text-ink">How it works</Link>
+                            <Link href="#product" className="transition-colors hover:text-ink">Product</Link>
+                            <Link href="#farms" className="transition-colors hover:text-ink">For farms</Link>
                         </div>
-                    </Reveal>
-                    <Reveal delay={0.24}>
-                        <div className="mt-9 flex items-center gap-6 text-sm text-ink-muted">
-                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> Bands, not exact numbers</span>
-                            <span className="inline-flex items-center gap-2"><Check size={16} className="text-forest-500" /> Bad-weather shortfalls forgiven</span>
+                        <div className="flex items-center gap-3">
+                            <Link href="/app" className="hidden text-sm font-medium text-ink-soft transition-colors hover:text-ink sm:inline">Sign in</Link>
+                            <LinkButton href="/demo" variant="primary" className="gap-2">
+                                {CTA}
+                                <ArrowRight size={16} />
+                            </LinkButton>
                         </div>
-                    </Reveal>
+                    </nav>
                 </div>
+            </header>
 
-                <Reveal delay={0.15} y={28}>
-                    <HeroVisual />
-                </Reveal>
-            </div>
-        </section>
-    );
-}
-
-/** Custom 2.5D glass composition — a contract + its supply chain, floating. */
-function HeroVisual() {
-    return (
-        <div className="perspective relative mx-auto h-[420px] w-full max-w-md">
-            {/* glow */}
-            <div className="absolute left-1/2 top-1/2 h-72 w-72 -translate-x-1/2 -translate-y-1/2 rounded-full bg-forest-300/30 blur-3xl" />
-
-            {/* main contract card */}
-            <div className="absolute left-1/2 top-6 w-[300px] -translate-x-1/2 preserve-3d animate-float-slow" style={{ transform: "rotateX(8deg) rotateY(-12deg)" }}>
-                <div className="glass-card p-5">
-                    <div className="flex items-center justify-between">
-                        <span className="grid h-11 w-11 place-items-center rounded-2xl bg-forest-50 text-forest-600"><Wheat size={22} /></span>
-                        <span className="badge bg-forest-50 text-forest-600"><span className="h-1.5 w-1.5 rounded-full bg-current" /> Active</span>
-                    </div>
-                    <h3 className="mt-3 font-display text-2xl text-ink">Heirloom tomatoes</h3>
-                    <p className="text-sm text-ink-muted">30–50 lb/week · band · Jun–Sep</p>
-                    <div className="mt-2.5 inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-2.5 py-1 text-2xs font-semibold text-forest-600">
-                        <Pulse size={12} /> Reliability 98%
-                    </div>
-                    <div className="my-4 divider" />
-                    <div className="flex items-end justify-between">
+            <main>
+                {/* ------------------------------------------------------------ Hero */}
+                <section className="relative overflow-hidden">
+                    <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
+                    <div className="bg-grid pointer-events-none absolute inset-0 -z-10 opacity-60 [mask-image:radial-gradient(60%_50%_at_50%_0%,black,transparent)]" />
+                    <div className="mx-auto grid max-w-6xl items-center gap-14 px-5 py-20 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:py-28">
                         <div>
-                            <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Committed range</p>
-                            <p className="font-display text-2xl text-forest-600">$3.9k–6.5k</p>
-                        </div>
-                        <div className="flex -space-x-2">
-                            <span className="grid h-8 w-8 place-items-center rounded-full bg-forest-600 text-2xs font-bold text-white ring-2 ring-white">RF</span>
-                            <span className="grid h-8 w-8 place-items-center rounded-full bg-harvest-400 text-2xs font-bold text-white ring-2 ring-white">OK</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            {/* floating supply-chain mini board */}
-            <div className="absolute -left-2 bottom-2 w-[260px] animate-float" style={{ animationDelay: "0.8s" }}>
-                <div className="glass-panel p-4">
-                    <p className="mb-3 flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wide text-ink-faint"><Nodes size={13} /> Supply chain</p>
-                    <div className="flex items-center justify-between">
-                        {[
-                            { Icon: Wheat, on: true },
-                            { Icon: Crate, on: true },
-                            { Icon: Truck, on: false },
-                            { Icon: MapPin, on: false },
-                        ].map(({ Icon, on }, i, arr) => (
-                            <div key={i} className="flex items-center">
-                                <span className={`grid h-9 w-9 place-items-center rounded-xl ${on ? "bg-forest-500 text-white shadow-forest-glow" : "bg-paper-sunk text-ink-faint"}`}>
-                                    <Icon size={16} />
-                                </span>
-                                {i < arr.length - 1 && <span className={`mx-1 h-0.5 w-4 rounded-full ${arr[i + 1].on ? "bg-forest-400" : "bg-line-strong"}`} />}
-                            </div>
-                        ))}
-                    </div>
-                    <p className="mt-3 text-2xs font-medium text-forest-600">● Product is in cold storage</p>
-                </div>
-            </div>
-
-            {/* AI draft chip */}
-            <div className="absolute -right-1 top-2 animate-float" style={{ animationDelay: "0.4s" }}>
-                <div className="glass-card flex items-center gap-2 px-3.5 py-2.5">
-                    <Sparkle size={16} className="text-harvest-500" />
-                    <span className="text-sm font-semibold text-ink">Agreement drafted</span>
-                </div>
-            </div>
-        </div>
-    );
-}
-
-function LogoBand() {
-    return (
-        <div className="border-y border-line bg-white/40">
-            <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-10 gap-y-3 px-5 py-5 text-center text-sm text-ink-faint lg:px-8">
-                <span className="font-medium">What we sell is flexible commitment and proven reliability —</span>
-                <span className="font-display text-lg italic text-ink-soft">not cheaper food.</span>
-            </div>
-        </div>
-    );
-}
-
-const FLEX = [
-    { Icon: Scale, title: "Quantity bands", body: "Commit to a range, not a number. “30–50 lb a week” — not exactly 40. Real farms can’t promise an exact yield months out, and real kitchens can’t promise exact demand. The band absorbs both." },
-    { Icon: Leaf, title: "Crop-failure clause", body: "Hail, drought, pests — when the weather wrecks a harvest, the shortfall is forgiven. No penalty, no breach. Built into every contract so a bad week never becomes a bad relationship." },
-    { Icon: Clock, title: "Opt-out window", body: "Life changes. Give notice inside the window and step out cleanly. Nobody is trapped in a deal that stopped working for them." },
-    { Icon: Calendar, title: "Short minimum commitment", body: "Start with a short minimum term so both sides can prove it out — then it stays flexible. You’re committing to a relationship, not signing your year away." },
-];
-
-function Flexibility() {
-    return (
-        <section className="bg-aurora py-20">
-            <div className="mx-auto max-w-6xl px-5 lg:px-8">
-                <Reveal>
-                    <p><span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-600"><span className="h-px w-5 bg-forest-400/60" /> The differentiator</span></p>
-                    <h2 className="mt-4 max-w-2xl font-display text-4xl leading-tight text-ink sm:text-5xl">Flexible commitment, not a rigid number.</h2>
-                    <p className="mt-4 max-w-xl text-lg text-ink-muted">A handshake gives you nothing to stand on. A fixed purchase order punishes the first bad harvest. CropConnect contracts bend where farming actually bends — so committing stops feeling risky.</p>
-                </Reveal>
-                <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {FLEX.map((f) => (
-                        <StaggerItem key={f.title}>
-                            <div className="glass-card h-full p-6">
-                                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-50 text-forest-600"><f.Icon size={24} /></span>
-                                <h3 className="mt-4 font-display text-xl text-ink">{f.title}</h3>
-                                <p className="mt-1.5 text-[14px] leading-relaxed text-ink-muted">{f.body}</p>
-                            </div>
-                        </StaggerItem>
-                    ))}
-                </Stagger>
-            </div>
-        </section>
-    );
-}
-
-function Reliability() {
-    const points = [
-        { Icon: Pulse, t: "A real fulfillment record", b: "Every delivery you make — or miss — updates your reliability score. It’s history, not a testimonial." },
-        { Icon: Shield, t: "See it before you commit", b: "Check how dependable a farm or buyer has actually been, then decide. No more committing on a hunch." },
-        { Icon: Repeat, t: "Owned by the platform", b: "Your track record lives here. Build it over seasons — and leave it behind if you ever walk away." },
-    ];
-    return (
-        <section className="bg-paper-warm/60 py-20">
-            <div className="mx-auto max-w-6xl px-5 lg:px-8">
-                <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
-                    <Reveal>
-                        <p><span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-600"><span className="h-px w-5 bg-forest-400/60" /> Reliability you can see</span></p>
-                        <h2 className="mt-4 font-display text-4xl leading-tight text-ink sm:text-5xl">Trust earned in deliveries, not words.</h2>
-                        <p className="mt-4 max-w-md text-lg text-ink-muted">Flexibility only works if both sides actually show up. So every fulfilled and missed delivery builds a reliability score on each profile — the trust layer, and the reason to stay.</p>
-                        <div className="mt-7 inline-flex items-center gap-4 rounded-3xl border border-line bg-white/70 px-6 py-4 backdrop-blur">
-                            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-500 text-white shadow-forest-glow"><Pulse size={24} /></span>
-                            <div>
-                                <p className="font-display text-3xl text-forest-600">98%</p>
-                                <p className="text-2xs font-semibold uppercase tracking-wide text-ink-faint">Deliveries fulfilled on band</p>
-                            </div>
-                        </div>
-                    </Reveal>
-                    <Stagger className="space-y-3">
-                        {points.map((p) => (
-                            <StaggerItem key={p.t}>
-                                <div className="flex items-start gap-4 glass-card p-5">
-                                    <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-forest-50 text-forest-600"><p.Icon size={22} /></span>
-                                    <div>
-                                        <p className="font-display text-lg text-ink">{p.t}</p>
-                                        <p className="mt-0.5 text-[15px] leading-relaxed text-ink-muted">{p.b}</p>
-                                    </div>
+                            <Reveal>
+                                <Eyebrow>For independent restaurants</Eyebrow>
+                            </Reveal>
+                            <Reveal delay={0.05}>
+                                <h1 className="mt-5 max-w-xl text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">
+                                    Make your menu more profitable, <span className="ink-grad">one local dish at a time.</span>
+                                </h1>
+                            </Reveal>
+                            <Reveal delay={0.1}>
+                                <p className="mt-6 max-w-md text-lg leading-relaxed text-ink-muted">
+                                    Tell us what you want on the plate. We source it local and hand you the story that lets you charge a little more — so the same dish earns more.
+                                </p>
+                            </Reveal>
+                            <Reveal delay={0.15}>
+                                <div className="mt-8 flex flex-wrap items-center gap-3">
+                                    <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
+                                        {CTA}
+                                        <ArrowRight size={18} />
+                                    </LinkButton>
+                                    <LinkButton href="#how" variant="ghost" size="lg">How it works</LinkButton>
                                 </div>
-                            </StaggerItem>
-                        ))}
-                    </Stagger>
-                </div>
-            </div>
-        </section>
-    );
-}
-
-const LOOP = [
-    { Icon: Wheat, title: "List", body: "A farm posts a supply offer, or a buyer posts a need — crop, volume, cadence, price, season." },
-    { Icon: Compass, title: "Match", body: "AI surfaces compatible counterparties ranked by crop, season, location, volume and price fit." },
-    { Icon: Handshake, title: "Negotiate", body: "Accept, counter, or decline on any term. Every version is kept for clarity." },
-    { Icon: Pen, title: "Contract", body: "On agreement, AI drafts a clean, plain-language supply agreement. Both parties confirm." },
-    { Icon: Truck, title: "Fulfill", body: "Track deliveries against the contract on a live supply-chain board." },
-    { Icon: Repeat, title: "Renew", body: "At term end, both sides are prompted to renew or revise. Renewal is the proof." },
-];
-
-function ContractLoop() {
-    return (
-        <section id="loop" className="mx-auto max-w-6xl px-5 py-20 lg:px-8">
-            <Reveal>
-                <p className="text-center"><span className="inline-flex items-center gap-2 text-2xs font-semibold uppercase tracking-[0.16em] text-forest-600"><span className="h-px w-5 bg-forest-400/60" /> The contract loop</span></p>
-                <h2 className="mx-auto mt-4 max-w-2xl text-center font-display text-4xl leading-tight text-ink sm:text-5xl">One repeating loop. Everything exists to make it fast.</h2>
-            </Reveal>
-            <Stagger className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {LOOP.map((s, i) => (
-                    <StaggerItem key={s.title}>
-                        <div className="group glass-card h-full p-6 transition-all duration-300 hover:-translate-y-1 hover:shadow-glass-lg">
-                            <div className="flex items-center justify-between">
-                                <span className="grid h-12 w-12 place-items-center rounded-2xl bg-forest-50 text-forest-600 transition group-hover:bg-forest-500 group-hover:text-white"><s.Icon size={24} /></span>
-                                <span className="font-display text-3xl text-line-strong">0{i + 1}</span>
-                            </div>
-                            <h3 className="mt-4 font-display text-2xl text-ink">{s.title}</h3>
-                            <p className="mt-1.5 text-[15px] leading-relaxed text-ink-muted">{s.body}</p>
+                            </Reveal>
+                            <Reveal delay={0.2}>
+                                <p className="mt-7 flex items-center gap-2 text-sm text-ink-faint">
+                                    <Sparkle size={15} className="text-brand-500" />
+                                    Early access — onboarding a small group of design-partner kitchens this season.
+                                </p>
+                            </Reveal>
                         </div>
-                    </StaggerItem>
-                ))}
-            </Stagger>
-        </section>
-    );
-}
 
-const FEATURES = [
-    { Icon: Nodes, title: "A living supply-chain board", body: "Map every step from harvest to drop-off on an editable, Miro-style canvas. Highlight exactly where the product is right now. Both parties keep it current until the contract closes." },
-    { Icon: Pen, title: "Instant agreement drafting", body: "Turn agreed terms — bands, clauses, cadence, opt-out window — into a clear, plain-language agreement in one click. AI even suggests a fair starting point. No lawyer needed to begin." },
-    { Icon: Scale, title: "Bands you can see", body: "A quantity range × price × cadence becomes a committed value range that accrues across the term. Negotiate the band with the numbers right in front of you." },
-    { Icon: Shield, title: "Reliability that follows you", body: "Every fulfilled and missed delivery feeds a reliability score you can check before committing. A renewed contract — not a one-off match — is the real proof of demand." },
-];
-
-function Demo() {
-    return (
-        <section id="demo" className="relative overflow-hidden border-y border-line bg-paper-warm/50 py-20">
-            <div className="pointer-events-none absolute inset-0 bg-aurora opacity-60" />
-            <div className="relative mx-auto max-w-6xl px-5 lg:px-8">
-                <Reveal>
-                    <div className="mx-auto max-w-2xl text-center">
-                        <span className="inline-flex items-center gap-2 rounded-full border border-line bg-white/70 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-forest-600 backdrop-blur">
-                            <Nodes size={13} /> Live — no signup
-                        </span>
-                        <h2 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl">
-                            Don't take our word for it. <span className="text-gradient italic">Try the board.</span>
-                        </h2>
-                        <p className="mt-4 text-lg text-ink-muted">
-                            Drag the steps. Connect them. Click a step to move where the product is right now. This is the real thing — go ahead, break it.
-                        </p>
-                    </div>
-                </Reveal>
-
-                <Reveal delay={0.1} y={28}>
-                    <div className="mt-10">
-                        <DemoBoard />
-                    </div>
-                </Reveal>
-
-                <Reveal delay={0.15}>
-                    <div className="mt-8 flex flex-col items-center gap-3">
-                        <p className="text-sm text-ink-muted">That's one feature. The whole contract runs like this.</p>
-                        <LinkButton href="/signup" size="lg">Start free — it takes a minute <ArrowRight size={17} /></LinkButton>
-                    </div>
-                </Reveal>
-            </div>
-        </section>
-    );
-}
-
-function Features() {
-    return (
-        <section id="features" className="bg-paper-warm/60 py-20">
-            <div className="mx-auto max-w-6xl px-5 lg:px-8">
-                <Reveal>
-                    <h2 className="max-w-2xl font-display text-4xl leading-tight text-ink sm:text-5xl">The visual tools that make committing easy.</h2>
-                    <p className="mt-4 max-w-xl text-lg text-ink-muted">Negotiation is hard when it's all text and phone calls. CropConnect makes every important part of a contract something you can see and agree on.</p>
-                </Reveal>
-                <div className="mt-12 grid gap-5 md:grid-cols-2">
-                    {FEATURES.map((f, i) => (
-                        <Reveal key={f.title} delay={i * 0.06}>
-                            <div className="glass-card h-full p-7">
-                                <span className="grid h-14 w-14 place-items-center rounded-2xl bg-gradient-to-br from-forest-500 to-forest-700 text-white shadow-forest-glow"><f.Icon size={26} /></span>
-                                <h3 className="mt-5 font-display text-2xl text-ink">{f.title}</h3>
-                                <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">{f.body}</p>
+                        <Reveal delay={0.1} className="lg:pl-6">
+                            <div className="relative">
+                                <div className="absolute -inset-6 -z-10 rounded-[2rem] bg-brand-500/[0.04] blur-2xl" />
+                                <Glass className="rounded-3xl p-6 shadow-lift">
+                                    <div className="mb-4 flex items-center justify-between">
+                                        <span className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">Tonight&rsquo;s menu</span>
+                                        <Badge tone="harvest" dot>Live</Badge>
+                                    </div>
+                                    <LivingMenuLine dish="Heirloom tomato salad" base={16} lift={3} farm="Teter Farm" miles={12} />
+                                    <div className="mt-4 grid grid-cols-3 gap-3">
+                                        <MiniStat label="Same plate cost" value="No change" />
+                                        <MiniStat label="Menu price" value="+$3" accent />
+                                        <MiniStat label="Per cover" value="Margin up" />
+                                    </div>
+                                    <p className="mt-4 text-center text-xs text-ink-faint">Tap the row to see the upgrade.</p>
+                                </Glass>
                             </div>
                         </Reveal>
-                    ))}
-                </div>
-            </div>
-        </section>
-    );
-}
-
-function Audience() {
-    return (
-        <section id="who" className="mx-auto max-w-6xl px-5 py-20 lg:px-8">
-            <div className="grid gap-5 md:grid-cols-2">
-                <Reveal>
-                    <div className="glass-card h-full overflow-hidden p-8">
-                        <span className="grid h-14 w-14 place-items-center rounded-3xl bg-forest-50 text-forest-600"><Barn size={28} /></span>
-                        <h3 className="mt-5 font-display text-3xl text-ink">For farms</h3>
-                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">Revenue certainty without yield risk. Lock in demand before the season inside a band you can actually hit — and if the weather turns, the crop-failure clause has your back.</p>
-                        <ul className="mt-5 space-y-2.5">
-                            {["Committed revenue, no exact-yield promise", "Bad-harvest shortfalls forgiven", "A reliability record that's yours to build"].map((x) => (
-                                <li key={x} className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="text-forest-500" /> {x}</li>
-                            ))}
-                        </ul>
                     </div>
-                </Reveal>
-                <Reveal delay={0.08}>
-                    <div className="glass-card h-full overflow-hidden p-8">
-                        <span className="grid h-14 w-14 place-items-center rounded-3xl bg-sky/10 text-sky"><Storefront size={28} /></span>
-                        <h3 className="mt-5 font-display text-3xl text-ink">For buyers</h3>
-                        <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">Reliable local supply without lock-in. Plan menus around a dependable band, check a farm's reliability score before you commit, and step out cleanly through the opt-out window if you need to.</p>
-                        <ul className="mt-5 space-y-2.5">
-                            {["A supply band to plan menus around", "Vet reliability before you commit", "Opt-out window — no rigid lock-in"].map((x) => (
-                                <li key={x} className="flex items-center gap-2.5 text-[15px] text-ink-soft"><Check size={17} className="text-sky" /> {x}</li>
-                            ))}
-                        </ul>
-                    </div>
-                </Reveal>
-            </div>
-        </section>
-    );
-}
+                </section>
 
-function AiSection() {
-    return (
-        <section className="mx-auto max-w-6xl px-5 pb-20 lg:px-8">
-            <Reveal>
-                <div className="overflow-hidden rounded-4xl border border-forest-800 bg-gradient-to-br from-forest-700 to-forest-900 p-9 text-white sm:p-12">
-                    <div className="grid gap-8 lg:grid-cols-[1fr_1fr] lg:items-center">
-                        <div>
-                            <span className="inline-flex items-center gap-2 rounded-full bg-white/10 px-3.5 py-1.5 text-2xs font-semibold uppercase tracking-[0.14em] text-harvest-300"><Sparkle size={14} /> Where AI fits</span>
-                            <h2 className="mt-5 font-display text-4xl leading-tight sm:text-5xl">We turn a messy handshake into a flexible contract — automatically.</h2>
-                            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75">AI is the enabler, not a veneer. It drafts the plain-language agreement from your terms, suggests a fair starting band and price, and ranks the counterparties most worth your time. Lead with the job done, not the model.</p>
+                {/* --------------------------------------------------------- Problem */}
+                <section className="border-t border-line bg-canvas-soft">
+                    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                        <Reveal>
+                            <Eyebrow>The squeeze</Eyebrow>
+                            <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Independent kitchens run on margins thinner than the steak.</h2>
+                        </Reveal>
+                        <Stagger className="mt-12 grid gap-6 md:grid-cols-3">
+                            <StaggerItem>
+                                <Card className="h-full p-7">
+                                    <IconBadge><MarginUp size={20} /></IconBadge>
+                                    <h3 className="mt-5 text-xl">Margins are razor-thin</h3>
+                                    <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+                                        Most independents net around 3&ndash;5%. A few dollars per cover is the difference between a good month and a bad one.
+                                    </p>
+                                </Card>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Card className="h-full p-7">
+                                    <IconBadge><Truck size={20} /></IconBadge>
+                                    <h3 className="mt-5 text-xl">The distributor is reliable, but generic</h3>
+                                    <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+                                        The broadliner shows up every week. It also gives you nothing to put on the menu that a diner can&rsquo;t get down the street.
+                                    </p>
+                                </Card>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Card className="h-full p-7">
+                                    <IconBadge><Farm size={20} /></IconBadge>
+                                    <h3 className="mt-5 text-xl">Local is desirable, but a hassle</h3>
+                                    <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">
+                                        Calling farms, chasing invoices, juggling drop-offs. The story sells — but sourcing it yourself eats the hours you don&rsquo;t have.
+                                    </p>
+                                </Card>
+                            </StaggerItem>
+                        </Stagger>
+                    </div>
+                </section>
+
+                {/* ------------------------------------------------------- How it works */}
+                <section id="how" className="border-t border-line scroll-mt-20">
+                    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                        <Reveal>
+                            <Eyebrow>How it works</Eyebrow>
+                            <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Three steps. We carry the parts that cost you time.</h2>
+                        </Reveal>
+                        <Stagger className="mt-12 grid gap-6 lg:grid-cols-3">
+                            <StaggerItem>
+                                <Step n={1} icon={<Plate size={22} />} title="Tell us what you want">
+                                    Pick the items you&rsquo;d love to feature — tomatoes, greens, a heritage pork. You set the dish; we read the spec.
+                                </Step>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Step n={2} icon={<Route size={22} />} title="We source & deliver local">
+                                    We find the right nearby farm, handle the buy, and bring it to your door on a schedule you can plan a menu around.
+                                </Step>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Step n={3} icon={<StoryTag size={22} />} title="We hand you the story">
+                                    Farm name, miles, the why — packaged for the menu and the server&rsquo;s mouth. That&rsquo;s what lets you charge more.
+                                </Step>
+                            </StaggerItem>
+                        </Stagger>
+                    </div>
+                </section>
+
+                {/* ------------------------------------------------------ Margin proof */}
+                <section className="border-t border-line bg-canvas-soft">
+                    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                        <div className="grid items-center gap-12 lg:grid-cols-2">
+                            <Reveal>
+                                <Eyebrow>The margin proof</Eyebrow>
+                                <h2 className="mt-4 text-3xl sm:text-4xl">We raise your prices, not cut your costs.</h2>
+                                <p className="mt-5 max-w-md text-[15px] leading-relaxed text-ink-muted">
+                                    A credible local story gives the same plate room to move on price. Here&rsquo;s a worked example — a model with the numbers shown, not a guarantee.
+                                </p>
+
+                                <div className="mt-8 space-y-3">
+                                    <ProofRow label="Menu price before" value={usd(16)} />
+                                    <ProofRow label="Menu price after the local story" value={usd(19)} accent />
+                                    <div className="divider" />
+                                    <ProofRow label="Added margin per plate" value={`+${usd(3)}`} bold accent />
+                                    <ProofRow label="Across 25 of these a night" value={`+${usd(75)}`} bold accent />
+                                </div>
+
+                                <p className="mt-5 flex items-start gap-2 text-xs leading-relaxed text-ink-faint">
+                                    <Shield size={14} className="mt-0.5 shrink-0 text-ink-muted" />
+                                    Illustrative model. Assumes one featured item, ~$3 of pricing power from provenance, and 25 covers/night. Your real lift depends on your menu and your room.
+                                </p>
+
+                                <div className="mt-7">
+                                    <LinkButton href="/demo" variant="primary" className="gap-2">
+                                        See your full margin gain
+                                        <ArrowRight size={16} />
+                                    </LinkButton>
+                                </div>
+                            </Reveal>
+
+                            <Reveal delay={0.08}>
+                                <Glass className="rounded-3xl p-6 shadow-lift">
+                                    <div className="mb-4 flex items-center justify-between">
+                                        <span className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">Worked example</span>
+                                        <Badge tone="brand">Model</Badge>
+                                    </div>
+                                    <LivingMenuLine dish="Roasted beet & chèvre" base={16} lift={3} farm="Pinetree Gardens" miles={9} />
+                                    <Card className="mt-4 flex items-center justify-between p-5">
+                                        <div>
+                                            <p className="text-sm text-ink-muted">Same food cost</p>
+                                            <p className="font-display text-lg text-ink">Unchanged</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-sm text-ink-muted">Margin per plate</p>
+                                            <p className="font-mono text-2xl text-harvest-500 tnum">+{usd(3)}</p>
+                                        </div>
+                                    </Card>
+                                    <div className="mt-4 flex items-center gap-2 rounded-xl bg-brand-50 px-4 py-3 text-sm text-brand-700">
+                                        <TrendUp size={18} />
+                                        The cost line stays flat. The price line moves.
+                                    </div>
+                                </Glass>
+                            </Reveal>
                         </div>
-                        <div className="space-y-3">
-                            {[
-                                { Icon: Pen, t: "Plain-language drafting", b: "Bands, crop-failure clause, opt-out window → a clean agreement, instantly." },
-                                { Icon: Scale, t: "Fair starting point", b: "A suggested band and price to negotiate from, not a blank page." },
-                                { Icon: Compass, t: "Matching & recommendations", b: "The right farms and buyers, ranked by real fit." },
-                            ].map((x) => (
-                                <div key={x.t} className="flex items-start gap-3.5 rounded-2xl bg-white/8 p-4 backdrop-blur">
-                                    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-white/12 text-harvest-300"><x.Icon size={20} /></span>
+                    </div>
+                </section>
+
+                {/* ----------------------------------------------------- What you get */}
+                <section id="product" className="border-t border-line scroll-mt-20">
+                    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                        <Reveal>
+                            <Eyebrow>What you get</Eyebrow>
+                            <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Everything to source local — and get paid for it.</h2>
+                        </Reveal>
+                        <Stagger className="mt-12 grid gap-6 sm:grid-cols-2">
+                            <StaggerItem>
+                                <Feature icon={<Route size={22} />} title="Sourcing">
+                                    We match each item to the right nearby farm and run the buy, so you skip the phone tag and the invoices.
+                                </Feature>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Feature icon={<StoryTag size={22} />} title="Story Studio">
+                                    Menu-ready provenance — farm, miles, the reason it&rsquo;s better — written so a server can sell it in one breath.
+                                </Feature>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Feature icon={<MarginUp size={22} />} title="Margin Studio">
+                                    See the price you can defend on each dish and what it adds per cover, before you commit.
+                                </Feature>
+                            </StaggerItem>
+                            <StaggerItem>
+                                <Feature icon={<Truck size={22} />} title="Deliveries">
+                                    One predictable drop on a schedule you can build a menu around. No coolers full of surprises.
+                                </Feature>
+                            </StaggerItem>
+                        </Stagger>
+                    </div>
+                </section>
+
+                {/* ------------------------------------------------------- Comparison */}
+                <section className="border-t border-line bg-canvas-soft">
+                    <div className="mx-auto max-w-6xl px-5 py-20 sm:px-8 lg:py-24">
+                        <Reveal>
+                            <Eyebrow>Why CropConnect</Eyebrow>
+                            <h2 className="mt-4 max-w-2xl text-3xl sm:text-4xl">Local on your own, the broadliner, or both done for you.</h2>
+                        </Reveal>
+
+                        <Reveal delay={0.06}>
+                            <Card className="mt-10 overflow-hidden p-0">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full min-w-[640px] border-collapse text-left text-sm">
+                                        <thead>
+                                            <tr className="border-b border-line">
+                                                <th className="px-6 py-5 font-medium text-ink-muted">&nbsp;</th>
+                                                <th className="px-6 py-5 font-display text-base font-normal text-ink-soft">You, alone</th>
+                                                <th className="px-6 py-5 font-display text-base font-normal text-ink-soft">A broadliner</th>
+                                                <th className="bg-brand-50/60 px-6 py-5 font-display text-base font-normal text-brand-700">
+                                                    <span className="inline-flex items-center gap-2"><Mark size={18} /> CropConnect</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <CompareRow
+                                                label="Local sourcing effort"
+                                                a="Hours of calls & invoices"
+                                                b="None — but nothing local"
+                                                c="We run it for you"
+                                            />
+                                            <CompareRow
+                                                label="Pricing power / story"
+                                                a="Strong, if you build it"
+                                                b="None — generic supply"
+                                                c="Menu-ready, every item"
+                                            />
+                                            <CompareRow
+                                                label="Reliability"
+                                                a="Depends on each farm"
+                                                b="High, very predictable"
+                                                c="Scheduled local drops"
+                                            />
+                                            <CompareRow
+                                                label="Effect on margin"
+                                                a="Upside, lots of work"
+                                                b="Flat — you compete on price"
+                                                c="Higher price, same cost"
+                                                last
+                                            />
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </Card>
+                        </Reveal>
+                    </div>
+                </section>
+
+                {/* --------------------------------------------------------- For farms */}
+                <section id="farms" className="border-t border-line scroll-mt-20">
+                    <div className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
+                        <Reveal>
+                            <div className="flex flex-col items-start gap-5 rounded-2xl border border-line bg-canvas-soft p-8 sm:flex-row sm:items-center sm:justify-between">
+                                <div className="flex items-start gap-4">
+                                    <IconBadge><Leaf size={20} /></IconBadge>
                                     <div>
-                                        <p className="font-semibold">{x.t}</p>
-                                        <p className="text-sm text-white/70">{x.b}</p>
+                                        <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-brand-600">For farms</p>
+                                        <h3 className="mt-1.5 text-xl">We bring you committed demand, not another spot listing.</h3>
+                                        <p className="mt-1.5 max-w-xl text-[15px] leading-relaxed text-ink-muted">
+                                            Restaurants commit to what they&rsquo;ll feature, so you grow and harvest against real orders.
+                                        </p>
                                     </div>
                                 </div>
-                            ))}
+                                <Link href="/demo" className="group inline-flex shrink-0 items-center gap-1.5 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700">
+                                    Grow for restaurants
+                                    <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" />
+                                </Link>
+                            </div>
+                        </Reveal>
+                    </div>
+                </section>
+
+                {/* ------------------------------------------------------------- Close */}
+                <section className="border-t border-line">
+                    <div className="relative overflow-hidden">
+                        <div className="bg-aura pointer-events-none absolute inset-0 -z-10" />
+                        <div className="mx-auto max-w-3xl px-5 py-24 text-center sm:px-8">
+                            <Reveal>
+                                <Badge tone="harvest" className="mx-auto">Free to start</Badge>
+                                <h2 className="mt-6 text-balance text-4xl sm:text-5xl">Source one item, one week — free.</h2>
+                                <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-ink-muted">
+                                    Put one local dish on your menu and watch what it does to the check. No contract, no risk to your line.
+                                </p>
+                                <div className="mt-8 flex justify-center">
+                                    <LinkButton href="/demo" variant="primary" size="lg" className="gap-2">
+                                        {CTA}
+                                        <ArrowUpRight size={18} />
+                                    </LinkButton>
+                                </div>
+                            </Reveal>
                         </div>
                     </div>
+                </section>
+            </main>
+
+            {/* ------------------------------------------------------------- Footer */}
+            <footer className="border-t border-line bg-canvas-soft">
+                <div className="mx-auto flex max-w-6xl flex-col gap-6 px-5 py-12 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+                    <div className="flex items-center gap-3">
+                        <Logo href={null} size="sm" />
+                    </div>
+                    <p className="max-w-md text-xs leading-relaxed text-ink-faint">
+                        Margin figures are illustrative models with stated assumptions, not financial advice or a guarantee of results. Your outcome depends on your menu, market, and execution.
+                    </p>
                 </div>
-            </Reveal>
-        </section>
-    );
-}
-
-function Positioning() {
-    const stats = [
-        { v: "6 steps", l: "From listing to renewal" },
-        { v: "1 metro", l: "Deliberately narrow to start" },
-        { v: "0", l: "Fabricated testimonials" },
-    ];
-    return (
-        <section className="border-y border-line bg-white/50 py-12">
-            <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 px-5 sm:grid-cols-3 lg:px-8">
-                {stats.map((s) => (
-                    <Reveal key={s.l}>
-                        <div className="text-center">
-                            <p className="font-display text-4xl text-forest-600 sm:text-5xl">{s.v}</p>
-                            <p className="mt-1.5 text-sm text-ink-muted">{s.l}</p>
-                        </div>
-                    </Reveal>
-                ))}
-            </div>
-        </section>
-    );
-}
-
-function CTA() {
-    return (
-        <section className="mx-auto max-w-6xl px-5 py-24 text-center lg:px-8">
-            <Reveal>
-                <h2 className="mx-auto max-w-3xl font-display text-5xl leading-[1.04] text-ink sm:text-6xl">Sign it. Fulfill it. <span className="text-gradient italic">Renew it.</span></h2>
-                <p className="mx-auto mt-5 max-w-xl text-lg text-ink-muted">Start with a single committed contract. That's the smallest thing worth proving — and the beginning of a relationship the platform comes to own.</p>
-                <div className="mt-9 flex flex-wrap justify-center gap-3">
-                    <LinkButton href="/signup" size="lg">Get started <ArrowRight size={17} /></LinkButton>
-                    <LinkButton href="/login" variant="ghost" size="lg">Sign in</LinkButton>
+                <div className="border-t border-line">
+                    <div className="mx-auto max-w-6xl px-5 py-5 text-2xs text-ink-faint sm:px-8">
+                        &copy; {new Date().getFullYear()} CropConnect &middot; Built for independent restaurants.
+                    </div>
                 </div>
-            </Reveal>
-        </section>
+            </footer>
+        </div>
     );
 }
 
-function Footer() {
+/* ---------------------------------------------------------------- helpers */
+
+function MiniStat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
     return (
-        <footer className="border-t border-line bg-paper-warm/60">
-            <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-5 py-9 text-sm text-ink-muted sm:flex-row lg:px-8">
-                <Logo />
-                <p className="text-center text-[13px] text-ink-faint">Committed supply + provability. Not legal or financial advice — have any contract reviewed by a qualified attorney.</p>
-                <p className="text-[13px]">© {new Date().getFullYear()} CropConnect</p>
+        <div className="rounded-xl border border-line bg-canvas px-3 py-2.5">
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-ink-faint">{label}</p>
+            <p className={`mt-0.5 text-sm font-medium ${accent ? "font-mono text-harvest-500 tnum" : "text-ink"}`}>{value}</p>
+        </div>
+    );
+}
+
+function IconBadge({ children }: { children: React.ReactNode }) {
+    return (
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-brand-50 text-brand-600 ring-1 ring-brand-100">
+            {children}
+        </span>
+    );
+}
+
+function Step({ n, icon, title, children }: { n: number; icon: React.ReactNode; title: string; children: React.ReactNode }) {
+    return (
+        <Card hover className="h-full p-7">
+            <div className="flex items-center justify-between">
+                <IconBadge>{icon}</IconBadge>
+                <span className="font-mono text-3xl text-line-strong tnum">{String(n).padStart(2, "0")}</span>
             </div>
-        </footer>
+            <h3 className="mt-5 text-xl">{title}</h3>
+            <p className="mt-2 text-[15px] leading-relaxed text-ink-muted">{children}</p>
+        </Card>
+    );
+}
+
+function Feature({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
+    return (
+        <Glass className="flex h-full gap-4 rounded-2xl p-6">
+            <IconBadge>{icon}</IconBadge>
+            <div>
+                <h3 className="text-lg">{title}</h3>
+                <p className="mt-1.5 text-[15px] leading-relaxed text-ink-muted">{children}</p>
+            </div>
+        </Glass>
+    );
+}
+
+function ProofRow({ label, value, accent, bold }: { label: string; value: string; accent?: boolean; bold?: boolean }) {
+    return (
+        <div className="flex items-center justify-between gap-4">
+            <span className={`text-[15px] ${bold ? "font-medium text-ink" : "text-ink-muted"}`}>{label}</span>
+            <span className={`font-mono tnum ${bold ? "text-xl" : "text-lg"} ${accent ? "text-harvest-500" : "text-ink"}`}>{value}</span>
+        </div>
+    );
+}
+
+function CompareRow({ label, a, b, c, last }: { label: string; a: string; b: string; c: string; last?: boolean }) {
+    return (
+        <tr className={last ? "" : "border-b border-line"}>
+            <td className="px-6 py-4 font-medium text-ink">{label}</td>
+            <td className="px-6 py-4 text-ink-muted">{a}</td>
+            <td className="px-6 py-4 text-ink-muted">{b}</td>
+            <td className="bg-brand-50/60 px-6 py-4 font-medium text-brand-700">
+                <span className="inline-flex items-center gap-2">
+                    <Check size={15} className="shrink-0 text-brand-500" />
+                    {c}
+                </span>
+            </td>
+        </tr>
     );
 }
