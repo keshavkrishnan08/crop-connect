@@ -55,6 +55,17 @@
   .node.done .ic{background:var(--brand);color:#fff}
   .node .lab{font-size:12.5px;font-weight:600;color:var(--ink)}.node .s{font-size:10px;color:var(--ink-muted);margin-top:2px}
   .conn{width:26px;height:2px;background:repeating-linear-gradient(90deg,var(--brand) 0 6px,transparent 6px 11px)}
+  .vpipe{display:flex;flex-direction:column}
+  .vstep{display:flex;align-items:center;gap:13px;padding:8px 0;border-bottom:1px solid var(--line)}
+  .vstep:last-child{border-bottom:0}
+  .vstep .vn{width:30px;height:30px;flex:0 0 auto;border-radius:9px;display:grid;place-items:center;font-weight:700;font-size:13px;font-family:'JetBrains Mono',monospace;background:var(--brand-50);color:var(--brand)}
+  .vstep .vn.done{background:var(--brand);color:#fff}
+  .vstep .vlab{font-size:14.5px;font-weight:600;color:var(--ink)}
+  .vstep .vs{font-size:11.5px;color:var(--ink-muted)}
+  .pstats{display:flex;gap:44px;border-top:1px solid var(--line);padding-top:16px;margin-top:6px}
+  .pstats .pn{font-family:'Fraunces',serif;font-weight:600;font-size:34px;color:var(--ink);line-height:1}
+  .pstats .pn span{color:#a9701a}
+  .pstats .pl{font-size:12.5px;color:var(--ink-muted);margin-top:4px;max-width:18ch}
   /* spreadsheet */
   .sheet{width:100%;border-collapse:collapse;font-size:14.5px}
   .sheet th,.sheet td{border:1px solid var(--line);padding:11px 14px}
@@ -146,20 +157,29 @@
   <section class="slide" style="background:var(--canvas-soft)">
     <div class="pad">
       <h2 class="title">Product</h2>
-      <p class="sub">An AI agent runs local sourcing end to end. You name one ingredient. It does the other eight jobs and shows the work on a live board.</p>
-      <div style="flex:1;display:flex;align-items:center">
-        <div class="pipe" style="width:100%">
-          <div class="node done"><div class="ic">✓</div><div class="lab">Request</div><div class="s">you ask once</div></div><div class="conn"></div>
-          <div class="node done"><div class="ic">✓</div><div class="lab">Farm match</div><div class="s">vetted, ranked</div></div><div class="conn"></div>
-          <div class="node done"><div class="ic">✓</div><div class="lab">Agreement</div><div class="s">signed for you</div></div><div class="conn"></div>
-          <div class="node"><div class="ic">4</div><div class="lab">Delivery</div><div class="s">weekly, on us</div></div><div class="conn"></div>
-          <div class="node"><div class="ic">5</div><div class="lab">On the menu</div><div class="s">earning margin</div></div>
-        </div>
+      <p class="sub">An AI agent runs local sourcing end to end. You name one ingredient. It does the rest.</p>
+      <div class="body">
+        <div class="col"><ul class="bullets">
+          <li>You do two things. Ask, and put it on the menu.</li>
+          <li>The agent does the other eight: source, vet, contract, deliver, cover shortfalls, prove it, track the margin.</li>
+          <li>Set up in about 10 minutes. Your first item is free.</li>
+          <li>A live board shows every step as it happens.</li>
+        </ul></div>
+        <div class="col"><div class="panel">
+          <div class="ptitle">The pipeline</div>
+          <div class="vpipe">
+            <div class="vstep"><span class="vn done">✓</span><div><div class="vlab">Request</div><div class="vs">you ask once</div></div></div>
+            <div class="vstep"><span class="vn done">✓</span><div><div class="vlab">Farm match</div><div class="vs">vetted and ranked</div></div></div>
+            <div class="vstep"><span class="vn done">✓</span><div><div class="vlab">Agreement</div><div class="vs">drafted for you</div></div></div>
+            <div class="vstep"><span class="vn">4</span><div><div class="vlab">Delivery</div><div class="vs">weekly, on us</div></div></div>
+            <div class="vstep"><span class="vn">5</span><div><div class="vlab">On the menu</div><div class="vs">earning margin</div></div></div>
+          </div>
+        </div></div>
       </div>
-      <div style="display:flex;gap:48px;border-top:1px solid var(--line);padding-top:18px">
-        <div><div style="font-family:Fraunces,serif;font-weight:600;font-size:36px;color:var(--ink);line-height:1">+20<span style="color:#a9701a">%</span></div><div style="font-size:13px;color:var(--ink-muted);margin-top:4px;max-width:18ch">more a named-local dish can charge</div></div>
-        <div><div style="font-family:Fraunces,serif;font-weight:600;font-size:36px;color:var(--ink);line-height:1">38<span style="color:#a9701a">%</span></div><div style="font-size:13px;color:var(--ink-muted);margin-top:4px;max-width:18ch">of diners choose a restaurant for local sourcing</div></div>
-        <div><div style="font-family:Fraunces,serif;font-weight:600;font-size:36px;color:var(--ink);line-height:1">55<span style="color:#a9701a">%</span></div><div style="font-size:13px;color:var(--ink-muted);margin-top:4px;max-width:18ch">want the story behind their food, which we provide</div></div>
+      <div class="pstats">
+        <div><div class="pn">+20<span>%</span></div><div class="pl">more a named-local dish can charge</div></div>
+        <div><div class="pn">38<span>%</span></div><div class="pl">of diners choose a restaurant for local sourcing</div></div>
+        <div><div class="pn">55<span>%</span></div><div class="pl">want the story behind their food, which we provide</div></div>
       </div>
     </div>
     <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">03</span></div>
@@ -294,33 +314,26 @@
   <section class="slide">
     <div class="pad">
       <h2 class="title">The ask</h2>
-      <p class="sub">A small SAFE to land the first Indianapolis customers. Here is exactly where every dollar goes.</p>
+      <p class="sub">A small SAFE to win the first Indianapolis customers. Almost all of it is sales.</p>
       <div class="terms">
         <span><b>$50K–$100K</b> raise</span><span>SAFE · post-money</span><span><b>$4M</b> cap</span><span><b>20%</b> discount</span><span>MFN</span><span>converts at the priced seed</span>
       </div>
-      <div style="flex:1;display:flex;gap:28px;margin-top:16px">
-        <table class="sheet" style="flex:1">
-          <caption>Use of funds · $75K midpoint</caption>
-          <tr><th>Where it goes</th><th>Amount</th><th>Share</th></tr>
-          <tr><td class="cat" colspan="3">Sales &amp; go-to-market</td></tr>
-          <tr><td>Part-time industry insider, 6-mo retainer</td><td>$18K</td><td>24%</td></tr>
-          <tr><td>Sales commissions, first cohort</td><td>$9K</td><td>12%</td></tr>
-          <tr><td>Onboarding visits and tasting samples</td><td>$6K</td><td>8%</td></tr>
-          <tr class="sub"><td>Subtotal</td><td>$33K</td><td>44%</td></tr>
-        </table>
-        <table class="sheet" style="flex:1">
-          <caption>&nbsp;</caption>
-          <tr><th>Where it goes</th><th>Amount</th><th>Share</th></tr>
-          <tr><td class="cat" colspan="3">Sourcing &amp; delivery · month one at cost</td></tr>
-          <tr><td>Pilot food float, purchased at cost</td><td>$12K</td><td>16%</td></tr>
-          <tr><td>Third-party delivery and cold chain</td><td>$10K</td><td>13%</td></tr>
-          <tr><td>Farm vetting and onboarding</td><td>$5K</td><td>7%</td></tr>
-          <tr class="sub"><td>Subtotal</td><td>$27K</td><td>36%</td></tr>
-          <tr><td class="cat" colspan="3">Product, infra, legal</td></tr>
-          <tr><td>Hosting, database, agent compute</td><td>$5K</td><td>7%</td></tr>
-          <tr><td>Tools, SAFE legal, insurance</td><td>$10K</td><td>13%</td></tr>
-          <tr class="grand"><td>Total · 80% to customers</td><td>$75K</td><td>100%</td></tr>
-        </table>
+      <div class="body">
+        <div class="col"><ul class="bullets">
+          <li>Enough to land the first 10 to 15 kitchens and the farms that supply them.</li>
+          <li>The cost to expand is sales. A part-time insider and warm intros do the work.</li>
+          <li>We run sourcing and delivery at cost for month one, so operating costs stay small early on.</li>
+        </ul></div>
+        <div class="col"><div class="panel" style="padding:8px 22px 14px">
+          <table class="sheet">
+            <caption>Use of funds · $75K midpoint</caption>
+            <tr><th>Where it goes</th><th>Amount</th><th>Share</th></tr>
+            <tr><td>Sales and customer acquisition</td><td>$60K</td><td>80%</td></tr>
+            <tr><td>Operating costs, run at cost early</td><td>$11K</td><td>15%</td></tr>
+            <tr><td>Legal and admin</td><td>$4K</td><td>5%</td></tr>
+            <tr class="grand"><td>Total</td><td>$75K</td><td>100%</td></tr>
+          </table>
+        </div></div>
       </div>
     </div>
     <div class="foot"><span class="brandmark"><span class="leaf"></span> CropConnect</span><span class="pagenum">08</span></div>
