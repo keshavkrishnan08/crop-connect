@@ -360,7 +360,7 @@ export function agentRoadmap(s: AppState): RoadmapStep[] {
     const hasMenu = s.dishes.length > 0;
     const enough = s.items.length >= 3;
     return [
-        { id: "menu", title: "Connect your menu", detail: "So Sage knows what to price.", done: hasMenu, href: "/app/story", cta: "Open Story Studio" },
+        { id: "menu", title: "Finish your setup", detail: "Add your kitchen and menu so Sage can price.", done: hasMenu, href: "/app/onboarding", cta: "Set up" },
         { id: "first", title: "Source your first ingredient", detail: "Name one thing. The agent runs the rest.", done: hasItems, href: "/app/sourcing/new", cta: "Source it" },
         { id: "agree", title: "Let the agreement run", detail: "Sage drafted the terms with the farm.", done: anyAgreed, href: "/app/sourcing", cta: "See the board" },
         { id: "live", title: "Put it on the menu", detail: "Go live and start earning the margin.", done: anyLive, href: "/app/story", cta: "Get the story" },
