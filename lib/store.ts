@@ -67,6 +67,21 @@ export interface SourcingItem {
     createdAt: string;
     agreedAt?: string;
     loi?: LOI;               // preliminary agreement / negotiation
+    allocations?: Allocation[]; // volume split across farms (lead farm is farmId)
+}
+
+export interface Allocation { farmId: string; qty: number }
+/** Rough weekly capacity per farm, derived from reliability. */
+export function farmCapacity(farm: Farm): number { return Math.round(45 + Math.max(0, farm.reliability - 86) * 6); }
+/** Split a weekly quantity across ranked farms by capacity. */
+export function allocateAcrossFarms(ranked: { farm: Farm }[], qty: number): Allocation[] {
+    let remaining = qty; const out: Allocation[] = [];
+    for (const r of ranked) {
+        if (remaining <= 0) break;
+        const take = Math.min(remaining, farmCapacity(r.farm));
+        if (take > 0) { out.push({ farmId: r.farm.id, qty: take }); remaining -= take; }
+    }
+    return out;
 }
 
 /** Negotiated price = base + accepted quality deltas. */
@@ -229,10 +244,14 @@ export const actions = {
     autoSource(itemId: string) {
         const item = state.items.find((i) => i.id === itemId);
         if (!item) return;
-        const best = rankFarms(state.farms, item.crop, item.priceCeiling)[0];
+        const ranked = rankFarms(state.farms, item.crop, item.priceCeiling);
+        const best = ranked[0];
+        const allocations = allocateAcrossFarms(ranked, item.qtyPerWeek);
         if (best) actions.chooseFarm(itemId, best.farm.id);
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, allocations } : i) }));
         actions.draftLoi(itemId);
         if (best) pushActivity(`Matched ${best.farm.name} for ${item.crop}`, "match", itemId);
+        if (allocations.length > 1) pushActivity(`Split ${item.qtyPerWeek} ${item.unit} across ${allocations.length} farms to cover the volume`, "match", itemId);
         pushActivity(`Drafted a preliminary agreement, ready for your review`, "contract", itemId);
     },
     /** The agent drafts the LOI: terms ready to sign, open to negotiation. */
