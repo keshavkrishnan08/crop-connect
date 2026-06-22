@@ -149,7 +149,7 @@ export interface SampleMenu { restaurant: Restaurant; menu: string; }
 
 export const SAMPLES: SampleMenu[] = [
     {
-        restaurant: { name: "Rosewood", cuisine: "New American", location: "Sebastopol, CA", coversPerWeek: 620, distributor: "Sysco" },
+        restaurant: { name: "Rosewood", cuisine: "New American", location: "Indianapolis, IN", coversPerWeek: 620, distributor: "Sysco" },
         menu: `Heirloom tomato salad, basil, stracciatella  16
 Roasted beet & citrus, pistachio  14
 Garden greens, sherry vinaigrette  12
