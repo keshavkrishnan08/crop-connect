@@ -109,7 +109,7 @@ function Overview({ item, farm, signed, price, onGoTerms }: { item: SourcingItem
                 <ol className="space-y-2.5">
                     {[
                         ["Sage matched the farm", `${farm?.name} cleared due diligence and can cover your volume.`, true],
-                        ["You set the quality bar", "Add any QC specs you need. The farm prices and accepts them.", signed],
+                        ["Choose your quality specs", "Each spec is the farm's posted rate, added to the price. No haggling.", signed],
                         ["You sign the contract", "Nothing is binding until you sign. Then weekly delivery begins.", signed],
                         ["Every drop is verified", "Each delivery is photographed and QC-checked before escrow releases.", item.deliveries.some((d) => d.status === "confirmed")],
                     ].map(([t, d, done], i) => (
@@ -220,6 +220,8 @@ function TermsTab({ item, farm, signed, price, onSign }: { item: SourcingItem; f
                 </div>
             </Card>
 
+            <p className="flex items-center gap-1.5 px-1 text-2xs text-ink-faint"><Shield size={12} className="text-brand-500" /> Price is the farm's posted rate, published in advance and fixed. We do not negotiate price, you only choose specs and term.</p>
+
             {!signed && (
                 <Card className="p-5">
                     <p className="mb-2 text-sm font-medium text-ink">Contract length</p>
@@ -252,7 +254,7 @@ function QualityTab({ item, signed }: { item: SourcingItem; signed: boolean }) {
         <div className="space-y-5">
             <Card className="p-5">
                 <div className="mb-1 flex items-center gap-2"><Shield size={16} className="text-brand-600" /><h3 className="text-sm font-medium text-ink">Quality specifications</h3></div>
-                <p className="mb-4 text-[13px] text-ink-muted">Set the bar for your kitchen. {AGENT_NAME} negotiates each spec with the farm and prices it into the contract. Every delivery is checked against this list.</p>
+                <p className="mb-4 text-[13px] text-ink-muted">Each spec carries the farm's posted rate, set in advance. Choose what your kitchen needs and it is added to the price, no haggling. Every delivery is checked against this list.</p>
                 {loi.qualityTerms.length > 0 ? (
                     <div className="space-y-2">
                         {loi.qualityTerms.map((t) => (

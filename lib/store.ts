@@ -109,7 +109,25 @@ export function allocateAcrossFarms(ranked: { farm: Farm }[], qty: number): Allo
     return out;
 }
 
-/** Negotiated price = base + accepted quality deltas. */
+// ---- posted pricing: farms publish rates up front, so price is not negotiated ----
+/** Going market rate per crop. A farm's posted price = this x its price index. */
+export const MARKET_RATE: Record<string, number> = {
+    "heirloom tomato": 4.2, tomato: 2.6, "salad greens": 5.8, greens: 5.5, salad: 5.8, arugula: 7, herb: 9,
+    "summer squash": 2.9, squash: 2.9, beet: 2.8, carrot: 2.4, root: 2.6, "specialty mushroom": 9, mushroom: 8,
+    pepper: 3.2, corn: 1.8, cucumber: 2.2, apple: 2.4, peach: 3, berry: 6.5, pumpkin: 1.6,
+};
+export function marketRate(crop: string): number {
+    const c = crop.toLowerCase();
+    if (MARKET_RATE[c]) return MARKET_RATE[c];
+    for (const k in MARKET_RATE) if (c.includes(k) || k.includes(c.split(" ")[0])) return MARKET_RATE[k];
+    return 4;
+}
+/** The price a farm posts for a crop, published in advance and fixed, not negotiated. */
+export function farmPostedPrice(farm: Farm, crop: string): number {
+    return Math.round(marketRate(crop) * farm.priceIndex * 100) / 100;
+}
+
+/** Contract price = the farm's posted base + the farm's posted rates for the quality specs you chose. */
 export function loiPrice(loi: LOI): number {
     return loi.pricePerUnit + loi.qualityTerms.reduce((s, t) => s + t.priceDelta, 0);
 }
@@ -296,11 +314,12 @@ export const actions = {
             ...s, items: s.items.map((i) => {
                 if (i.id !== itemId) return i;
                 const farm = s.farms.find((f) => f.id === i.farmId);
+                const posted = farm ? farmPostedPrice(farm, i.crop) : (i.priceCeiling || 0);
                 const loi: LOI = {
-                    status: "review", pricePerUnit: i.priceCeiling || 0, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [],
-                    log: [{ id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.`, ts: Date.now() }],
+                    status: "review", pricePerUnit: posted, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [],
+                    log: [{ id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} at their posted rate of $${posted.toFixed(2)}/${i.unit}. The price is fixed; add any quality specs you need and sign when ready.`, ts: Date.now() }],
                 };
-                return { ...i, stage: "matched", loi };
+                return { ...i, priceCeiling: posted, stage: "matched", loi };
             }),
         }));
     },
@@ -309,21 +328,19 @@ export const actions = {
         const opt = QUALITY_OPTIONS.find((o) => o.id === optionId); if (!opt) return;
         const item = state.items.find((i) => i.id === itemId);
         const farm = state.farms.find((f) => f.id === item?.farmId);
+        // The farm already includes some specs at no charge; everything else is its posted rate. No negotiation.
         const alreadyMeets = !!farm && ((optionId === "organic" && farm.practices.some((p) => /organic/i.test(p))) || (optionId === "gap" && farm.reliability >= 92) || optionId === "nongmo");
-        const status: QualityTerm["status"] = alreadyMeets || opt.priceDelta === 0 ? "accepted" : "countered";
         const priceDelta = alreadyMeets ? 0 : opt.priceDelta;
         set((s) => ({
             ...s, items: s.items.map((i) => {
                 if (i.id !== itemId || !i.loi || i.loi.qualityTerms.some((t) => t.id === optionId)) return i;
-                const now = Date.now();
-                const term: QualityTerm = { id: optionId, label: opt.label, status, note: priceDelta ? `+$${opt.priceDelta.toFixed(2)}/${i.unit}` : "Included, no change", priceDelta };
+                const term: QualityTerm = { id: optionId, label: opt.label, status: "accepted", note: priceDelta ? `+$${priceDelta.toFixed(2)}/${i.unit}` : "Included", priceDelta };
                 const log: LoiNote[] = [...i.loi.log,
-                { id: uid("ln"), by: "you", text: `Requested ${opt.label}.`, ts: now },
-                { id: uid("ln"), by: "agent", text: priceDelta ? `${farm?.name ?? "The farm"} can meet this for +$${opt.priceDelta.toFixed(2)}/${i.unit}. Added to the terms.` : `${farm?.name ?? "The farm"} already meets this. Added at no extra cost.`, ts: now + 1 }];
+                { id: uid("ln"), by: "agent", text: priceDelta ? `Added ${opt.label} at ${farm?.name ?? "the farm"}'s posted rate, +$${priceDelta.toFixed(2)}/${i.unit}.` : `Added ${opt.label}. ${farm?.name ?? "The farm"} already meets this, no extra charge.`, ts: Date.now() }];
                 return { ...i, loi: { ...i.loi, qualityTerms: [...i.loi.qualityTerms, term], log } };
             }),
         }));
-        pushActivity(`Negotiated ${opt.label} into the ${item?.crop} agreement`, "contract", itemId);
+        pushActivity(`Added ${opt.label} to the ${item?.crop} contract`, "contract", itemId);
     },
     removeQualityTerm(itemId: string, termId: string) {
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, qualityTerms: i.loi.qualityTerms.filter((t) => t.id !== termId) } } : i) }));
