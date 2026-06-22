@@ -452,6 +452,7 @@ function DeliveriesTab({ item, signed, onGoTerms }: { item: SourcingItem; signed
 function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
     const loi = item.loi!;
     const meta = item.deliveryMeta?.[d.id];
+    const prePhoto = meta?.prePhoto ?? (d.status !== "confirmed" ? `https://loremflickr.com/600/450/${encodeURIComponent(item.crop)},farm,harvest?lock=${(d.id.charCodeAt(1) || 5) + d.qty + 3}` : undefined);
     const [open, setOpen] = React.useState(false);
     const [photo, setPhoto] = React.useState<string | null>(null);
     const [checks, setChecks] = React.useState<Record<number, boolean>>({});
@@ -487,8 +488,16 @@ function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
                     : <Button onClick={() => setOpen((v) => !v)} className="btn-sm">Receive <ArrowRight size={14} /></Button>}
             </div>
 
+            {!confirmed && prePhoto && (
+                <div className="flex items-center gap-3 border-t border-line bg-canvas-soft/40 px-4 py-2.5">
+                    <img src={prePhoto} alt="farm preview" className="h-12 w-16 shrink-0 rounded-lg object-cover" />
+                    <div className="min-w-0 flex-1"><p className="text-[12.5px] font-medium text-ink">Farm preview, sent ahead</p><p className="truncate text-2xs text-ink-muted">{meta?.preNote ?? "The farm photographed this batch before it ships. Verify the drop against it on arrival."}</p></div>
+                </div>
+            )}
+
             {open && !confirmed && (
                 <div className="border-t border-line bg-canvas-soft/60 p-4 animate-fade-in">
+                    {prePhoto && <div className="mb-4"><p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Farm's preview, for reference</p><img src={prePhoto} alt="preview" className="h-28 w-full rounded-xl object-cover" /></div>}
                     <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">1 · Photograph the produce on arrival</p>
                     {photo
                         ? <div className="relative"><img src={photo} alt="capture" className="h-44 w-full rounded-xl object-cover" /><button onClick={() => setPhoto(null)} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-ink/70 text-white"><X size={14} /></button></div>

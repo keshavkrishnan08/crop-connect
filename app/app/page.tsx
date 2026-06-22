@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useStore, farmById, orderEscrow, supplyHeadline, type Activity, type ActivityKind } from "@/lib/store";
+import { useStore, farmById, orderEscrow, supplyHeadline, farmNotifications, getState, type Activity, type ActivityKind } from "@/lib/store";
 import { Photo } from "@/components/marketing/Photo";
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
@@ -38,6 +38,9 @@ export default function Dashboard() {
                 subtitle={`${AGENT_NAME} is running your sourcing.`}
                 actions={<LinkButton href="/app/sourcing/new"><Plus size={18} /> Source an ingredient</LinkButton>}
             />
+
+            {/* news: latest from your farms */}
+            <NewsBanner />
 
             {/* recent events */}
             <RecentEvents activity={activity} />
@@ -136,6 +139,26 @@ export default function Dashboard() {
                 </aside>
             </div>
         </div>
+    );
+}
+
+function NewsBanner() {
+    useStore((s) => s.items);
+    const news = farmNotifications(getState()).slice(0, 3);
+    if (news.length === 0) return null;
+    return (
+        <Card className="mb-6 overflow-hidden p-0">
+            <div className="flex items-center gap-2 border-b border-line bg-gradient-to-br from-brand-50/50 to-transparent px-5 py-2.5"><Bell size={15} className="text-brand-600" /><h3 className="text-[13px] font-medium text-ink">Latest from your farms</h3></div>
+            <div className="divide-y divide-line">
+                {news.map((n) => (
+                    <Link key={n.id} href={`/app/sourcing/${n.itemId}`} className="flex items-center gap-3 px-5 py-2.5 transition hover:bg-canvas/60">
+                        <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />
+                        <span className="min-w-0 flex-1 truncate text-[13.5px] text-ink">{n.text}</span>
+                        <span className="hidden shrink-0 text-2xs text-ink-faint sm:block">{n.farm}</span>
+                    </Link>
+                ))}
+            </div>
+        </Card>
     );
 }
 
