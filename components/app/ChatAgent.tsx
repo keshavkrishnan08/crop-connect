@@ -39,13 +39,13 @@ export function ChatAgent() {
             {/* launcher. a quiet round avatar, hidden while open */}
             {!open && (
                 <button onClick={() => setOpen(true)} aria-label={`Ask ${AGENT_NAME}`} title={`Ask ${AGENT_NAME}`}
-                    className="group fixed bottom-5 left-5 z-[80] grid h-12 w-12 place-items-center rounded-full border border-line bg-canvas-soft/80 shadow-card backdrop-blur transition-all duration-200 hover:scale-105 hover:bg-canvas-soft hover:shadow-lift">
+                    className="group fixed bottom-5 right-5 z-[80] grid h-12 w-12 place-items-center rounded-full border border-line bg-canvas-soft/80 shadow-card backdrop-blur transition-all duration-200 hover:scale-105 hover:bg-canvas-soft hover:shadow-lift">
                     <AgentAvatar size={40} />
                 </button>
             )}
 
             {open && (
-                <div className="fixed bottom-5 left-5 z-[80] flex h-[480px] w-[min(370px,calc(100vw-2.5rem))] origin-bottom-left flex-col overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-lift animate-scale-in">
+                <div className="fixed bottom-5 right-5 z-[80] flex h-[480px] w-[min(370px,calc(100vw-2.5rem))] origin-bottom-right flex-col overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-lift animate-scale-in">
                     <div className="flex items-center gap-3 border-b border-line bg-gradient-to-br from-brand-50/70 to-transparent p-4">
                         <AgentAvatar size={38} active />
                         <div className="flex-1"><p className="font-display text-lg leading-none text-ink">{AGENT_NAME}</p><p className="text-2xs text-ink-muted">Your sourcing agent · sees your whole account</p></div>
