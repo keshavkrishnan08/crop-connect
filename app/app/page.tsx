@@ -5,12 +5,12 @@ import Link from "next/link";
 import { useStore, marginRollup, farmById, getState, type Activity, type ActivityKind } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
-import { AgentDock, AGENT_NAME } from "@/components/app/AgentDock";
+import { AGENT_NAME } from "@/components/app/AgentDock";
 import { Roadmap } from "@/components/app/Roadmap";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { CountUp } from "@/components/ui/CountUp";
 import { usd, cn } from "@/lib/utils";
-import { MarginUp, Truck, Route, Plus, ArrowRight, Calendar, Leaf, Farm, Pen, StoryTag, Search, Sparkle, Check } from "@/components/icons";
+import { MarginUp, Truck, Route, Plus, ArrowRight, Calendar, Leaf, Farm, Pen, StoryTag, Search, Check } from "@/components/icons";
 
 export default function Dashboard() {
     const items = useStore((s) => s.items);
@@ -31,8 +31,8 @@ export default function Dashboard() {
                 actions={<LinkButton href="/app/sourcing/new"><Plus size={18} /> Source an ingredient</LinkButton>}
             />
 
-            {/* who is working */}
-            <AgentDock />
+            {/* recent events */}
+            <RecentEvents activity={activity} />
 
             {/* the numbers */}
             <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -57,28 +57,6 @@ export default function Dashboard() {
                         {boardItems.length === 0
                             ? <EmptyState icon={<Route size={24} />} title="Nothing sourcing yet" description="Name one ingredient. The agent matches the farm, drafts the agreement, and schedules deliveries." action={<LinkButton href="/app/sourcing/new"><Plus size={18} /> Source an ingredient</LinkButton>} />
                             : <AutomationBoard items={boardItems} />}
-                    </Card>
-
-                    {/* activity feed */}
-                    <Card className="overflow-hidden p-0 transition-shadow duration-200 hover:shadow-lift">
-                        <div className="flex items-center justify-between border-b border-line bg-gradient-to-br from-brand-50/50 to-transparent px-5 py-4">
-                            <div className="flex items-center gap-2"><Sparkle size={17} className="text-brand-600" /><h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Handled for you</h3></div>
-                            <span className="text-2xs font-medium uppercase tracking-wide text-ink-faint">{activity.length} actions</span>
-                        </div>
-                        {activity.length === 0 ? <p className="px-5 py-8 text-center text-sm text-ink-muted">Nothing yet. Source an ingredient to start the engine.</p> : (
-                            <div className="divide-y divide-line">
-                                {activity.slice(0, 8).map((a) => (
-                                    <div key={a.id} className="flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-canvas/60">
-                                        <span className={cn("mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg", KIND_TONE[a.kind])}>{KIND_ICON[a.kind]}</span>
-                                        <div className="min-w-0 flex-1">
-                                            <p className="text-[14px] leading-snug text-ink">{a.text}</p>
-                                            <p className="mt-0.5 text-[12px] text-ink-faint">{relTime(a.ts)}</p>
-                                        </div>
-                                        {a.itemId && <Link href={`/app/sourcing/${a.itemId}`} className="mt-0.5 shrink-0 text-ink-faint transition hover:text-brand-600"><ArrowRight size={15} /></Link>}
-                                    </div>
-                                ))}
-                            </div>
-                        )}
                     </Card>
                 </div>
 
@@ -107,6 +85,33 @@ export default function Dashboard() {
                     </Card>
                 </aside>
             </div>
+        </div>
+    );
+}
+
+function RecentEvents({ activity }: { activity: Activity[] }) {
+    const latest = activity.slice(0, 4);
+    return (
+        <div className="mb-6 overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-card transition-shadow duration-200 hover:shadow-lift">
+            <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
+                <h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Recent</h3>
+                <span className="text-2xs text-ink-faint">{activity.length} events</span>
+            </div>
+            {latest.length === 0
+                ? <p className="px-5 py-6 text-center text-sm text-ink-muted">Nothing yet. Source an ingredient to get things moving.</p>
+                : (
+                    <div className="divide-y divide-line">
+                        {latest.map((a) => (
+                            <div key={a.id} className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-canvas/60">
+                                <span className={cn("grid h-7 w-7 shrink-0 place-items-center rounded-lg", KIND_TONE[a.kind])}>{KIND_ICON[a.kind]}</span>
+                                {a.itemId
+                                    ? <Link href={`/app/sourcing/${a.itemId}`} className="min-w-0 flex-1 truncate text-[14px] text-ink hover:text-brand-600">{a.text}</Link>
+                                    : <p className="min-w-0 flex-1 truncate text-[14px] text-ink">{a.text}</p>}
+                                <span className="shrink-0 font-mono text-[12px] text-ink-faint tnum">{relTime(a.ts)}</span>
+                            </div>
+                        ))}
+                    </div>
+                )}
         </div>
     );
 }
