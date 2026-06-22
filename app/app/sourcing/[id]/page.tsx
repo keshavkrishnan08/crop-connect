@@ -61,6 +61,27 @@ function ContractRoom({ item, farm, signed }: { item: SourcingItem; farm?: Farm;
                 </div>
             </Card>
 
+            {/* supply split across farms */}
+            {item.allocations && item.allocations.length > 1 && (
+                <Card className="p-5">
+                    <div className="mb-1 flex items-center gap-2"><Handshake size={16} className="text-brand-600" /><h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Supply split</h3></div>
+                    <p className="mb-4 text-[13px] text-ink-muted">No single farm could cover {item.qtyPerWeek} {item.unit}/wk, so {AGENT_NAME} fractioned it across {item.allocations.length} farms.</p>
+                    <div className="space-y-2.5">
+                        {item.allocations.map((a) => {
+                            const f = farmById(a.farmId);
+                            const pct = Math.round((a.qty / item.qtyPerWeek) * 100);
+                            return (
+                                <div key={a.farmId} className="flex items-center gap-3">
+                                    <span className="w-32 shrink-0 truncate text-[13px] font-medium text-ink">{f?.name ?? "Farm"}</span>
+                                    <div className="h-2 flex-1 overflow-hidden rounded-full bg-canvas-sunk"><div className="h-full rounded-full bg-brand-400" style={{ width: `${pct}%` }} /></div>
+                                    <span className="w-20 shrink-0 text-right font-mono text-[12px] text-ink-muted tnum">{a.qty} {item.unit}</span>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </Card>
+            )}
+
             {/* quality guidelines */}
             <Card className="p-5">
                 <div className="mb-1 flex items-center gap-2"><Pen size={16} className="text-brand-600" /><h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Quality guidelines</h3></div>
