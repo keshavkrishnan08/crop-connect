@@ -47,7 +47,7 @@ export interface LOI {
     signedAt?: string;       // restaurant signature
     signedFarmAt?: string;   // farm counter-signature
 }
-export interface DeliveryMeta { photo?: string; qc?: boolean; note?: string }
+export interface DeliveryMeta { photo?: string; qc?: boolean; note?: string; prePhoto?: string; preNote?: string; preAt?: number }
 
 // ---- supply updates: the live link between farm and restaurant ----
 export type SupplyKind = "ontrack" | "harvest" | "packed" | "transit" | "delay" | "shortfall" | "delivered" | "quality";
@@ -208,6 +208,19 @@ export interface AppState {
     farms: Farm[];
     items: SourcingItem[];
     activity: Activity[];
+    notifsReadTs?: number; // last time the restaurant cleared the notification bell
+}
+
+// ---- notifications: farm-initiated actions the restaurant should see ----
+export interface FarmNotif { id: string; itemId: string; crop: string; farm?: string; kind: SupplyKind; text: string; ts: number }
+export function farmNotifications(s: AppState): FarmNotif[] {
+    return s.items
+        .flatMap((i) => (i.updates ?? []).map((u) => ({ id: u.id, itemId: i.id, crop: i.crop, farm: s.farms.find((f) => f.id === i.farmId)?.name, kind: u.kind, text: u.text, ts: u.ts })))
+        .sort((a, b) => b.ts - a.ts);
+}
+export function unreadNotifCount(s: AppState): number {
+    const since = s.notifsReadTs ?? 0;
+    return farmNotifications(s).filter((n) => n.ts > since).length;
 }
 
 // ---- seed ----
@@ -249,6 +262,7 @@ function seedItems(): SourcingItem[] {
             ],
             loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5), signedFarmAt: wk(-5), ref: "CC-2026-7421", farmAccepted: true },
             updates: [
+                { id: uid("su"), kind: "quality", text: "Teter Organic Farm sent a pre-delivery photo of tomorrow's pick. Looks excellent, on track.", ts: today.getTime() - 2 * 3600e3 },
                 { id: uid("su"), kind: "transit", text: "On the truck from Teter Organic, ETA tomorrow 8-9am.", ts: today.getTime() - 6 * 3600e3 },
                 { id: uid("su"), kind: "packed", text: "40 lb harvested this morning and packed in returnable crates.", ts: today.getTime() - 28 * 3600e3, resolved: true },
                 { id: uid("su"), kind: "ontrack", text: "Harvest on schedule, brix looking great this week.", ts: today.getTime() - 3 * 86400e3, resolved: true },
@@ -450,6 +464,22 @@ export const actions = {
     /** Acknowledge a heads-up so it clears from the alert strip. */
     acknowledgeSupply(itemId: string, updateId: string) {
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, updates: (i.updates ?? []).map((u) => u.id === updateId ? { ...u, resolved: true } : u) } : i) }));
+    },
+    markNotifsRead() { set((s) => ({ ...s, notifsReadTs: Date.now() })); },
+    /** The farm sends a pre-delivery preview photo a day or two ahead (verification before it ships). */
+    sendPreDeliveryPhoto(itemId: string, deliveryId: string) {
+        const item = state.items.find((i) => i.id === itemId);
+        const farm = state.farms.find((f) => f.id === item?.farmId);
+        const photo = `https://loremflickr.com/600/450/${encodeURIComponent(item?.crop ?? "produce")},farm,fresh?lock=${(deliveryId.charCodeAt(3) || 9) + 11}`;
+        set((s) => ({
+            ...s, items: s.items.map((i) => {
+                if (i.id !== itemId) return i;
+                const meta = { ...(i.deliveryMeta || {}), [deliveryId]: { ...(i.deliveryMeta?.[deliveryId] || {}), prePhoto: photo, preNote: `${farm?.farmer?.split(" ")[0] ?? "The farm"} sent a preview of this week's harvest.`, preAt: Date.now() } };
+                const update: SupplyUpdate = { id: uid("su"), kind: "quality", text: `${farm?.name ?? "Your farm"} sent a pre-delivery photo. Looks great, on track for your next drop.`, ts: Date.now() };
+                return { ...i, deliveryMeta: meta, updates: [update, ...(i.updates ?? [])] };
+            }),
+        }));
+        pushActivity(`${farm?.name ?? "Your farm"} sent a pre-delivery photo for ${item?.crop}`, "delivery", itemId);
     },
     chooseFarm(itemId: string, farmId: string) {
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, farmId, stage: "matched" } : i) }));
