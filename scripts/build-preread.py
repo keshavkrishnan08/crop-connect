@@ -92,9 +92,10 @@ bullet("**Monthly churn:** assume about 3%, reflecting normal restaurant turnove
 para("We treat lifetime value as a hypothesis to test with data, not a number to lead with.")
 
 heading("Go-to-Market")
-para("We win one metro at a time and earn density before expanding. The Indianapolis plan has three steps:")
-numbered("**Onboard the farms first.** Pre-sign 8 to 12 vetted local farms across the core crops so supply and fill are guaranteed before we sell a single restaurant. This removes the cold-start problem.")
-numbered("**Onboard restaurants with the audit.** For each target we run the free audit on their public menu and bring a specific, quantified estimate of the margin they are leaving behind. The offer removes their risk: first ingredient free, ten-minute setup, cancel any month, with a guarantee. We start with one ingredient (about $400/month) and grow the account toward the $896 blended ARPA.")
+para("We win one metro at a time and earn density before expanding. The Indianapolis plan, in order:")
+numbered("**Onboard the farms.** Pre-sign 8 to 12 vetted local farms across the core crops so supply and fill are guaranteed before we sell a single restaurant. This removes the cold-start problem.")
+numbered("**Show restaurants their savings.** For each target we run the free audit on their public menu and bring a specific, quantified estimate of the money they could save and the margin they are leaving behind.")
+numbered("**Win them with a risk-free offer.** First ingredient free, free ten-minute setup, cancel any month, backed by a guarantee. We start with one ingredient (about $400/month) and grow the account toward the $896 blended ARPA.")
 numbered("**Expand metro by metro.** At roughly 30 to 40 kitchens and 15 or more farms in Indianapolis, open the next city with the same playbook.")
 
 heading("Why We Win")
