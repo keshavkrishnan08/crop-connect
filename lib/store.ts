@@ -113,6 +113,17 @@ export const SEED_FARMS: Farm[] = [
     { id: "f_rivergate", name: "Tuttle Orchards", farmer: "Tomás Vela", location: "Greenfield, IN", region: "E", distanceMi: 26, practices: ["Organic"], crops: ["apple", "peach", "berry", "pumpkin"], reliability: 88, priceIndex: 1.03, story: "Heirloom fruit orchard east of the city, apples and peaches." },
 ];
 
+// ---- Special of the week: the agent drafts a ready-to-run menu special ----
+export interface WeekSpecial { id: string; crop: string; unit: string; price: number; farmId: string; dishName: string; description: string }
+export const WEEK_SPECIALS: WeekSpecial[] = [
+    { id: "sp_tom", crop: "heirloom tomato", unit: "lb", price: 16, farmId: "f_teter", dishName: "Teter Farm Heirloom Tomato Toast", description: "Vine-ripened heirlooms from Teter Organic in Noblesville, whipped stracciatella, basil oil, sourdough." },
+    { id: "sp_squash", crop: "summer squash", unit: "lb", price: 15, farmId: "f_sunfield", dishName: "Wood-Grilled Sunfield Squash", description: "Greenwood summer squash over coals, salsa verde, toasted pepitas, a squeeze of lime." },
+    { id: "sp_peach", crop: "peach", unit: "case", price: 14, farmId: "f_rivergate", dishName: "Tuttle Orchard Peach & Burrata", description: "Greenfield peaches at peak, torn burrata, hot honey, mint, flaky salt." },
+    { id: "sp_mush", crop: "specialty mushroom", unit: "lb", price: 17, farmId: "f_emberlu", dishName: "Hoosier Mushroom Toast", description: "Lion's mane and oyster from Hoosier Mushroom Co., taleggio, thyme, confit garlic." },
+    { id: "sp_beet", crop: "beet", unit: "lb", price: 13, farmId: "f_marsh", dishName: "Wild Ginger Roasted Beets", description: "Martinsville beets roasted in their skins, citrus, pistachio, whipped chèvre." },
+    { id: "sp_greens", crop: "salad greens", unit: "lb", price: 13, farmId: "f_blue", dishName: "Growing Places Little Gems", description: "Just-cut little gems from a downtown garden, buttermilk dill, charred lemon, breadcrumb." },
+];
+
 function seedItems(): SourcingItem[] {
     const today = new Date();
     const wk = (n: number) => { const d = new Date(today); d.setDate(d.getDate() + n * 7); return d.toISOString().slice(0, 10); };
@@ -129,7 +140,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 40, status: "delivered" },
                 { id: uid("dl"), date: wk(1), qty: 40, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
+            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
         },
         {
             id: "s_greens", crop: "salad greens", unit: "lb", qtyPerWeek: 30, priceCeiling: 6, dishName: "Garden greens, sherry vinaigrette",
@@ -140,7 +151,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 30, status: "scheduled" },
                 { id: uid("dl"), date: wk(1), qty: 30, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Blue Oak Gardens, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
+            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
@@ -170,7 +181,7 @@ function seedActivity(): Activity[] {
     return [
         a("Confirmed this week's heirloom tomato delivery", "delivery", 90, "s_tom"),
         a("Tomato salad is live on your menu", "story", 60 * 26, "s_tom"),
-        a("Scheduled 8 weekly deliveries with Blue Oak", "delivery", 60 * 48, "s_greens"),
+        a("Scheduled 8 weekly deliveries with Growing Places Indy", "delivery", 60 * 48, "s_greens"),
         a("Drafted your supply agreement for salad greens", "contract", 60 * 49, "s_greens"),
         a("Matched Sunfield Acres for summer squash", "match", 60 * 70, "s_squash"),
     ];

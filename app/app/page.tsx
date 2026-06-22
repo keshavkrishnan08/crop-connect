@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
 import { AGENT_NAME } from "@/components/app/AgentDock";
 import { Roadmap } from "@/components/app/Roadmap";
+import { SpecialCard } from "@/components/app/SpecialCard";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { CountUp } from "@/components/ui/CountUp";
 import { usd, cn } from "@/lib/utils";
@@ -41,6 +42,9 @@ export default function Dashboard() {
                 <Stat icon={<MarginUp size={20} />} label="Realized uplift / mo" value={<CountUp to={roll.realizedMonthly} format={(n) => usd(n, { compact: n > 9999 })} className="value-pos" />} tone="harvest" sub={`${usd(roll.realizedAnnual, { compact: true })}/yr run-rate`} />
                 <Stat icon={<Check size={20} />} label="Your steps this week" value={<span className="font-mono tnum">0</span>} tone="violet" sub="we did the rest" />
             </div>
+
+            {/* proactive: the agent drafts a menu special */}
+            <SpecialCard />
 
             {/* the work, side by side with your to-dos */}
             <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
