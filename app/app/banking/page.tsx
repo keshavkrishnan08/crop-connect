@@ -18,6 +18,12 @@ export default function BankingPage() {
         .sort((a, b) => +new Date(a.d.date) - +new Date(b.d.date))
         .slice(0, 8);
 
+    const receipts = items
+        .flatMap((i) => i.deliveries.filter((d) => d.status === "confirmed").map((d) => ({ item: i, d, amt: (d.qty || 0) * (i.priceCeiling || 0) })))
+        .sort((a, b) => +new Date(b.d.date) - +new Date(a.d.date))
+        .slice(0, 12);
+    const paidTotal = receipts.reduce((s, r) => s + r.amt, 0);
+
     return (
         <div className="animate-fade-up">
             <PageHeader eyebrow="Banking" title="Banking"
@@ -65,6 +71,36 @@ export default function BankingPage() {
                     </Card>
                 </aside>
             </div>
+
+            {/* invoices & receipts */}
+            <section className="mt-8">
+                <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-display text-xl text-ink">Invoices &amp; receipts</h2>
+                    <span className="text-2xs text-ink-faint">{receipts.length} paid · {usd(paidTotal, { compact: paidTotal > 9999 })} this period</span>
+                </div>
+                <Card className="overflow-hidden p-0">
+                    {receipts.length === 0
+                        ? <p className="px-5 py-8 text-center text-sm text-ink-muted">Receipts appear here once deliveries are confirmed and escrow releases.</p>
+                        : <div className="divide-y divide-line">
+                            <div className="hidden grid-cols-[1fr_1.6fr_1fr_1fr_auto] gap-3 bg-canvas-sunk px-5 py-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint sm:grid">
+                                <span>Date</span><span>Item</span><span>Farm</span><span>Contract</span><span className="text-right">Amount</span>
+                            </div>
+                            {receipts.map((r) => {
+                                const farm = farmById(r.item.farmId);
+                                return (
+                                    <div key={r.d.id} className="grid grid-cols-2 items-center gap-3 px-5 py-3 text-[13.5px] sm:grid-cols-[1fr_1.6fr_1fr_1fr_auto]">
+                                        <span className="font-mono text-ink-muted tnum">{new Date(r.d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
+                                        <span className="truncate font-medium text-ink"><span className="tnum">{r.d.qty}</span> {r.item.unit} <span className="capitalize">{r.item.crop}</span></span>
+                                        <span className="hidden truncate text-ink-muted sm:block">{farm?.name}</span>
+                                        <span className="hidden truncate font-mono text-2xs text-ink-faint sm:block">{r.item.loi?.ref ?? "—"}</span>
+                                        <span className="text-right font-mono font-medium text-ink tnum">{usd(r.amt)}</span>
+                                    </div>
+                                );
+                            })}
+                        </div>}
+                </Card>
+                <p className="mt-2 px-1 text-2xs text-ink-faint">Every confirmed delivery generates a receipt and releases escrow to the farm. A monthly statement is available to download or hand to your bookkeeper.</p>
+            </section>
         </div>
     );
 }

@@ -56,8 +56,8 @@ export default function ItemPage({ params }: { params: { id: string } }) {
             <div className={cn("mb-5 flex items-center gap-3 rounded-2xl border px-5 py-3.5", signed ? "border-brand-200 bg-brand-50/50" : "border-violet-200 bg-violet-50/50")}>
                 <span className={cn("grid h-9 w-9 place-items-center rounded-full text-white", signed ? "bg-brand-500" : "bg-violet-500")}>{signed ? <Check size={18} /> : <Handshake size={18} />}</span>
                 <div className="flex-1">
-                    <p className="text-sm font-semibold text-ink">{signed ? "Signed and active" : "Drafted by Sage, awaiting your signature"}</p>
-                    <p className="text-[13px] text-ink-muted">{signed ? "The farm is delivering on this contract." : "Review the farm, the terms, the quality specs, and logistics, then sign. Nothing is binding until you do."}</p>
+                    <p className="text-sm font-semibold text-ink">{signed ? "Signed and active" : "Farm accepted, awaiting your signature"}</p>
+                    <p className="text-[13px] text-ink-muted">{signed ? "Both sides signed. The farm is delivering on this contract." : "The farm confirmed availability at its posted rate. Review everything, then sign. Nothing is binding until you do."}</p>
                 </div>
                 {!signed && <Button onClick={() => setTab("terms")}>Review &amp; sign <ArrowRight size={15} /></Button>}
             </div>
@@ -112,9 +112,9 @@ function Overview({ item, farm, signed, price, onGoTerms }: { item: SourcingItem
                 <h3 className="mb-3 text-sm font-medium text-ink">How this works</h3>
                 <ol className="space-y-2.5">
                     {[
-                        ["Sage matched the farm", `${farm?.name} cleared due diligence and can cover your volume.`, true],
+                        ["Farm matched and accepted", `${farm?.name} cleared due diligence and accepted your request at its posted rate.`, item.loi?.farmAccepted ?? false],
                         ["Choose your quality specs", "Each spec is the farm's posted rate, added to the price. No haggling.", signed],
-                        ["You sign the contract", "Nothing is binding until you sign. Then weekly delivery begins.", signed],
+                        ["Both sides sign", "You sign, the farm counter-signs, and the contract is executed. Then delivery begins.", signed],
                         ["Every drop is verified", "Each delivery is photographed and QC-checked before escrow releases.", item.deliveries.some((d) => d.status === "confirmed")],
                     ].map(([t, d, done], i) => (
                         <li key={i} className="flex gap-3">
@@ -238,14 +238,26 @@ function TermsTab({ item, farm, signed, price, onSign }: { item: SourcingItem; f
             )}
 
             {signed
-                ? <Card className="flex flex-wrap items-center justify-between gap-3 border-brand-200 bg-brand-50/40 p-5">
-                    <div className="flex items-center gap-2.5"><span className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-white"><Check size={18} /></span><div><p className="text-sm font-semibold text-ink">Signed{loi.signedAt ? ` on ${loi.signedAt}` : ""}</p><p className="text-[13px] text-ink-muted">{usd(esc.held, { compact: true })} held · {ESCROW_LABEL[esc.status]}</p></div></div>
-                    <Link href="/app/banking" className="btn-soft btn-sm">View in Banking <ArrowRight size={15} /></Link>
+                ? <Card className="border-brand-200 bg-brand-50/40 p-5">
+                    <div className="flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5"><span className="grid h-9 w-9 place-items-center rounded-full bg-brand-500 text-white"><Check size={18} /></span><div><p className="text-sm font-semibold text-ink">Executed contract</p><p className="font-mono text-2xs text-ink-faint">{loi.ref ?? "Signed"}</p></div></div>
+                        <Link href="/app/banking" className="btn-soft btn-sm">Banking <ArrowRight size={15} /></Link>
+                    </div>
+                    <div className="mt-4 grid grid-cols-2 gap-3">
+                        <div className="rounded-xl border border-line bg-white/70 p-3"><p className="text-2xs uppercase tracking-wide text-ink-faint">Your signature</p><p className="mt-0.5 font-display text-base text-ink">Signed</p><p className="font-mono text-2xs text-ink-faint">{loi.signedAt}</p></div>
+                        <div className="rounded-xl border border-line bg-white/70 p-3"><p className="truncate text-2xs uppercase tracking-wide text-ink-faint">{farm?.name ?? "Farm"}</p><p className="mt-0.5 font-display text-base text-ink">Counter-signed</p><p className="font-mono text-2xs text-ink-faint">{loi.signedFarmAt ?? loi.signedAt}</p></div>
+                    </div>
+                    <p className="mt-3 font-mono text-2xs text-ink-faint tnum">{usd(esc.held, { compact: true })} held in escrow · {ESCROW_LABEL[esc.status]}</p>
                 </Card>
                 : <Card className="flex flex-wrap items-center justify-between gap-3 p-5">
                     <div><p className="text-2xs uppercase tracking-wide text-ink-faint">Total per week, once signed</p><p className="font-display text-2xl text-ink tnum">{usd(item.qtyPerWeek * price)}<span className="text-base text-ink-muted">/wk</span></p></div>
                     <Button onClick={onSign}><Pen size={16} /> Sign contract</Button>
                 </Card>}
+
+            <Card className="flex items-start gap-3 p-4">
+                <Shield size={17} className="mt-0.5 shrink-0 text-brand-600" />
+                <p className="text-[13px] leading-relaxed text-ink-soft"><b className="text-ink">Your money is protected.</b> Each delivery's payment is held in escrow and released to the farm only after you confirm receipt with a photo and a quality check. You never prepay a no-show, and a failed drop is never charged.</p>
+            </Card>
         </div>
     );
 }

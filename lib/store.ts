@@ -42,7 +42,10 @@ export interface LOI {
     log: LoiNote[];
     transport: "we" | "you"; // who runs the trucks
     termWeeks: number;       // contract length
-    signedAt?: string;
+    farmAccepted?: boolean;  // farm confirmed availability + posted terms
+    ref?: string;            // executed contract number
+    signedAt?: string;       // restaurant signature
+    signedFarmAt?: string;   // farm counter-signature
 }
 export interface DeliveryMeta { photo?: string; qc?: boolean; note?: string }
 
@@ -235,7 +238,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 40, status: "delivered" },
                 { id: uid("dl"), date: wk(1), qty: 40, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
+            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5), signedFarmAt: wk(-5), ref: "CC-2026-7421", farmAccepted: true },
             updates: [
                 { id: uid("su"), kind: "transit", text: "On the truck from Teter Organic, ETA tomorrow 8-9am.", ts: today.getTime() - 6 * 3600e3 },
                 { id: uid("su"), kind: "packed", text: "40 lb harvested this morning and packed in returnable crates.", ts: today.getTime() - 28 * 3600e3, resolved: true },
@@ -251,7 +254,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 30, status: "scheduled" },
                 { id: uid("dl"), date: wk(1), qty: 30, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
+            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2), signedFarmAt: wk(-2), ref: "CC-2026-3318", farmAccepted: true },
             updates: [
                 { id: uid("su"), kind: "delay", text: "Rain pushed Tuesday's cut back a day. Sage rerouted 12 lb to Sunfield Acres so your Wednesday service is fully covered. No action needed.", ts: today.getTime() - 5 * 3600e3 },
                 { id: uid("su"), kind: "harvest", text: "Greens cut and washed at Growing Places Indy.", ts: today.getTime() - 30 * 3600e3, resolved: true },
@@ -261,7 +264,7 @@ function seedItems(): SourcingItem[] {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
             stage: "matched", farmId: "f_sunfield", lift: 2, harvestWindow: "Jun–Oct",
             createdAt: wk(-1), deliveries: [],
-            loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
+            loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], farmAccepted: true, log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
         },
     ];
 }
@@ -378,8 +381,11 @@ export const actions = {
                 const farm = s.farms.find((f) => f.id === i.farmId);
                 const posted = farm ? farmPostedPrice(farm, i.crop) : (i.priceCeiling || 0);
                 const loi: LOI = {
-                    status: "review", pricePerUnit: posted, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [],
-                    log: [{ id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} at their posted rate of $${posted.toFixed(2)}/${i.unit}. The price is fixed; add any quality specs you need and sign when ready.`, ts: Date.now() }],
+                    status: "review", pricePerUnit: posted, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], farmAccepted: true,
+                    log: [
+                        { id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} at their posted rate of $${posted.toFixed(2)}/${i.unit}. The price is fixed; add any quality specs you need and sign when ready.`, ts: Date.now() },
+                        { id: uid("ln"), by: "farm", text: `Confirmed. We can supply ${i.qtyPerWeek} ${i.unit}/wk at our posted rate and meet your standard specs. Ready to sign whenever you are.`, ts: Date.now() + 1 },
+                    ],
                 };
                 return { ...i, priceCeiling: posted, stage: "matched", loi };
             }),
@@ -413,7 +419,9 @@ export const actions = {
         if (!item || !item.loi) return;
         const finalPrice = loiPrice(item.loi);
         const farm = state.farms.find((f) => f.id === item.farmId);
-        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, priceCeiling: finalPrice, loi: { ...i.loi, status: "signed", signedAt: new Date().toISOString().slice(0, 10) } } : i) }));
+        const today = new Date().toISOString().slice(0, 10);
+        const ref = `CC-${new Date().getFullYear()}-${itemId.slice(-4).toUpperCase()}`;
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, priceCeiling: finalPrice, loi: { ...i.loi, status: "signed", signedAt: today, signedFarmAt: today, ref, log: [...i.loi.log, { id: uid("ln"), by: "farm", text: "Counter-signed. We're official, looking forward to supplying you.", ts: Date.now() }] } } : i) }));
         actions.confirmAgreement(itemId);
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, updates: [{ id: uid("su"), kind: "ontrack" as SupplyKind, text: `Contract live with ${farm?.name ?? "your farm"}. Sage scheduled your weekly drops and will post an update before every one.`, ts: Date.now() }, ...(i.updates ?? [])] } : i) }));
         pushActivity(`Contract signed with ${farm?.name ?? "the farm"} for ${item.crop}`, "contract", itemId);
