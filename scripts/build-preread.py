@@ -105,6 +105,12 @@ para("The companies that tried to deliver local food themselves struggled becaus
 sources("Source.  6. Valuations are peak reported figures from press and PitchBook: Misfits Market (about $2B, 2021) and Choco (about $1.2B, 2022); Afresh has raised about $148M.")
 
 heading("Team")
+try:
+    _pic = doc.add_paragraph()
+    _pic.paragraph_format.space_after = Pt(4)
+    _pic.add_run().add_picture("pitch/keshav.jpg", width=Inches(1.25))
+except Exception:
+    pass
 para("**Keshav Krishnan**, founder. His research on the **economic cost of climate-driven migration** gave him a data-level view of how fragile long-distance food supply chains are and why regional, resilient sourcing is where the system is heading, the conviction behind CropConnect. He also **built the entire product solo**, from the agent to the contracts and escrow, which is why a working platform already exists at the pre-seed stage. The first hire this round funds is a **Head of Sourcing**, who builds and manages the local farm supply and uses existing restaurant relationships to open doors. The strongest candidates are **produce-distributor sales reps or territory managers** (for example at Indianapolis Fruit, Piazza Produce, or What Chefs Want) and **food-hub or farm-cooperative managers** (for example Hoosier Harvest Market or the Farmers Cooperative Food Hub), who already carry a book of restaurant accounts and know the local growers. A modest base plus meaningful equity is attractive to a strong rep ready to trade a commission grind for ownership.")
 note("To complete before sending: one concrete figure from your climate-migration research, and the name of a sourcing hire if you have one lined up.")
 
