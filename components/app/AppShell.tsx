@@ -25,7 +25,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     const router = useRouter();
     const restaurant = useStore((s) => s.restaurant);
     const [open, setOpen] = React.useState(false);
-    const fullBleed = pathname === "/app/sourcing"; // the board is the whole page
+    const fullBleed = pathname === "/app/sourcing" || pathname === "/app/onboarding"; // full-screen pages
 
     async function signOut() {
         const supabase = getBrowserClient();
