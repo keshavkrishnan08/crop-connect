@@ -4,6 +4,7 @@ import re
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
+from docx.oxml.shared import OxmlElement, qn
 
 BRAND = RGBColor(0x23, 0x5C, 0x3A)
 INK = RGBColor(0x16, 0x24, 0x1C)
@@ -57,6 +58,20 @@ def note(text):
 
 def sources(text):
     p = doc.add_paragraph(); p.paragraph_format.space_before = Pt(14); runs(p, text, size=8.5, color=GREY)
+
+def paper_link(label, url):
+    p = doc.add_paragraph(); p.paragraph_format.space_before = Pt(4)
+    r = p.add_run(label); r.bold = True; r.font.size = Pt(10); r.font.color.rgb = INK
+    part = p.part
+    r_id = part.relate_to(url, "http://schemas.openxmlformats.org/officeDocument/2006/relationships/hyperlink", is_external=True)
+    link = OxmlElement("w:hyperlink"); link.set(qn("r:id"), r_id)
+    run = OxmlElement("w:r"); rpr = OxmlElement("w:rPr")
+    col = OxmlElement("w:color"); col.set(qn("w:val"), "235C3A"); rpr.append(col)
+    u = OxmlElement("w:u"); u.set(qn("w:val"), "single"); rpr.append(u)
+    sz = OxmlElement("w:sz"); sz.set(qn("w:val"), "20"); rpr.append(sz)
+    run.append(rpr)
+    t = OxmlElement("w:t"); t.text = url; run.append(t); link.append(run)
+    p._p.append(link)
 
 # ---- content (memo format) ----
 title("CropConnect Investor Pre-Read")
@@ -112,7 +127,8 @@ try:
 except Exception:
     pass
 para("**Keshav Krishnan**, founder. His research on the **economic cost of climate-driven migration** gave him a data-level view of how fragile long-distance food supply chains are and why regional, resilient sourcing is where the system is heading, the conviction behind CropConnect. He also **built the entire product solo**, from the agent to the contracts and escrow, which is why a working platform already exists at the pre-seed stage. The first hire this round funds is a **Head of Sourcing**, who builds and manages the local farm supply and uses existing restaurant relationships to open doors. The strongest candidates are **produce-distributor sales reps or territory managers** (for example at Indianapolis Fruit, Piazza Produce, or What Chefs Want) and **food-hub or farm-cooperative managers** (for example Hoosier Harvest Market or the Farmers Cooperative Food Hub), who already carry a book of restaurant accounts and know the local growers. A modest base plus meaningful equity is attractive to a strong rep ready to trade a commission grind for ownership.")
-note("To complete before sending: one concrete figure from your climate-migration research, and the name of a sourcing hire if you have one lined up.")
+paper_link("Founder's research, the economic cost of climate-driven migration: ", "https://www.researchsquare.com/article/rs-9181113/v1")
+note("To complete before sending: the name of a sourcing hire if you have one lined up.")
 
 heading("Status and Ask")
 para("The product is built and live; we are **pre-revenue**. We are raising **$50,000 to $100,000** on a post-money SAFE (**$4M** cap, **20%** discount, MFN), with about **80%** going to sales. The round funds one milestone: **15 paying kitchens and about $13,000 in monthly recurring revenue in Indianapolis**, the proof point to raise a priced seed.")
