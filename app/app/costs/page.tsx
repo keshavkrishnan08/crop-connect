@@ -3,23 +3,13 @@
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
-import { Shield, Receipt, X, Check } from "@/components/icons";
-
-const LINES: { item: string; vendor: string; qty: number; unit: string; billed: number; benchmark: number }[] = [
-    { item: "Roma tomatoes", vendor: "Sysco", qty: 60, unit: "lb", billed: 1.84, benchmark: 1.52 },
-    { item: "Yellow onions", vendor: "Sysco", qty: 50, unit: "lb", billed: 0.71, benchmark: 0.68 },
-    { item: "Chicken breast", vendor: "US Foods", qty: 80, unit: "lb", billed: 3.49, benchmark: 2.95 },
-    { item: "Olive oil", vendor: "Sysco", qty: 6, unit: "gal", billed: 38.0, benchmark: 37.5 },
-    { item: "Mixed greens", vendor: "US Foods", qty: 24, unit: "case", billed: 26.4, benchmark: 22.0 },
-    { item: "Heavy cream", vendor: "Sysco", qty: 12, unit: "qt", billed: 4.1, benchmark: 4.05 },
-    { item: "Russet potatoes", vendor: "Sysco", qty: 100, unit: "lb", billed: 0.82, benchmark: 0.79 },
-    { item: "Lemons", vendor: "US Foods", qty: 18, unit: "case", billed: 41.0, benchmark: 34.0 },
-];
+import { Shield, X, Check } from "@/components/icons";
+import { INVOICE_LINES, isOvercharged } from "@/lib/recovery";
 
 export default function CostsPage() {
-    const rows = LINES.map((l) => {
+    const rows = INVOICE_LINES.map((l) => {
         const over = l.billed - l.benchmark;
-        const flagged = over > l.benchmark * 0.05;
+        const flagged = isOvercharged(l);
         return { l, over, flagged, lineOver: flagged ? over * l.qty : 0 };
     });
     const flaggedRows = rows.filter((r) => r.flagged);
@@ -32,7 +22,7 @@ export default function CostsPage() {
             <div className="mb-6 grid gap-4 sm:grid-cols-3">
                 <Sum value={usd(weekly * 4.345, { compact: weekly * 4.345 > 9999 })} label="Overcharges caught / mo" tone="harvest" />
                 <Sum value={String(flaggedRows.length)} label="Lines flagged this week" tone="violet" />
-                <Sum value={String(LINES.length)} label="Lines audited" tone="brand" />
+                <Sum value={String(INVOICE_LINES.length)} label="Lines audited" tone="brand" />
             </div>
 
             <Card className="overflow-hidden p-0">
