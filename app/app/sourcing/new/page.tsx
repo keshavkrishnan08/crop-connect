@@ -45,7 +45,7 @@ export default function NewNeedPage() {
 
     return (
         <div className="animate-fade-up">
-            {run && <AutonomousRun itemId={run.id} crop={run.crop} onDone={async () => { await flushRemote(); toast.success("Sourced", "It's running on your board now."); router.push("/app"); }} />}
+            {run && <AutonomousRun itemId={run.id} crop={run.crop} onDone={async () => { await flushRemote(); toast.success("Contract drafted", "Review the terms and sign."); router.push(`/app/sourcing/${run.id}`); }} />}
             <PageHeader eyebrow="New request" title="Source an ingredient" subtitle="Tell us one thing you'd like to bring local. We'll match nearby farms and run the contract, deliveries, and story from there." />
             <Card className="max-w-2xl p-6">
                 <div className="grid gap-5">

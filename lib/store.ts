@@ -29,6 +29,29 @@ export interface Farm {
 
 export interface Delivery { id: string; date: string; qty: number; status: "scheduled" | "delivered" | "confirmed"; }
 
+// ---- LOI / contract negotiation ----
+export type LoiParty = "you" | "farm" | "agent";
+export interface QualityTerm { id: string; label: string; status: "accepted" | "countered"; note: string; priceDelta: number }
+export interface LoiNote { id: string; by: LoiParty; text: string; ts: number }
+export interface LOI {
+    status: "review" | "signed";
+    pricePerUnit: number;
+    cadence: string;
+    qualityTerms: QualityTerm[];
+    log: LoiNote[];
+    signedAt?: string;
+}
+export interface QualityOption { id: string; label: string; priceDelta: number; detail: string }
+export const QUALITY_OPTIONS: QualityOption[] = [
+    { id: "organic", label: "Certified Organic", priceDelta: 0.3, detail: "Only certified-organic product." },
+    { id: "nongmo", label: "Non-GMO", priceDelta: 0, detail: "No genetically modified seed." },
+    { id: "grade1", label: "Grade No. 1 only", priceDelta: 0.2, detail: "Top visual and size grade." },
+    { id: "harvest48", label: "Harvested within 48h", priceDelta: 0.1, detail: "Freshness window on every drop." },
+    { id: "coldchain", label: "Cold chain to your door", priceDelta: 0.15, detail: "Temperature held end to end." },
+    { id: "gap", label: "Food-safety docs (GAP)", priceDelta: 0, detail: "Audited paperwork on file." },
+    { id: "variety", label: "Lock a single variety", priceDelta: 0.05, detail: "No substitutions across the season." },
+];
+
 export interface SourcingItem {
     id: string;
     crop: string;
@@ -43,6 +66,12 @@ export interface SourcingItem {
     deliveries: Delivery[];
     createdAt: string;
     agreedAt?: string;
+    loi?: LOI;               // preliminary agreement / negotiation
+}
+
+/** Negotiated price = base + accepted quality deltas. */
+export function loiPrice(loi: LOI): number {
+    return loi.pricePerUnit + loi.qualityTerms.reduce((s, t) => s + t.priceDelta, 0);
 }
 
 export type ActivityKind = "match" | "contract" | "delivery" | "story" | "system";
@@ -84,6 +113,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 40, status: "delivered" },
                 { id: uid("dl"), date: wk(1), qty: 40, status: "scheduled" },
             ],
+            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
         },
         {
             id: "s_greens", crop: "salad greens", unit: "lb", qtyPerWeek: 30, priceCeiling: 6, dishName: "Garden greens, sherry vinaigrette",
@@ -94,11 +124,13 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 30, status: "scheduled" },
                 { id: uid("dl"), date: wk(1), qty: 30, status: "scheduled" },
             ],
+            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Blue Oak Gardens, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
             stage: "matched", farmId: "f_sunfield", lift: 2, harvestWindow: "Jun–Oct",
             createdAt: wk(-1), deliveries: [],
+            loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
         },
     ];
 }
@@ -193,15 +225,63 @@ export const actions = {
         return item.id;
     },
     logActivity(text: string, kind: ActivityKind, itemId?: string) { pushActivity(text, kind, itemId); },
-    /** The autonomous loop: match the best farm, lock the agreement, schedule deliveries. */
+    /** The autonomous loop: match the best farm and draft a preliminary agreement (LOI) to review. */
     autoSource(itemId: string) {
         const item = state.items.find((i) => i.id === itemId);
         if (!item) return;
         const best = rankFarms(state.farms, item.crop, item.priceCeiling)[0];
         if (best) actions.chooseFarm(itemId, best.farm.id);
-        actions.confirmAgreement(itemId);
+        actions.draftLoi(itemId);
         if (best) pushActivity(`Matched ${best.farm.name} for ${item.crop}`, "match", itemId);
-        pushActivity(`Drafted your supply agreement`, "contract", itemId);
+        pushActivity(`Drafted a preliminary agreement, ready for your review`, "contract", itemId);
+    },
+    /** The agent drafts the LOI: terms ready to sign, open to negotiation. */
+    draftLoi(itemId: string) {
+        set((s) => ({
+            ...s, items: s.items.map((i) => {
+                if (i.id !== itemId) return i;
+                const farm = s.farms.find((f) => f.id === i.farmId);
+                const loi: LOI = {
+                    status: "review", pricePerUnit: i.priceCeiling || 0, cadence: "Weekly", qualityTerms: [],
+                    log: [{ id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.`, ts: Date.now() }],
+                };
+                return { ...i, stage: "matched", loi };
+            }),
+        }));
+    },
+    /** Restaurant requests a quality guideline; the agent underwrites and the farm responds. */
+    requestQualityTerm(itemId: string, optionId: string) {
+        const opt = QUALITY_OPTIONS.find((o) => o.id === optionId); if (!opt) return;
+        const item = state.items.find((i) => i.id === itemId);
+        const farm = state.farms.find((f) => f.id === item?.farmId);
+        const alreadyMeets = !!farm && ((optionId === "organic" && farm.practices.some((p) => /organic/i.test(p))) || (optionId === "gap" && farm.reliability >= 92) || optionId === "nongmo");
+        const status: QualityTerm["status"] = alreadyMeets || opt.priceDelta === 0 ? "accepted" : "countered";
+        const priceDelta = alreadyMeets ? 0 : opt.priceDelta;
+        set((s) => ({
+            ...s, items: s.items.map((i) => {
+                if (i.id !== itemId || !i.loi || i.loi.qualityTerms.some((t) => t.id === optionId)) return i;
+                const now = Date.now();
+                const term: QualityTerm = { id: optionId, label: opt.label, status, note: priceDelta ? `+$${opt.priceDelta.toFixed(2)}/${i.unit}` : "Included, no change", priceDelta };
+                const log: LoiNote[] = [...i.loi.log,
+                { id: uid("ln"), by: "you", text: `Requested ${opt.label}.`, ts: now },
+                { id: uid("ln"), by: "agent", text: priceDelta ? `${farm?.name ?? "The farm"} can meet this for +$${opt.priceDelta.toFixed(2)}/${i.unit}. Added to the terms.` : `${farm?.name ?? "The farm"} already meets this. Added at no extra cost.`, ts: now + 1 }];
+                return { ...i, loi: { ...i.loi, qualityTerms: [...i.loi.qualityTerms, term], log } };
+            }),
+        }));
+        pushActivity(`Negotiated ${opt.label} into the ${item?.crop} agreement`, "contract", itemId);
+    },
+    removeQualityTerm(itemId: string, termId: string) {
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, qualityTerms: i.loi.qualityTerms.filter((t) => t.id !== termId) } } : i) }));
+    },
+    /** Both sides accept: the LOI becomes an official contract and deliveries schedule. */
+    signContract(itemId: string) {
+        const item = state.items.find((i) => i.id === itemId);
+        if (!item || !item.loi) return;
+        const finalPrice = loiPrice(item.loi);
+        const farm = state.farms.find((f) => f.id === item.farmId);
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, priceCeiling: finalPrice, loi: { ...i.loi, status: "signed", signedAt: new Date().toISOString().slice(0, 10) } } : i) }));
+        actions.confirmAgreement(itemId);
+        pushActivity(`Contract signed with ${farm?.name ?? "the farm"} for ${item.crop}`, "contract", itemId);
         pushActivity(`Scheduled 8 weekly deliveries`, "delivery", itemId);
     },
     chooseFarm(itemId: string, farmId: string) {
