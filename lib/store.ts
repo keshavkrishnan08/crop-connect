@@ -334,12 +334,11 @@ function pushActivity(text: string, kind: ActivityKind, itemId?: string) {
 }
 
 function hydrate() {
+    // No localStorage read during render: server and client must produce the same first paint
+    // (both the deterministic seed) or React throws a hydration mismatch. The authenticated
+    // account data is loaded post-mount by SupabaseSync, which reconciles without a mismatch.
     if (hydrated || typeof window === "undefined") return;
     hydrated = true;
-    try {
-        const raw = localStorage.getItem(KEY);
-        if (raw) state = { ...seed(), ...JSON.parse(raw) };
-    } catch { /* noop */ }
 }
 
 export function useStore<T>(selector: (s: AppState) => T): T {
