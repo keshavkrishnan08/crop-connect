@@ -41,8 +41,11 @@ export function SupabaseSync() {
             try {
                 const remote = await pullState(supabase, user.id);
                 if (!active) return;
-                if (remote) hydrateRemote(remote);
-                else await pushState(supabase, user.id, getState()); // seed a new account
+                // Only adopt a remote that actually holds data. A brand-new account can have a
+                // restaurant row before its seed rows land; hydrating that empty state would wipe
+                // the local seed, so we (re)seed instead.
+                if (remote && (remote.items.length > 0 || remote.dishes.length > 0)) hydrateRemote(remote);
+                else await pushState(supabase, user.id, getState());
             } catch { /* keep local state on failure */ }
         })();
 

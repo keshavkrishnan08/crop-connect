@@ -1,0 +1,16 @@
+import { chromium } from "playwright";
+const b = await chromium.launch();
+const p = await b.newPage({ viewport: { width: 1300, height: 900 } });
+await p.goto("http://localhost:3000/sign-in", { waitUntil: "networkidle" });
+await p.locator('button:has-text("Create account")').first().click();
+await p.fill('input[type="email"]', `pn2+${Date.now()}@cropconnect.test`);
+await p.fill('input[type="password"]', "test123456");
+await p.locator('button[type="submit"]').click();
+await p.waitForURL("**/app", { timeout: 40000 }); await p.waitForTimeout(2500);
+await p.goto("http://localhost:3000/app/sourcing", { waitUntil: "networkidle" }); await p.waitForTimeout(1500);
+console.log("board split:", /split across 2 farms/.test(await p.content()));
+await p.screenshot({ path: "scripts/board.png" });
+await p.goto("http://localhost:3000/app/banking", { waitUntil: "networkidle" }); await p.waitForTimeout(900);
+console.log("late penalty:", /Late delivery/.test(await p.content()));
+await p.screenshot({ path: "scripts/banking.png", fullPage: true });
+await b.close(); console.log("done");

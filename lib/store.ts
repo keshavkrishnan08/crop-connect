@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { type Dish, type Restaurant, type Levers, DEFAULT_LEVERS, parseMenu, SAMPLES, computeUplift } from "@/lib/margin";
-import { uid } from "@/lib/utils";
+import { uid, usd } from "@/lib/utils";
 
 // ============ CONCRETE SOURCING FLOW ============
 // The spine of the app: every locally-sourced ingredient moves through a real
@@ -88,7 +88,16 @@ export interface SourcingItem {
     allocations?: Allocation[]; // volume split across farms (lead farm is farmId)
     deliveryMeta?: Record<string, DeliveryMeta>; // qc + photo proof per delivery
     updates?: SupplyUpdate[]; // proactive supply status the restaurant sees
+    penalties?: Penalty[]; // SLA credits owed to the restaurant when the farm misses
 }
+
+// ---- service-level penalties: protect the restaurant, paid from the farm's escrow ----
+export const PENALTY_POLICY = { latePct: 0.10, shortPct: 0.25, qcPct: 1.0 };
+export type PenaltyKind = "late" | "short" | "qc";
+export interface Penalty { id: string; deliveryId?: string; kind: PenaltyKind; reason: string; amount: number; ts: number }
+export const PENALTY_LABEL: Record<PenaltyKind, string> = { late: "Late delivery", short: "Short / missed", qc: "Failed QC" };
+/** Total SLA credits owed to the restaurant on an item. */
+export function itemCredits(item: SourcingItem): number { return (item.penalties ?? []).reduce((s, p) => s + p.amount, 0); }
 
 /** The current supply headline for an item, so the restaurant always knows where things stand. */
 export function supplyHeadline(item: SourcingItem): { tone: "brand" | "harvest" | "sky"; text: string; sub: string } {
@@ -244,6 +253,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("su"), kind: "packed", text: "40 lb harvested this morning and packed in returnable crates.", ts: today.getTime() - 28 * 3600e3, resolved: true },
                 { id: uid("su"), kind: "ontrack", text: "Harvest on schedule, brix looking great this week.", ts: today.getTime() - 3 * 86400e3, resolved: true },
             ],
+            penalties: [{ id: uid("pn"), kind: "late", reason: "Drop arrived two hours past the window.", amount: 18, ts: today.getTime() - 18 * 86400e3 }],
         },
         {
             id: "s_greens", crop: "salad greens", unit: "lb", qtyPerWeek: 30, priceCeiling: 6, dishName: "Garden greens, sherry vinaigrette",
@@ -259,6 +269,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("su"), kind: "delay", text: "Rain pushed Tuesday's cut back a day. Sage rerouted 12 lb to Sunfield Acres so your Wednesday service is fully covered. No action needed.", ts: today.getTime() - 5 * 3600e3 },
                 { id: uid("su"), kind: "harvest", text: "Greens cut and washed at Growing Places Indy.", ts: today.getTime() - 30 * 3600e3, resolved: true },
             ],
+            allocations: [{ farmId: "f_blue", qty: 18 }, { farmId: "f_teter", qty: 12 }],
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
@@ -488,16 +499,30 @@ export const actions = {
     },
     /** Confirm a delivery with photo proof and a QC pass. A delivery cannot be confirmed without a photo. */
     confirmDeliveryProof(itemId: string, deliveryId: string, photo: string, qc: boolean) {
+        const item0 = state.items.find((i) => i.id === itemId);
+        const del = item0?.deliveries.find((d) => d.id === deliveryId);
+        const penalty: Penalty | null = !qc && item0 && del
+            ? { id: uid("pn"), deliveryId, kind: "qc", reason: "Quality check flagged issues on receipt.", amount: Math.round(del.qty * (item0.priceCeiling || 0) * PENALTY_POLICY.shortPct), ts: Date.now() }
+            : null;
         set((s) => ({
             ...s, items: s.items.map((i) => {
                 if (i.id !== itemId) return i;
                 const deliveries = i.deliveries.map((d) => d.id === deliveryId ? { ...d, status: "confirmed" as Delivery["status"] } : d);
                 const meta = { ...(i.deliveryMeta || {}), [deliveryId]: { photo, qc } };
-                return { ...i, deliveries, deliveryMeta: meta, stage: "live" as Stage };
+                return { ...i, deliveries, deliveryMeta: meta, stage: "live" as Stage, penalties: penalty ? [...(i.penalties ?? []), penalty] : i.penalties };
             }),
         }));
+        pushActivity(qc ? `Delivery confirmed with photo proof for ${item0?.crop}` : `QC issue logged on ${item0?.crop}, ${usd(penalty?.amount ?? 0)} credited back to you`, "delivery", itemId);
+    },
+    /** Restaurant flags a delivery as late; the SLA credits a penalty against the farm's escrow. */
+    reportLate(itemId: string, deliveryId: string) {
         const item = state.items.find((i) => i.id === itemId);
-        pushActivity(`Delivery confirmed with photo proof for ${item?.crop}`, "delivery", itemId);
+        const del = item?.deliveries.find((d) => d.id === deliveryId);
+        if (!item || !del) return;
+        const amount = Math.round(del.qty * (item.priceCeiling || 0) * PENALTY_POLICY.latePct);
+        const penalty: Penalty = { id: uid("pn"), deliveryId, kind: "late", reason: "Delivery arrived past the agreed window.", amount, ts: Date.now() };
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, penalties: [...(i.penalties ?? []), penalty], updates: [{ id: uid("su"), kind: "delay" as SupplyKind, text: `Flagged a late drop. Under the SLA, ${usd(amount)} is credited back to you from the farm's escrow.`, ts: Date.now() }, ...(i.updates ?? [])] } : i) }));
+        pushActivity(`Late delivery on ${item.crop}, ${usd(amount)} credited under the SLA`, "contract", itemId);
     },
     setItemLift(itemId: string, lift: number) { set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, lift } : i) })); },
     removeItem(itemId: string) { set((s) => ({ ...s, items: s.items.filter((i) => i.id !== itemId) })); },

@@ -258,6 +258,16 @@ function TermsTab({ item, farm, signed, price, onSign }: { item: SourcingItem; f
                 <Shield size={17} className="mt-0.5 shrink-0 text-brand-600" />
                 <p className="text-[13px] leading-relaxed text-ink-soft"><b className="text-ink">Your money is protected.</b> Each delivery's payment is held in escrow and released to the farm only after you confirm receipt with a photo and a quality check. You never prepay a no-show, and a failed drop is never charged.</p>
             </Card>
+
+            <Card className="p-5">
+                <div className="mb-3 flex items-center gap-2"><Shield size={16} className="text-brand-600" /><h3 className="text-sm font-medium text-ink">Service level &amp; penalties</h3></div>
+                <div className="space-y-2 text-[13.5px]">
+                    <div className="flex items-center justify-between"><span className="text-ink-soft">Late delivery, past the window</span><span className="font-mono text-ink">10% credit</span></div>
+                    <div className="flex items-center justify-between"><span className="text-ink-soft">Short or missed drop</span><span className="font-mono text-ink">25% credit + backup sourced</span></div>
+                    <div className="flex items-center justify-between"><span className="text-ink-soft">Failed quality check</span><span className="font-mono text-ink">Not charged</span></div>
+                </div>
+                <p className="mt-3 text-2xs text-ink-faint">Credits are paid from the farm's escrow automatically and show up in Banking. You never chase a refund.</p>
+            </Card>
         </div>
     );
 }
@@ -470,7 +480,10 @@ function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
                 </div>
                 {meta?.photo && <img src={meta.photo} alt="proof" className="h-10 w-10 rounded-lg object-cover" />}
                 {confirmed
-                    ? <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-600"><Check size={12} /> {meta?.qc ? "QC passed" : "Received"}</span>
+                    ? <div className="flex items-center gap-2.5">
+                        <button onClick={() => { actions.reportLate(item.id, d.id); toast.success("Late flagged", "A credit was applied from the farm's escrow."); }} className="text-2xs font-semibold text-harvest-600 hover:underline">Report late</button>
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-600"><Check size={12} /> {meta?.qc ? "QC passed" : "Received"}</span>
+                    </div>
                     : <Button onClick={() => setOpen((v) => !v)} className="btn-sm">Receive <ArrowRight size={14} /></Button>}
             </div>
 
