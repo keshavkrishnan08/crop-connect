@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the investor pre-read as a clean, editable .docx."""
+"""Build the investor pre-read as a clean, editable .docx — memo format."""
 import re
 from docx import Document
 from docx.shared import Pt, Inches, RGBColor
@@ -10,8 +10,6 @@ INK = RGBColor(0x16, 0x24, 0x1C)
 GREY = RGBColor(0x5b, 0x6b, 0x60)
 
 doc = Document()
-
-# page + base font
 s = doc.sections[0]
 s.top_margin = s.bottom_margin = Inches(0.8)
 s.left_margin = s.right_margin = Inches(0.9)
@@ -23,103 +21,75 @@ normal.paragraph_format.space_after = Pt(6)
 normal.paragraph_format.line_spacing = 1.12
 
 def runs(p, text, size=10.5, color=INK):
-    """Render **bold** and {N} superscript-citation markup into runs."""
     for idx, seg in enumerate(text.split("**")):
         bold = idx % 2 == 1
         for part in re.split(r"(\{[^}]*\})", seg):
             if not part:
                 continue
             if part[0] == "{" and part[-1] == "}":
-                r = p.add_run(part[1:-1])
-                r.font.superscript = True
-                r.font.size = Pt(7)
-                r.font.color.rgb = BRAND
+                r = p.add_run(part[1:-1]); r.font.superscript = True; r.font.size = Pt(7); r.font.color.rgb = BRAND
             else:
-                r = p.add_run(part)
-                r.bold = bold
-                r.font.size = Pt(size)
-                r.font.color.rgb = color
+                r = p.add_run(part); r.bold = bold; r.font.size = Pt(size); r.font.color.rgb = color
 
 def title(text):
-    p = doc.add_paragraph()
-    p.paragraph_format.space_after = Pt(12)
-    r = p.add_run(text)
-    r.bold = True
-    r.font.size = Pt(19)
-    r.font.color.rgb = INK
+    p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(12)
+    r = p.add_run(text); r.bold = True; r.font.size = Pt(19); r.font.color.rgb = INK
 
 def heading(text):
-    p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(11)
-    p.paragraph_format.space_after = Pt(3)
-    r = p.add_run(text)
-    r.bold = True
-    r.font.size = Pt(12)
-    r.font.color.rgb = BRAND
+    p = doc.add_paragraph(); p.paragraph_format.space_before = Pt(11); p.paragraph_format.space_after = Pt(3)
+    r = p.add_run(text); r.bold = True; r.font.size = Pt(12); r.font.color.rgb = BRAND
 
 def para(text):
-    p = doc.add_paragraph()
-    p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY
-    runs(p, text)
+    p = doc.add_paragraph(); p.alignment = WD_ALIGN_PARAGRAPH.JUSTIFY; runs(p, text)
 
 def bullet(text):
-    p = doc.add_paragraph(style="List Bullet")
-    p.paragraph_format.space_after = Pt(3)
-    runs(p, text)
+    p = doc.add_paragraph(style="List Bullet"); p.paragraph_format.space_after = Pt(3); runs(p, text)
+
+def note(text):
+    p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(4); runs(p, text, size=9.5, color=GREY)
 
 def sources(text):
-    p = doc.add_paragraph()
-    p.paragraph_format.space_before = Pt(14)
-    runs(p, text, size=8.5, color=GREY)
+    p = doc.add_paragraph(); p.paragraph_format.space_before = Pt(14); runs(p, text, size=8.5, color=GREY)
 
-# ---- content ----
+# ---- content (memo format) ----
 title("CropConnect — Investor Pre-Read")
 
-heading("Problem")
-para("Independent full-service restaurants run on a net margin of about **3–5% of revenue**.{1} Food and labor alone consume roughly **60 cents of every dollar**.{1} There is almost no room to cut, so growth has to come from charging more for the same seats.")
-para("Local sourcing is how kitchens do that. **38% of U.S. diners** say they are more likely to choose a restaurant that offers locally sourced food,{2} and **55%** want to know the story behind what they eat.{3} But sourcing locally by hand is a second full-time job: finding farms, vetting them, negotiating prices, writing agreements, scheduling deliveries, and covering shortfalls when a crop comes up short. An owner already working 60-hour weeks skips it. **The demand exists; the labor to capture it does not.**")
+heading("Summary")
+para("CropConnect is an AI agent that runs local sourcing for restaurants end to end: it finds the farms, signs the contracts, runs weekly delivery, holds payment in escrow, and tracks the added margin. The owner does two things — ask, and put the dish on the menu. Diners increasingly choose restaurants for local food, but sourcing it by hand is a second full-time job, so most independents skip it; an AI agent makes that work cheap enough to do for them. The product is built and live. We are **pre-revenue**, raising **$50,000–$100,000** on a SAFE to land the first **15 paying kitchens in Indianapolis**.")
+
+heading("Market and Timing")
+para("Independent full-service restaurants net about **3–5% of revenue**, with food and labor consuming roughly **60 cents of every dollar**.{1} There is little to cut, so growth has to come from charging more for the same seats. Local sourcing is how kitchens do that: **38% of U.S. diners** are more likely to choose a restaurant offering locally sourced food,{2} and **55%** want the story behind what they eat;{3} the share rating ingredient transparency as important rose from **69% in 2018 to 76% in 2023**.{3} The barrier is labor, not demand — doing it by hand means finding farms, vetting them, negotiating, contracting, scheduling, and covering shortfalls.")
+para("Two things just became true at once: durable diner demand for local, and AI agents finally cheap enough to run that coordination as a done-for-you service. The market is large — U.S. restaurants did about **$1.1 trillion** across roughly **1 million** locations in 2024.{4}")
 
 heading("Product")
-para("CropConnect is an AI agent that runs local sourcing end to end. The restaurant enters one need — say, **40 lbs of heirloom tomatoes a week**. With no further work from the owner, the agent:")
-bullet("ranks vetted local farms by crop, distance, reliability, and price;")
-bullet("splits the order across several farms if one cannot cover the volume;")
-bullet("drafts a supply contract and runs a short negotiation over quality terms (organic, grade, freshness window);")
-bullet("schedules weekly deliveries through third-party logistics;")
-bullet("holds the food payment in escrow and releases it to the farm only after delivery is confirmed; and")
-bullet("tracks the added margin on each dish.")
-para("Setup takes about **ten minutes**, and the first ingredient is free. The product is built and live today, including the agent, the contracts, the escrow, and a free instant sourcing audit any restaurant can run before signing up.")
-
-heading("Why Now")
-para("Two curves crossed. Diner demand for local has risen for years — the share of shoppers who rate ingredient transparency as important went from **69% in 2018 to 76% in 2023**.{3} And AI agents have only just made the coordination behind local sourcing cheap enough to give away as a done-for-you service. Work that used to require a salaried sourcing manager can now be run by software. This is the first moment both are true at once.")
-
-heading("Market")
-para("U.S. restaurants did about **$1.1 trillion** in sales across roughly **1 million** locations in 2024.{4} Our wedge is the independent full-service segment — the operators who both want local sourcing and lack the staff to do it. We win one metro at a time and earn density before expanding.")
-para("In the **Indianapolis metro** there are roughly **4,500** restaurants; we estimate about **1,500** are target independents.{5} At a blended **$10,700** per restaurant per year, that is about **$16 million** of annual revenue available in Indianapolis alone, before a second market.{5}")
-
-heading("Precedent")
-para("This is a graveyard, and the cause of death is consistent.")
-bullet("**Webvan** raised more than **$800 million** to deliver fresh groceries, built its own warehouses and truck fleet, expanded city by city, and filed for bankruptcy in 2001.{6}")
-bullet("**Good Eggs** raised roughly **$50 million** to deliver local food, scaled to four cities, and in 2015 laid off most of its staff and retreated to a single market.{6}")
-bullet("**Farmigo** (2016), **Door to Door Organics** (2016), and **Relay Foods** (2016) each tried to aggregate small farms and deliver the food themselves. Each shut the business down.{6}")
-para("The reason was the same every time: **they owned the perishable inventory and the logistics.** Warehouses, trucks, and spoilage are cash-intensive and low-margin, and the math gets worse as you add cities. They also sold to consumers, the most price-sensitive buyer, and they expanded geography before the unit economics worked. The large distributors (Sysco, US Foods) serve scale but not small local farms; for them, “local” is a checkbox, not the product.")
-para("We are different on every count: we own **no warehouses, trucks, or inventory** (the restaurant funds the food at the farm's price and delivery is third-party at cost); we sell to **restaurants on a recurring fee**, not to price-sensitive consumers; we earn **density in one metro** before expanding; and the coordination that made this unprofitable by hand is now run by an **AI agent**.")
+para("The restaurant enters one need — say, 40 lbs of heirloom tomatoes a week — and the agent, with no further work from the owner: ranks vetted local farms by crop, distance, reliability, and price; splits the order across farms if one cannot cover it; drafts a contract and negotiates quality terms; schedules weekly third-party delivery; holds payment in escrow until delivery is confirmed; and tracks the added margin per dish. Setup takes about **ten minutes** and the first ingredient is free. The product, including the agent, contracts, escrow, and a free instant sourcing audit, is **built and live today**.")
 
 heading("Business Model")
-para("Three explicit parts:")
-bullet("**Food:** billed to the restaurant at the farm's price. We make **$0** on the food itself.")
-bullet("**Delivery:** passed through at third-party cost. We make **$0** on logistics.")
-bullet("**Service fee:** our only revenue. A **$299** monthly base plus a per-item fee that scales with volume, blending to about **$896** per restaurant per month (about **$10,700** per year).")
-para("Because our costs are software, agent compute, and a thin coordination layer, the service-fee gross margin runs about **80% at scale**. At ~$896 per month and ~80% margin, a customer contributes about **$717** per month, so even a $1,000 acquisition cost pays back in under two months (illustrative).")
+para("Our economics are deliberately asset-light, and there are only three parts. **Food** is billed to the restaurant at the farm's price — we make **$0** on it. **Delivery** is passed through at third-party cost — we make **$0** on logistics. Our only revenue is a **service fee**: a **$299** monthly base plus a per-item fee that scales with volume, blending to about **$896 per restaurant per month** (~$10,700/year). Because our costs are software, agent compute, and a thin coordination layer, the service-fee gross margin runs about **80% at scale**. At that margin a customer contributes ~**$717/month**, so even a $1,000 acquisition cost pays back in under two months (illustrative). We make software margins on a problem others tried to solve with trucks.")
 
-heading("Moat")
-bullet("**Two-sided density:** once we vet and contract a city's farms, a new entrant must rebuild the whole local supply base. More restaurants pull more farm capacity; more farms mean better fill.")
-bullet("**Proprietary data:** every contract, delivery, and price trains the agent on local supply, reliability, and demand, so our matching and forecasting beat any generic tool.")
-bullet("**Switching costs:** once we run a kitchen's sourcing, contracts, deliveries, and margins, replacing us means rebuilding their supply chain by hand.")
+heading("Go-to-Market")
+para("We win **one metro at a time** and earn density before expanding. The motion is a **part-time industry insider plus warm introductions** into Indianapolis kitchens — a credibility-led, low-CAC channel rather than cold paid acquisition. The wedge is the **free instant audit**: it turns a cold kitchen into a quantified “money on the table” conversation using their own menu, and the free first ingredient removes the risk of trying. We estimate about **1,500 target independents** in the metro.{5}")
 
-heading("Ask")
-para("The product is built and live; we are **pre-revenue**. We are raising **$50,000–$100,000** on a post-money SAFE (**$4M** cap, **20%** discount, MFN). About **80%** of the round goes to sales. It funds one milestone: **15 paying kitchens and about $13,000 in monthly recurring revenue in Indianapolis within 90 days** — the proof point to raise a priced seed.")
+heading("Why We Win")
+para("Many have tried this and failed, and the cause of death is consistent. **Webvan** raised more than **$800M**, built its own warehouses and trucks, expanded city by city, and went bankrupt in 2001.{6} **Good Eggs** raised ~$50M, scaled to four cities, and in 2015 retreated to one.{6} **Farmigo**, **Door to Door Organics**, and **Relay Foods** each tried to aggregate small farms and deliver, and each shut down by 2016.{6} They **owned the perishable inventory and the logistics**, sold to price-sensitive consumers, and expanded geography before the unit economics worked. Large distributors (Sysco, US Foods) serve scale but not small local farms; for them, “local” is a checkbox.")
+para("We are different on every count, and the advantage compounds. We own **no warehouses, trucks, or inventory**; we sell to **restaurants on a recurring fee**; we earn **density in one metro** first; and an **AI agent** runs the coordination that made this unprofitable by hand. That density is the moat: vet a city's farms once and a rival must rebuild the whole local supply base. Every contract, delivery, and price also **trains the agent** on local supply and demand, and once we run a kitchen's sourcing, contracts, and deliveries, **replacing us means rebuilding their supply chain by hand**.")
 
-sources("Sources.  1 — Restaurant net-margin and prime-cost benchmarks: National Restaurant Association; Restaurant365 industry benchmarks.  2 — National Restaurant Association, 2022 State of the Restaurant Industry.  3 — FMI, transparency and foodservice trends, 2023.  4 — National Restaurant Association, 2024 industry forecast.  5 — Indianapolis restaurant counts and revenue opportunity are internal estimates.  6 — Company outcomes are publicly reported: Webvan (bankruptcy, 2001); Good Eggs (layoffs and market exit, 2015); Farmigo, Door to Door Organics, and Relay Foods (ceased food operations, 2016).")
+heading("Team")
+para("**Keshav Krishnan**, founder. [Add one or two lines on your relevant background: industry exposure, technical build of the product, and any prior ventures.] Early sales are led by a **part-time industry insider** with existing restaurant relationships in the market.")
+note("To complete before sending: founder background, and the insider's name/relationships.")
+
+heading("Status and Ask")
+para("The product is **built and live**; we are **pre-revenue**. We are raising **$50,000–$100,000** on a post-money SAFE (**$4M** cap, **20%** discount, MFN), with about **80%** going to sales. The round funds one milestone: **15 paying kitchens and ~$13,000 in monthly recurring revenue in Indianapolis within 90 days** — the proof point to raise a priced seed.")
+
+heading("Risks and Open Questions")
+bullet("**Willingness to pay is unproven.** Being pre-revenue, we have not yet confirmed a restaurant will pay ~$896/month. Mitigation: the free audit quantifies ROI before they pay, and a guarantee backs it.")
+bullet("**Acquisition is unproven.** Restaurants are slow, low-tech buyers; the insider/warm-intro motion may not scale cheaply. Mitigation: start where introductions exist and measure CAC and sales-cycle from the first cohort.")
+bullet("**Operational reliability.** A single missed delivery breaks trust, and coordinating perishable weekly supply is hard even asset-light. Mitigation: a backup farm stands by for every crop; escrow aligns the farm's incentive to deliver.")
+bullet("**Churn.** Independent restaurants close often and run thin. Mitigation: deep switching costs once we are embedded in their sourcing and contracts.")
+bullet("**Cold start / density.** The flywheel needs both farms and restaurants in a metro. Mitigation: seed the farm side first and stay in one metro until it is dense.")
+bullet("**Team depth.** A small team is key-person risk. Mitigation: this round funds the first dedicated sales hire.")
+
+sources("Sources.  1 — Restaurant net-margin and prime-cost benchmarks: National Restaurant Association; Restaurant365 industry benchmarks.  2 — National Restaurant Association, 2022 State of the Restaurant Industry.  3 — FMI, transparency and foodservice trends, 2023.  4 — National Restaurant Association, 2024 industry forecast.  5 — Indianapolis restaurant counts and target-segment figures are internal estimates.  6 — Company outcomes are publicly reported: Webvan (bankruptcy, 2001); Good Eggs (layoffs and market exit, 2015); Farmigo, Door to Door Organics, and Relay Foods (ceased food operations, 2016).")
 sources("Keshav Krishnan · keshavkrishnanbusiness@gmail.com · Confidential")
 
 doc.save("pitch/cropconnect-preread.docx")
