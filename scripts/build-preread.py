@@ -57,16 +57,15 @@ title("CropConnect — Investor Pre-Read")
 heading("Summary")
 para("CropConnect is an AI agent that does one thing for a restaurant: it runs local sourcing end to end — finding the farms, signing the contracts, scheduling weekly delivery, holding payment in escrow, and tracking the added margin. The owner names an ingredient and puts the dish on the menu; the software does the rest, automatically. The business is **asset-light**: we own no warehouses, trucks, or inventory, the food is billed at the farm's price, and delivery is third-party, so we earn a **software margin on a monthly service fee**, not a distribution margin. The product is **built and live, developed by the founder solo**. We are pre-revenue, raising **$50,000–$100,000** on a SAFE to land the first **15 paying kitchens in Indianapolis**.")
 
-heading("The Insight")
-para("Until now, running local sourcing for a restaurant required a salaried human coordinator — calling farms, negotiating, scheduling, chasing shortfalls. That made it a money-losing service no software company wanted and no distributor would do for small farms. **AI agents have cut that coordination cost by roughly two orders of magnitude.** That single change turns local sourcing from low-margin logistics into a high-margin software product, and it only became true recently. That is the opportunity.")
+heading("The Opportunity")
+para("Until now, running local sourcing for a restaurant required a salaried human coordinator. An AI agent can now do that work directly: it **connects a restaurant to the right local farms, drafts and negotiates custom supply contracts, and runs the ongoing services — delivery tracking, escrow payments, and reconciliation — on its own.** Software can now perform the coordination that used to require a person, which is what makes offering local sourcing profitable. That capability is recent, and it is the opportunity.")
 
 heading("Market and Timing")
-para("Independent full-service restaurants net about **3–5% of revenue**, with food and labor consuming roughly **60 cents of every dollar**.{1} Most growth has to come from charging more for the same seats, and local sourcing is a proven way to do it: **38% of U.S. diners** are more likely to choose a restaurant offering locally sourced food,{2} **55%** want the story behind their food,{3} and the share rating ingredient transparency as important rose from **69% in 2018 to 76% in 2023**.{3} Doing it by hand is the blocker, so most independents skip it.")
-para("**Indianapolis is the beachhead, not the market.** The metro has roughly 4,500 restaurants and about **1,500 target independents**;{5} the same playbook then repeats city by city, and each metro is a self-contained, already-profitable unit. The U.S. restaurant market is about **$1.1 trillion** across roughly **1 million** locations.{4} Beyond restaurants, the farm relationships and the allocation layer become a demand aggregator for growers — a **farming platform** that is a larger market than restaurant sourcing alone. We prove one metro first so that expansion is a repeatable motion, not a bet.")
+para("Independent full-service restaurants net about **3–5% of revenue**, with food and labor consuming roughly **60 cents of every dollar**.{1} Most growth has to come from charging more for the same seats, and local sourcing is a proven way to do it: **38% of U.S. diners** are more likely to choose a restaurant offering locally sourced food,{2} and the share rating ingredient transparency as important rose from **69% in 2018 to 76% in 2023**.{3} Sourcing locally by hand requires finding farms, vetting them, negotiating, contracting, scheduling, and covering shortfalls.")
+para("The U.S. restaurant market is about **$1.1 trillion** across roughly **1 million** locations.{4} Of those, we estimate about **150,000 are independent full-service restaurants that would plausibly buy** — chef-driven, mid-to-upscale operators that value local sourcing — a serviceable market of roughly **$1.6 billion a year** at our pricing.{5} In the **Indianapolis** metro, of about 4,500 restaurants we estimate roughly **1,500 fit that profile**, about **$16 million a year**.{5} We start in Indianapolis and repeat the same playbook city by city; each metro is a self-contained, profitable unit. Beyond restaurants, the farm relationships and the allocation layer become a demand aggregator for growers — a **farming platform** larger than restaurant sourcing alone.")
 
 heading("Product")
 para("The restaurant enters one need — say, 40 lbs of heirloom tomatoes a week — and the agent runs the entire workflow **automatically**: it ranks vetted local farms by crop, distance, reliability, and price; splits the order across farms if one cannot cover it; drafts a contract and negotiates quality terms; schedules weekly third-party delivery; holds payment in escrow until delivery is confirmed; and tracks the added margin per dish. **This is real automation, not a manual service dressed as software** — the founder built it as a working product, live today, including a free instant audit any restaurant can run before signing up.")
-para("**Sourcing is the wedge.** The same agent and data also power adjacent capabilities — invoice and waste auditing, menu-margin analysis, and menu specials — that deepen retention and grow revenue per account. Sourcing lands the customer; these make it a platform.")
 
 heading("Business Model")
 para("Revenue comes only from a monthly service fee. Food is billed at the farm's price and delivery is passed through at third-party cost, both with no markup. The fee is a **$299** base plus a per-item fee that scales with volume, blending to about **$896 per restaurant per month** (~$10,700/year). Because our costs are software, agent compute, and a thin coordination layer, the service-fee gross margin is high.")
@@ -74,10 +73,10 @@ para("Revenue comes only from a monthly service fee. Food is billed at the farm'
 heading("Unit Economics")
 para("These are targets, not results; we are pre-revenue and will validate them against the first cohort.")
 bullet("**ARPA:** ~$896/month at maturity, starting near $400 on the first ingredient and growing as items are added.")
-bullet("**Service-fee gross margin:** ~80% target.")
-bullet("**CAC target:** $800–$1,200 (insider commission, one onboarding visit, samples).")
-bullet("**Payback:** within a few months at target margin.")
-bullet("**Monthly logo churn:** assume ~3%, reflecting normal restaurant turnover; the embedded sourcing, contracts, and deliveries should make real churn lower.")
+bullet("**Gross margin:** ~80%, or about **$717/month** of gross profit per restaurant.")
+bullet("**CAC: ~$850 per restaurant** — sales commission ~$400, the first ingredient serviced free (~$300 in foregone fee), and onboarding plus tasting samples ~$150.")
+bullet("**Payback:** about **one to two months** at target margin.")
+bullet("**Monthly churn:** assume ~3%, reflecting normal restaurant turnover; the embedded sourcing, contracts, and deliveries should make real churn lower.")
 para("We treat lifetime value as a hypothesis to test with data, not a number to lead with.")
 
 heading("Go-to-Market")
@@ -108,7 +107,7 @@ bullet("**Churn.** Independent restaurants close often and run thin. Mitigation:
 bullet("**Cold start / density.** The flywheel needs both farms and restaurants in a metro. Mitigation: seed the farm side first and stay in one metro until it is dense.")
 bullet("**Team depth.** A solo team is key-person risk. Mitigation: this round funds the first dedicated sales hire.")
 
-sources("Sources.  1 — Restaurant net-margin and prime-cost benchmarks: National Restaurant Association; Restaurant365 industry benchmarks.  2 — National Restaurant Association, 2022 State of the Restaurant Industry.  3 — FMI, transparency and foodservice trends, 2023.  4 — National Restaurant Association, 2024 industry forecast.  5 — Indianapolis restaurant counts and target-segment figures are internal estimates.  6 — Company outcomes are publicly reported: Webvan (bankruptcy, 2001); Good Eggs (layoffs and market exit, 2015); Farmigo, Door to Door Organics, and Relay Foods (ceased food operations, 2016).")
+sources("Sources.  1 — Restaurant net-margin and prime-cost benchmarks: National Restaurant Association; Restaurant365 industry benchmarks.  2 — National Restaurant Association, 2022 State of the Restaurant Industry.  3 — FMI, transparency and foodservice trends, 2023.  4 — National Restaurant Association, 2024 industry forecast.  5 — U.S. and Indianapolis target-segment restaurant counts and the revenue estimates derived from them are internal estimates.  6 — Company outcomes are publicly reported: Webvan (bankruptcy, 2001); Good Eggs (layoffs and market exit, 2015); Farmigo, Door to Door Organics, and Relay Foods (ceased food operations, 2016).")
 
 doc.save("pitch/cropconnect-preread.docx")
 print("saved pitch/cropconnect-preread.docx")
