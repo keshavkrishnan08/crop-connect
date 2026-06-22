@@ -8,7 +8,6 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
 import { AGENT_NAME } from "@/components/app/AgentDock";
 import { Roadmap } from "@/components/app/Roadmap";
-import { SpecialCard } from "@/components/app/SpecialCard";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
 import { Truck, Route, Plus, ArrowRight, Calendar, Farm, Pen, StoryTag, Search } from "@/components/icons";
@@ -70,9 +69,6 @@ export default function Dashboard() {
                     </div>
                 </div>
             )}
-
-            {/* proactive: the agent drafts a menu special */}
-            <SpecialCard />
 
             {/* the work, side by side with your to-dos */}
             <div className="grid gap-6 lg:grid-cols-[1.6fr_1fr]">
