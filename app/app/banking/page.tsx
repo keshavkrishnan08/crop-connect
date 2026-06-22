@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useStore, farmById, orderEscrow, ESCROW_LABEL, type SourcingItem } from "@/lib/store";
+import { useStore, farmById, orderEscrow, ESCROW_LABEL, PENALTY_LABEL, type SourcingItem } from "@/lib/store";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card, Badge, EmptyState } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
@@ -24,15 +24,19 @@ export default function BankingPage() {
         .slice(0, 12);
     const paidTotal = receipts.reduce((s, r) => s + r.amt, 0);
 
+    const penalties = items.flatMap((i) => (i.penalties ?? []).map((p) => ({ item: i, p }))).sort((a, b) => b.p.ts - a.p.ts);
+    const credits = penalties.reduce((s, x) => s + x.p.amount, 0);
+
     return (
         <div className="animate-fade-up">
             <PageHeader eyebrow="Banking" title="Banking"
                 subtitle="Escrow, payouts, and contracts." />
 
             {/* summary */}
-            <div className="mb-6 grid gap-4 sm:grid-cols-3">
+            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
                 <Sum icon={<Shield size={20} />} label="Held in escrow" value={usd(totals.held, { compact: totals.held > 9999 })} tone="harvest" sub="for upcoming deliveries" />
                 <Sum icon={<Check size={20} />} label="Released to farms" value={usd(totals.released, { compact: totals.released > 9999 })} tone="brand" sub="on confirmed delivery" />
+                <Sum icon={<Shield size={20} />} label="Credited to you" value={usd(credits, { compact: credits > 9999 })} tone="violet" sub="SLA penalties from misses" />
                 <Sum icon={<Receipt size={20} />} label="Active contracts" value={String(active.length)} tone="ink" sub="standing farm agreements" />
             </div>
 
@@ -101,6 +105,31 @@ export default function BankingPage() {
                 </Card>
                 <p className="mt-2 px-1 text-2xs text-ink-faint">Every confirmed delivery generates a receipt and releases escrow to the farm. A monthly statement is available to download or hand to your bookkeeper.</p>
             </section>
+
+            {/* credits & penalties */}
+            <section className="mt-8">
+                <div className="mb-4 flex items-center justify-between">
+                    <h2 className="font-display text-xl text-ink">Credits &amp; penalties</h2>
+                    <span className="text-2xs text-ink-faint">Late 10% · short/missed 25% · failed QC 100%</span>
+                </div>
+                <Card className="overflow-hidden p-0">
+                    {penalties.length === 0
+                        ? <p className="px-5 py-8 text-center text-sm text-ink-muted">No penalties. Every drop has landed on time and passed QC.</p>
+                        : <div className="divide-y divide-line">
+                            {penalties.map(({ item, p }) => (
+                                <div key={p.id} className="flex items-center gap-3 px-5 py-3">
+                                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-harvest-400/15 text-harvest-600"><Shield size={16} /></span>
+                                    <div className="min-w-0 flex-1">
+                                        <p className="text-[14px] font-medium text-ink">{PENALTY_LABEL[p.kind]} · <span className="capitalize">{item.crop}</span></p>
+                                        <p className="truncate text-[12.5px] text-ink-muted">{p.reason}</p>
+                                    </div>
+                                    <span className="shrink-0 font-mono text-sm font-semibold text-brand-600 tnum">+{usd(p.amount)}</span>
+                                </div>
+                            ))}
+                        </div>}
+                </Card>
+                <p className="mt-2 px-1 text-2xs text-ink-faint">Penalties are credited to you automatically from the farm's escrow when a delivery is late, short, or fails QC. You never chase a refund.</p>
+            </section>
         </div>
     );
 }
@@ -128,8 +157,8 @@ function Contract({ item }: { item: SourcingItem }) {
     );
 }
 
-function Sum({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub: string; tone: "brand" | "harvest" | "ink" }) {
-    const t = tone === "harvest" ? "bg-harvest-400/12 text-harvest-500" : tone === "ink" ? "bg-ink/[0.06] text-ink-soft" : "bg-brand-50 text-brand-600";
+function Sum({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: string; sub: string; tone: "brand" | "harvest" | "ink" | "violet" }) {
+    const t = tone === "harvest" ? "bg-harvest-400/12 text-harvest-500" : tone === "violet" ? "bg-violet-50 text-violet-600" : tone === "ink" ? "bg-ink/[0.06] text-ink-soft" : "bg-brand-50 text-brand-600";
     return (
         <Card className="p-5">
             <span className={cn("mb-3 grid h-10 w-10 place-items-center rounded-xl", t)}>{icon}</span>
