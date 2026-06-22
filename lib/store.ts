@@ -40,8 +40,11 @@ export interface LOI {
     cadence: string;
     qualityTerms: QualityTerm[];
     log: LoiNote[];
+    transport: "we" | "you"; // who runs the trucks
+    termWeeks: number;       // contract length
     signedAt?: string;
 }
+export interface DeliveryMeta { photo?: string; qc?: boolean; note?: string }
 export interface QualityOption { id: string; label: string; priceDelta: number; detail: string }
 export const QUALITY_OPTIONS: QualityOption[] = [
     { id: "organic", label: "Certified Organic", priceDelta: 0.3, detail: "Only certified-organic product." },
@@ -51,6 +54,10 @@ export const QUALITY_OPTIONS: QualityOption[] = [
     { id: "coldchain", label: "Cold chain to your door", priceDelta: 0.15, detail: "Temperature held end to end." },
     { id: "gap", label: "Food-safety docs (GAP)", priceDelta: 0, detail: "Audited paperwork on file." },
     { id: "variety", label: "Lock a single variety", priceDelta: 0.05, detail: "No substitutions across the season." },
+    { id: "brix", label: "Brix / ripeness spec", priceDelta: 0.12, detail: "Minimum sugar level at harvest." },
+    { id: "size", label: "Uniform size grading", priceDelta: 0.08, detail: "Sorted to a consistent size band." },
+    { id: "pack", label: "Reusable packaging", priceDelta: 0.04, detail: "Returnable crates, no waste." },
+    { id: "wash", label: "Triple-washed, ready", priceDelta: 0.18, detail: "Cleaned and prepped on the farm." },
 ];
 
 export interface SourcingItem {
@@ -69,6 +76,23 @@ export interface SourcingItem {
     agreedAt?: string;
     loi?: LOI;               // preliminary agreement / negotiation
     allocations?: Allocation[]; // volume split across farms (lead farm is farmId)
+    deliveryMeta?: Record<string, DeliveryMeta>; // qc + photo proof per delivery
+}
+
+/** Full due-diligence profile for a farm, derived from its record. */
+export function farmDueDiligence(f: Farm) {
+    const seed = f.id.split("").reduce((a, c) => a + c.charCodeAt(0), 0);
+    return {
+        established: 1985 + (seed % 33),
+        acres: 6 + (seed % 70),
+        capacity: farmCapacity(f),
+        certifications: f.practices,
+        foodSafety: f.reliability >= 92 ? "GAP & Harmonized audit on file" : "Annual third-party inspection",
+        insured: true,
+        coldStorage: f.reliability >= 90,
+        fillRate: f.reliability,
+        leadDays: f.distanceMi <= 12 ? 1 : f.distanceMi <= 22 ? 2 : 3,
+    };
 }
 
 export interface Allocation { farmId: string; qty: number }
@@ -140,7 +164,7 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 40, status: "delivered" },
                 { id: uid("dl"), date: wk(1), qty: 40, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
+            loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
         },
         {
             id: "s_greens", crop: "salad greens", unit: "lb", qtyPerWeek: 30, priceCeiling: 6, dishName: "Garden greens, sherry vinaigrette",
@@ -151,13 +175,13 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(0), qty: 30, status: "scheduled" },
                 { id: uid("dl"), date: wk(1), qty: 30, status: "scheduled" },
             ],
-            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
+            loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
             stage: "matched", farmId: "f_sunfield", lift: 2, harvestWindow: "Jun–Oct",
             createdAt: wk(-1), deliveries: [],
-            loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
+            loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
         },
     ];
 }
@@ -273,7 +297,7 @@ export const actions = {
                 if (i.id !== itemId) return i;
                 const farm = s.farms.find((f) => f.id === i.farmId);
                 const loi: LOI = {
-                    status: "review", pricePerUnit: i.priceCeiling || 0, cadence: "Weekly", qualityTerms: [],
+                    status: "review", pricePerUnit: i.priceCeiling || 0, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [],
                     log: [{ id: uid("ln"), by: "agent", text: `I matched ${farm?.name ?? "a local farm"} and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.`, ts: Date.now() }],
                 };
                 return { ...i, stage: "matched", loi };
@@ -344,6 +368,34 @@ export const actions = {
                 return { ...i, deliveries, stage };
             }),
         }));
+    },
+    /** Post a message in the contract thread; the farm replies. */
+    sendMessage(itemId: string, text: string) {
+        const t = text.trim(); if (!t) return;
+        const item = state.items.find((i) => i.id === itemId);
+        const farm = state.farms.find((f) => f.id === item?.farmId);
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, log: [...i.loi.log, { id: uid("ln"), by: "you", text: t, ts: Date.now() }] } } : i) }));
+        const reply = `Thanks. ${farm?.farmer?.split(" ")[0] ?? "We"} will take care of it.`;
+        setTimeout(() => set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, log: [...i.loi.log, { id: uid("ln"), by: "farm", text: reply, ts: Date.now() }] } } : i) })), 900);
+    },
+    setTransport(itemId: string, who: "we" | "you") {
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, transport: who } } : i) }));
+    },
+    setTermWeeks(itemId: string, weeks: number) {
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, loi: { ...i.loi, termWeeks: weeks } } : i) }));
+    },
+    /** Confirm a delivery with photo proof and a QC pass. A delivery cannot be confirmed without a photo. */
+    confirmDeliveryProof(itemId: string, deliveryId: string, photo: string, qc: boolean) {
+        set((s) => ({
+            ...s, items: s.items.map((i) => {
+                if (i.id !== itemId) return i;
+                const deliveries = i.deliveries.map((d) => d.id === deliveryId ? { ...d, status: "confirmed" as Delivery["status"] } : d);
+                const meta = { ...(i.deliveryMeta || {}), [deliveryId]: { photo, qc } };
+                return { ...i, deliveries, deliveryMeta: meta, stage: "live" as Stage };
+            }),
+        }));
+        const item = state.items.find((i) => i.id === itemId);
+        pushActivity(`Delivery confirmed with photo proof for ${item?.crop}`, "delivery", itemId);
     },
     setItemLift(itemId: string, lift: number) { set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, lift } : i) })); },
     removeItem(itemId: string) { set((s) => ({ ...s, items: s.items.filter((i) => i.id !== itemId) })); },
