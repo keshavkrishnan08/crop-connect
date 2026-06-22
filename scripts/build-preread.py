@@ -48,6 +48,10 @@ def bullet(text):
 def numbered(text):
     p = doc.add_paragraph(style="List Number"); p.paragraph_format.space_after = Pt(4); runs(p, text)
 
+def subbullet(text):
+    p = doc.add_paragraph(style="List Bullet"); p.paragraph_format.space_after = Pt(2)
+    p.paragraph_format.left_indent = Inches(0.65); runs(p, text, size=10)
+
 def note(text):
     p = doc.add_paragraph(); p.paragraph_format.space_after = Pt(4); runs(p, text, size=9.5, color=GREY)
 
@@ -76,9 +80,14 @@ para("Revenue comes only from a monthly service fee. Food is billed at the farm'
 heading("Unit Economics")
 para("These are targets, not results; we are pre-revenue and will validate them against the first cohort.")
 bullet("**ARPA:** about $896/month at maturity, starting near $400 on the first ingredient and growing as items are added.")
-bullet("**Gross margin:** about 80%, or roughly **$717/month** of gross profit per restaurant.")
-bullet("**CAC: about $850 per restaurant.** Sales commission about $400, the first ingredient serviced free (about $300 in foregone fee), and onboarding plus tasting samples about $150.")
-bullet("**Payback:** about **one to two months** at target margin.")
+bullet("**Cost to serve one restaurant: about $130/month**, for a gross margin near **85%** (about $766/month of gross profit). The components:")
+subbullet("Agent tokens on the **Anthropic Claude API**, about $45 (farm matching, drafting and negotiating contracts, monthly audits, and specials).")
+subbullet("Payments and escrow on **Stripe Connect**, about $50 (card processing on the service fee; food held in escrow moves over ACH to keep fees low).")
+subbullet("Database, auth, and hosting on **Supabase and Vercel**, about $15.")
+subbullet("Light human oversight, about $20.")
+subbullet("Delivery runs through a **third-party courier API (for example Uber Direct)** and is billed through to the restaurant at cost, so it is not a margin cost to us.")
+bullet("**CAC: about $450 per restaurant** = a sales commission of about $400, plus one week of operating cost (agent tokens and delivery, about $50) for the free first ingredient.")
+bullet("**Payback:** under one month at target margin.")
 bullet("**Monthly churn:** assume about 3%, reflecting normal restaurant turnover; the embedded sourcing, contracts, and deliveries should make real churn lower.")
 para("We treat lifetime value as a hypothesis to test with data, not a number to lead with.")
 
@@ -93,8 +102,8 @@ para("Investors have put real money into food-supply software, which shows the d
 para("The companies that tried to deliver local food themselves struggled because they owned the perishable inventory and the logistics. We stay asset-light and pass the food through at cost, which is why the economics work for us. The advantage also compounds: vetting a city's farms once forces a rival to rebuild the entire local supply base, every contract and delivery trains the agent on local supply and demand, and a kitchen that runs its sourcing, contracts, and deliveries through us would have to rebuild its supply chain by hand to leave.")
 
 heading("Team")
-para("**Keshav Krishnan**, founder. His research on the **economic cost of climate-driven migration** gave him a data-level view of how fragile long-distance food supply chains are and why regional, resilient sourcing is where the system is heading, the conviction behind CropConnect. He also **built the entire product solo**, from the agent to the contracts and escrow, which is why a working platform already exists at the pre-seed stage. Early sales are led by a **part-time industry insider** with existing restaurant relationships in the market.")
-note("To complete before sending: the insider's name and relationships, and one concrete figure from your climate-migration research.")
+para("**Keshav Krishnan**, founder. His research on the **economic cost of climate-driven migration** gave him a data-level view of how fragile long-distance food supply chains are and why regional, resilient sourcing is where the system is heading, the conviction behind CropConnect. He also **built the entire product solo**, from the agent to the contracts and escrow, which is why a working platform already exists at the pre-seed stage. Early sales are led by a **part-time, commissioned salesperson** with existing relationships in the local restaurant scene.")
+note("To complete before sending: the salesperson's name and relationships, and one concrete figure from your climate-migration research.")
 
 heading("Status and Ask")
 para("The product is built and live; we are **pre-revenue**. We are raising **$50,000 to $100,000** on a post-money SAFE (**$4M** cap, **20%** discount, MFN), with about **80%** going to sales. The round funds one milestone: **15 paying kitchens and about $13,000 in monthly recurring revenue in Indianapolis within 90 days**, the proof point to raise a priced seed.")
