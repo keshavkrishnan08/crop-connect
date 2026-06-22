@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
-import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield, Mark } from "@/components/icons";
+import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield, Mark, MenuCard, Search, TrendUp } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -15,8 +15,11 @@ const NAV = [
     { href: "/app/orders", label: "Orders", icon: Receipt },
     { href: "/app/deals", label: "Deals", icon: Handshake },
     { href: "/app/banking", label: "Banking", icon: Shield },
-    { href: "/app/story", label: "Story Studio", icon: StoryTag },
+    { href: "/app/menu", label: "Menu", icon: MenuCard },
+    { href: "/app/costs", label: "Cost Guard", icon: Search },
+    { href: "/app/forecast", label: "Forecast", icon: TrendUp },
     { href: "/app/margins", label: "Margins", icon: MarginUp },
+    { href: "/app/story", label: "Story Studio", icon: StoryTag },
     { href: "/app/settings", label: "Settings", icon: Settings },
 ];
 
@@ -35,7 +38,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     }
 
     const NavList = ({ collapsible }: { collapsible: boolean }) => (
-        <nav className="flex-1 space-y-1 px-2.5" onClick={() => setOpen(false)}>
+        <nav className="flex-1 space-y-1 overflow-y-auto px-2.5 no-scrollbar" onClick={() => setOpen(false)}>
             {NAV.map((n) => {
                 const active = n.exact ? pathname === n.href : pathname.startsWith(n.href);
                 return (
