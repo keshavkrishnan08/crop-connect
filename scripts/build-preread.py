@@ -94,7 +94,7 @@ para("We treat lifetime value as a hypothesis to test with data, not a number to
 
 heading("Go-to-Market")
 para("We win one metro at a time and earn density before expanding. The Indianapolis plan, in order:")
-numbered("**Onboard the farms.** Pre-sign 8 to 12 vetted local farms across the core crops so supply and fill are guaranteed before we sell a single restaurant. This removes the cold-start problem.")
+numbered("**Onboard the farms through local groups.** We bring farms on through Indianapolis non-profit and farmer networks that already aggregate dozens of vetted local growers: the Indy Winter Farmers Market, Growing Places Indy, the Farmers Cooperative Food Hub, Hoosier Harvest Market, and FARMWISE Indiana. A single one of these partnerships covers our 8 to 12 starter farms on its own, so supply and fill are guaranteed before we sell a restaurant. This removes the cold-start problem and gives us instant credibility with growers.")
 numbered("**Show restaurants their savings.** For each target we run the free audit on their public menu and bring a specific, quantified estimate of the money they could save and the margin they are leaving behind.")
 numbered("**Win them with a risk-free offer.** First ingredient free, free ten-minute setup, cancel any month, backed by a guarantee. We start with one ingredient (about $400/month) and grow the account toward the $896 blended ARPA.")
 numbered("**Expand metro by metro.** At roughly 30 to 40 kitchens and 15 or more farms in Indianapolis, open the next city with the same playbook.")
