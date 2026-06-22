@@ -25,6 +25,7 @@ export interface Farm {
     reliability: number; // 0..100
     priceIndex: number;  // 1.0 = market; <1 cheaper
     farmer: string;
+    region?: "N" | "S" | "E" | "W" | "C"; // direction from the city (Indianapolis)
 }
 
 export interface Delivery { id: string; date: string; qty: number; status: "scheduled" | "delivered" | "confirmed"; }
@@ -104,12 +105,12 @@ export interface AppState {
 
 // ---- seed ----
 export const SEED_FARMS: Farm[] = [
-    { id: "f_teter", name: "Teter Farm", farmer: "Maria Teter", location: "Sebastopol, CA", distanceMi: 12, practices: ["Certified Organic", "No-till"], crops: ["heirloom tomato", "tomato", "greens", "pepper"], reliability: 98, priceIndex: 1.05, story: "Third-generation family farm growing dry-farmed heirloom tomatoes on the Sonoma coast." },
-    { id: "f_blue", name: "Blue Oak Gardens", farmer: "Devon Hale", location: "Petaluma, CA", distanceMi: 18, practices: ["Regenerative", "Certified Naturally Grown"], crops: ["greens", "salad", "arugula", "herb"], reliability: 95, priceIndex: 1.0, story: "Small-scale market garden specializing in tender salad greens and culinary herbs." },
-    { id: "f_marsh", name: "Marsh Hollow", farmer: "Ana Ruiz", location: "Healdsburg, CA", distanceMi: 22, practices: ["Organic"], crops: ["beet", "carrot", "root", "squash"], reliability: 92, priceIndex: 0.96, story: "Root crops and winter squash grown along the Russian River floodplain." },
-    { id: "f_emberlu", name: "Ember & Lu", farmer: "Sam Okafor", location: "Forestville, CA", distanceMi: 15, practices: ["Spray-free"], crops: ["mushroom", "specialty mushroom", "herb"], reliability: 90, priceIndex: 1.12, story: "Indoor specialty mushroom growers — oyster, lion's mane, maitake year-round." },
-    { id: "f_sunfield", name: "Sunfield Acres", farmer: "Grace Lin", location: "Santa Rosa, CA", distanceMi: 9, practices: ["Organic", "GAP Certified"], crops: ["squash", "pepper", "corn", "cucumber"], reliability: 96, priceIndex: 0.98, story: "Diversified vegetable farm, nine miles out — a reliable workhorse for summer produce." },
-    { id: "f_rivergate", name: "Rivergate Orchard", farmer: "Tomás Vela", location: "Geyserville, CA", distanceMi: 28, practices: ["Organic"], crops: ["apple", "peach", "berry", "citrus"], reliability: 88, priceIndex: 1.03, story: "Heirloom fruit orchard — stone fruit in summer, apples and citrus into winter." },
+    { id: "f_teter", name: "Teter Organic Farm", farmer: "Maria Teter", location: "Noblesville, IN", region: "N", distanceMi: 22, practices: ["Certified Organic", "No-till"], crops: ["heirloom tomato", "tomato", "greens", "pepper"], reliability: 98, priceIndex: 1.05, story: "Family organic farm north of the city, known for heirloom tomatoes." },
+    { id: "f_blue", name: "Growing Places Indy", farmer: "Devon Hale", location: "Indianapolis, IN", region: "C", distanceMi: 6, practices: ["Regenerative", "Certified Naturally Grown"], crops: ["greens", "salad", "arugula", "herb"], reliability: 95, priceIndex: 1.0, story: "Urban market garden a few miles from downtown, salad greens and herbs." },
+    { id: "f_marsh", name: "Wild Ginger Farm", farmer: "Ana Ruiz", location: "Martinsville, IN", region: "S", distanceMi: 24, practices: ["Organic"], crops: ["beet", "carrot", "root", "squash"], reliability: 92, priceIndex: 0.96, story: "Root crops and squash from the hills south of Indianapolis." },
+    { id: "f_emberlu", name: "Hoosier Mushroom Co.", farmer: "Sam Okafor", location: "Brownsburg, IN", region: "W", distanceMi: 18, practices: ["Spray-free"], crops: ["mushroom", "specialty mushroom", "herb"], reliability: 90, priceIndex: 1.12, story: "Indoor specialty mushroom growers west of the city, year-round." },
+    { id: "f_sunfield", name: "Sunfield Acres", farmer: "Grace Lin", location: "Greenwood, IN", region: "S", distanceMi: 14, practices: ["Organic", "GAP Certified"], crops: ["squash", "pepper", "corn", "cucumber"], reliability: 96, priceIndex: 0.98, story: "Diversified vegetable farm just south, a reliable summer workhorse." },
+    { id: "f_rivergate", name: "Tuttle Orchards", farmer: "Tomás Vela", location: "Greenfield, IN", region: "E", distanceMi: 26, practices: ["Organic"], crops: ["apple", "peach", "berry", "pumpkin"], reliability: 88, priceIndex: 1.03, story: "Heirloom fruit orchard east of the city, apples and peaches." },
 ];
 
 function seedItems(): SourcingItem[] {
