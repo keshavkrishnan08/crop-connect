@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useStore, actions, getState, computeDeals, farmById } from "@/lib/store";
-import { parseMenu } from "@/lib/margin";
+import { useStore, actions, getState, computeDeals, farmById, flushRemote } from "@/lib/store";
+import { parseMenu, DEFAULT_LEVERS } from "@/lib/margin";
 import { AgentAvatar, AGENT_NAME } from "@/components/app/AgentDock";
 import { Button } from "@/components/ui/kit";
 import { useToast } from "@/components/ui/Toast";
@@ -22,9 +22,12 @@ export default function OnboardingPage() {
     const [cuisine, setCuisine] = React.useState(restaurant.cuisine || "");
     const [location, setLocation] = React.useState(restaurant.location || "");
     const [menu, setMenu] = React.useState("");
+    const [site, setSite] = React.useState("");
     const [covers, setCovers] = React.useState(restaurant.coversPerWeek || 1200);
 
     const dishes = React.useMemo(() => parseMenu(menu || SAMPLE_MENU), [menu]);
+    const localizable = dishes.filter((d) => d.produceDriven);
+    const monthlyUplift = Math.round(Math.max(0, DEFAULT_LEVERS.priceLift - DEFAULT_LEVERS.produceCostDelta) * Math.max(1, localizable.length) * covers * DEFAULT_LEVERS.attachRate * 4.345);
     const suggestion = computeDeals(getState()).find((d) => !d.sourced);
     const suggFarm = suggestion ? farmById(suggestion.farmId) : undefined;
 
@@ -33,9 +36,10 @@ export default function OnboardingPage() {
     function next() { setStep((s) => Math.min(STEPS.length - 1, s + 1)); }
     function back() { setStep((s) => Math.max(0, s - 1)); }
 
-    function finish(sourceFirst: boolean) {
+    async function finish(sourceFirst: boolean) {
         actions.completeOnboarding({ ...restaurant, name: name || restaurant.name, cuisine, location, coversPerWeek: covers }, dishes);
-        toast.success("You're set up", `${AGENT_NAME} has your kitchen.`);
+        await flushRemote(); // persist to the account before leaving
+        toast.success("You're set up", `${AGENT_NAME} saved your kitchen.`);
         if (sourceFirst && suggestion) router.push(`/app/sourcing/new?crop=${encodeURIComponent(suggestion.crop)}&unit=${suggestion.unit}&price=${suggestion.price}`);
         else router.push("/app");
     }
@@ -58,7 +62,9 @@ export default function OnboardingPage() {
                                 <Field label="Restaurant name"><input className="field" value={name} onChange={(e) => setName(e.target.value)} placeholder="Rosewood" autoFocus /></Field>
                                 <Field label="Cuisine"><input className="field" value={cuisine} onChange={(e) => setCuisine(e.target.value)} placeholder="New American" /></Field>
                                 <Field label="City"><input className="field" value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Indianapolis, IN" /></Field>
+                                <Field label="Website (optional)"><input className="field" value={site} onChange={(e) => setSite(e.target.value)} placeholder="rosewood.com" /></Field>
                             </div>
+                            <p className="mt-2 text-2xs text-ink-faint">Add your site and we read the menu to estimate the revenue you can add.</p>
                         </div>
                     )}
                     {step === 1 && (
@@ -82,8 +88,14 @@ export default function OnboardingPage() {
                     )}
                     {step === 3 && (
                         <div className="animate-fade-up">
-                            <h1 className="mt-3 font-mono text-2xl font-semibold tracking-tight text-ink">Start with one dish.</h1>
-                            <p className="mt-2 text-[14px] text-ink-muted">{AGENT_NAME} looked at your menu and the farms near you. Here is the easiest first win.</p>
+                            <h1 className="mt-3 font-mono text-2xl font-semibold tracking-tight text-ink">Here is your upside.</h1>
+                            <p className="mt-2 text-[14px] text-ink-muted">{AGENT_NAME} read your menu and the farms near you.</p>
+                            <div className="mt-5 rounded-2xl border border-brand-200 bg-brand-50/60 p-5">
+                                <p className="text-2xs font-semibold uppercase tracking-wide text-brand-600">Revenue you could add</p>
+                                <p className="font-display text-4xl text-brand-700 tnum">{usd(monthlyUplift, { compact: monthlyUplift > 9999 })}<span className="text-lg text-ink-muted">/mo</span></p>
+                                <p className="text-2xs text-ink-faint">from bringing {localizable.length} {localizable.length === 1 ? "dish" : "dishes"} local</p>
+                            </div>
+                            <p className="mb-2 mt-5 text-[13px] font-semibold text-ink">Start with one dish</p>
                             {suggestion ? (
                                 <div className="mt-6 rounded-2xl border border-brand-200 bg-brand-50/50 p-5">
                                     <p className="flex items-center gap-1.5 text-2xs font-semibold uppercase tracking-wide text-brand-600"><Sparkle size={12} /> Suggested test product</p>
@@ -128,7 +140,9 @@ export default function OnboardingPage() {
                             <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-600 text-white"><Leaf size={22} /></span>
                             <p className="mt-4 font-display text-2xl capitalize text-ink">{suggestion.crop}</p>
                             <p className="mt-1 text-[13px] text-ink-muted">from {suggFarm?.name}</p>
-                            <div className="mt-4 flex items-center justify-center gap-1.5 text-sm font-medium text-brand-600"><Check size={15} /> Vetted and close to you</div>
+                            <p className="mt-4 font-display text-3xl text-brand-700 tnum">{usd(monthlyUplift, { compact: monthlyUplift > 9999 })}<span className="text-base text-ink-muted">/mo</span></p>
+                            <p className="text-2xs text-ink-faint">added revenue, modeled</p>
+                            <div className="mt-3 flex items-center justify-center gap-1.5 text-sm font-medium text-brand-600"><Check size={15} /> Vetted and close to you</div>
                         </div>
                     )}
                 </div>
