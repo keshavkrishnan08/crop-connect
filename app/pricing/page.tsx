@@ -29,6 +29,15 @@ const TERMS: { name: string; off: string; note: string; featured?: boolean }[] =
     { name: "12 months", off: "Save 20%", note: "Our best rate for a full year.", featured: true },
 ];
 
+const STACK: { label: string; sub: string; value: string }[] = [
+    { label: "Done-for-you local sourcing", sub: "Farms found, vetted, matched, and locked.", value: "$1,200/mo" },
+    { label: "Profit Recovery", sub: "Invoice overcharges, waste, and menu mispricing found.", value: "$2,400/mo" },
+    { label: "Contracts and escrow", sub: "Agreements written, payment held until delivery.", value: "$500/mo" },
+    { label: "Weekly delivery and logistics", sub: "Trucks and the schedule orchestrated for you.", value: "$800/mo" },
+    { label: "Specials and menu provenance", sub: "A weekly special drafted, plus farm stories for the plate.", value: "$600/mo" },
+    { label: "Margin tracking and reporting", sub: "What every local dish earns, live.", value: "$300/mo" },
+];
+
 export default function PricingPage() {
     return (
         <div className="relative min-h-screen bg-canvas text-ink">
@@ -41,7 +50,36 @@ export default function PricingPage() {
                         <Reveal><Eyebrow>Pricing</Eyebrow></Reveal>
                         <Reveal delay={0.05}><h1 className="mt-5 text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">Pricing that <span className="ink-grad">scales with you.</span></h1></Reveal>
                         <Reveal delay={0.1}><p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">You fund the food at cost, no markup and no cut of your sales. On top of that is one monthly service fee. It scales with how much we run for you and drops the longer you commit.</p></Reveal>
-                        <Reveal delay={0.15}><div className="mt-8 flex justify-center"><LinkButton href="/demo" size="lg" className="gap-2">Start free <ArrowRight size={18} /></LinkButton></div></Reveal>
+                        <Reveal delay={0.15}><div className="mt-8 flex justify-center"><LinkButton href="/audit" size="lg" className="gap-2">Get a free audit <ArrowRight size={18} /></LinkButton></div></Reveal>
+                    </div>
+                </section>
+
+                {/* Grand-slam value stack */}
+                <section className="border-b border-line bg-canvas-soft">
+                    <div className="mx-auto max-w-3xl px-5 py-24 lg:px-8 lg:py-32">
+                        <Reveal><Eyebrow>Everything you get</Eyebrow><h2 className="mt-4 text-3xl sm:text-4xl">More value than the price, on purpose.</h2><p className="mt-4 max-w-xl text-[15px] leading-relaxed text-ink-muted">Here is what the agent does for you every month, and what each piece would cost on its own.</p></Reveal>
+                        <Reveal delay={0.1}>
+                            <Card className="mt-10 overflow-hidden p-0">
+                                <div className="divide-y divide-line">
+                                    {STACK.map((s) => (
+                                        <div key={s.label} className="flex items-center gap-4 px-5 py-4 sm:px-7">
+                                            <Check size={18} className="shrink-0 text-brand-500" />
+                                            <div className="min-w-0 flex-1"><p className="text-[15px] font-semibold text-ink">{s.label}</p><p className="text-[13px] text-ink-muted">{s.sub}</p></div>
+                                            <span className="shrink-0 font-mono text-sm text-ink-soft tnum">{s.value}</span>
+                                        </div>
+                                    ))}
+                                </div>
+                                <div className="flex items-center justify-between bg-ink px-5 py-4 text-white sm:px-7">
+                                    <span className="text-sm font-semibold">Total value</span>
+                                    <span className="font-display text-2xl tnum">$5,800+/mo</span>
+                                </div>
+                            </Card>
+                            <div className="mt-6 rounded-3xl border border-brand-200 bg-brand-50/50 p-7 text-center">
+                                <p className="text-[16px] text-ink-soft">You pay <b className="text-ink">from $299/mo</b> for the service. The food is funded separately, at cost.</p>
+                                <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-2 text-[13.5px] font-semibold text-brand-700"><Shield size={15} /> We find more than we cost, or your month is free.</p>
+                                <div className="mt-5"><LinkButton href="/audit" className="gap-2">See your number <ArrowRight size={17} /></LinkButton></div>
+                            </div>
+                        </Reveal>
                     </div>
                 </section>
 

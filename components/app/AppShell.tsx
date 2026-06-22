@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useStore } from "@/lib/store";
 import { getBrowserClient } from "@/lib/supabase/client";
 import { Logo } from "@/components/ui/Logo";
-import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield, Mark, MenuCard, Search, TrendUp } from "@/components/icons";
+import { Dashboard, Route, StoryTag, MarginUp, Settings, Plus, Menu, X, MapPin, Logout, Receipt, Handshake, Shield, Mark, Sparkle } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -14,10 +14,8 @@ const NAV = [
     { href: "/app/sourcing", label: "Sourcing", icon: Route },
     { href: "/app/orders", label: "Orders", icon: Receipt },
     { href: "/app/deals", label: "Deals", icon: Handshake },
+    { href: "/app/recovery", label: "Profit Recovery", icon: Sparkle },
     { href: "/app/banking", label: "Banking", icon: Shield },
-    { href: "/app/menu", label: "Menu", icon: MenuCard },
-    { href: "/app/costs", label: "Cost Guard", icon: Search },
-    { href: "/app/forecast", label: "Forecast", icon: TrendUp },
     { href: "/app/margins", label: "Margins", icon: MarginUp },
     { href: "/app/story", label: "Story Studio", icon: StoryTag },
     { href: "/app/settings", label: "Settings", icon: Settings },

@@ -3,16 +3,8 @@
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
-import { Calendar, TrendUp, Check, Sprout } from "@/components/icons";
-
-const ITEMS: { name: string; unit: string; ordered: number; used: number; suggested: number; cost: number; trend: string }[] = [
-    { name: "Heirloom tomatoes", unit: "lb", ordered: 50, used: 41, suggested: 44, cost: 4.5, trend: "steady" },
-    { name: "Salad greens", unit: "lb", ordered: 40, used: 30, suggested: 33, cost: 6.0, trend: "up next week" },
-    { name: "Summer squash", unit: "lb", ordered: 35, used: 22, suggested: 26, cost: 3.0, trend: "down" },
-    { name: "Specialty mushrooms", unit: "lb", ordered: 18, used: 17, suggested: 18, cost: 9.0, trend: "steady" },
-    { name: "Beets", unit: "lb", ordered: 30, used: 19, suggested: 22, cost: 3.0, trend: "down" },
-    { name: "Peaches", unit: "case", ordered: 12, used: 8, suggested: 9, cost: 28, trend: "weekend spike" },
-];
+import { TrendUp, Check, Sprout } from "@/components/icons";
+import { PAR_ITEMS as ITEMS } from "@/lib/recovery";
 
 export default function ForecastPage() {
     const rows = ITEMS.map((it) => {
