@@ -45,6 +45,13 @@ export interface LOI {
     signedAt?: string;
 }
 export interface DeliveryMeta { photo?: string; qc?: boolean; note?: string }
+
+// ---- supply updates: the live link between farm and restaurant ----
+export type SupplyKind = "ontrack" | "harvest" | "packed" | "transit" | "delay" | "shortfall" | "delivered" | "quality";
+export interface SupplyUpdate { id: string; kind: SupplyKind; text: string; ts: number; resolved?: boolean }
+export const SUPPLY_TONE: Record<SupplyKind, "brand" | "sky" | "harvest" | "violet"> = {
+    ontrack: "brand", harvest: "brand", packed: "sky", transit: "sky", delay: "harvest", shortfall: "harvest", delivered: "brand", quality: "violet",
+};
 export interface QualityOption { id: string; label: string; priceDelta: number; detail: string }
 export const QUALITY_OPTIONS: QualityOption[] = [
     { id: "organic", label: "Certified Organic", priceDelta: 0.3, detail: "Only certified-organic product." },
@@ -77,6 +84,18 @@ export interface SourcingItem {
     loi?: LOI;               // preliminary agreement / negotiation
     allocations?: Allocation[]; // volume split across farms (lead farm is farmId)
     deliveryMeta?: Record<string, DeliveryMeta>; // qc + photo proof per delivery
+    updates?: SupplyUpdate[]; // proactive supply status the restaurant sees
+}
+
+/** The current supply headline for an item, so the restaurant always knows where things stand. */
+export function supplyHeadline(item: SourcingItem): { tone: "brand" | "harvest" | "sky"; text: string; sub: string } {
+    const ups = item.updates ?? [];
+    const openDelay = ups.find((u) => (u.kind === "delay" || u.kind === "shortfall") && !u.resolved);
+    if (openDelay) return { tone: "harvest", text: "Heads up, and handled", sub: openDelay.text };
+    const transit = ups.find((u) => u.kind === "transit");
+    if (transit && item.stage !== "live") return { tone: "sky", text: "On the way", sub: transit.text };
+    if (item.stage === "requested" || item.stage === "matched") return { tone: "sky", text: "Getting set up", sub: "Sage is lining up your first deliveries." };
+    return { tone: "brand", text: "On track", sub: ups[0]?.text ?? "Every drop is running on schedule." };
 }
 
 /** Full due-diligence profile for a farm, derived from its record. */
@@ -93,6 +112,40 @@ export function farmDueDiligence(f: Farm) {
         fillRate: f.reliability,
         leadDays: f.distanceMi <= 12 ? 1 : f.distanceMi <= 22 ? 2 : 3,
     };
+}
+
+// ---- farm catalog, ratings, reviews (the vetted ecosystem) ----
+export interface CatalogItem { crop: string; price: number; unit: string; capacity: number; inSeason: boolean; tag: string }
+export function farmCatalog(f: Farm): CatalogItem[] {
+    const cap = farmCapacity(f);
+    return f.crops.map((crop, idx) => ({
+        crop,
+        price: farmPostedPrice(f, crop),
+        unit: "lb",
+        capacity: Math.max(8, Math.round(cap * (1 - idx * 0.1))),
+        inSeason: (f.id.charCodeAt(3) + idx) % 4 !== 0,
+        tag: idx === 0 ? "Signature crop" : "",
+    }));
+}
+export function farmRating(f: Farm): number { return Math.round((3.6 + ((f.reliability - 86) / 14) * 1.4) * 10) / 10; }
+export interface FarmReview { id: string; restaurant: string; rating: number; text: string; when: string }
+export function farmReviews(f: Farm): FarmReview[] {
+    const names = ["Bluebeard", "Milktooth", "Beholder", "Vida", "Tinker Street", "Love Handle"];
+    const lines = [
+        "Consistent quality and never a missed drop. The agent handles everything.",
+        "Produce shows up exactly to spec. Our cooks love the freshness.",
+        "Fair posted pricing, no back-and-forth. Easy to plan menus around.",
+        "A real partner, flexible when we changed our volume mid-season.",
+    ];
+    const base = f.id.charCodeAt(2);
+    const n = 2 + (base % 2);
+    return Array.from({ length: n }, (_, i) => ({
+        id: `${f.id}-r${i}`,
+        restaurant: names[(base + i) % names.length],
+        rating: Math.min(5, Math.max(4, Math.round(farmRating(f)) - (i === 1 ? 1 : 0))),
+        text: lines[(base + i) % lines.length],
+        when: `${1 + ((base + i) % 9)} months ago`,
+    }));
 }
 
 export interface Allocation { farmId: string; qty: number }
@@ -183,6 +236,11 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(1), qty: 40, status: "scheduled" },
             ],
             loi: { status: "signed", pricePerUnit: 4.5, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [{ id: "organic", label: "Certified Organic", status: "accepted", note: "Included, no change", priceDelta: 0 }], log: [{ id: uid("ln"), by: "agent", text: "Matched Teter Organic Farm, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-5) },
+            updates: [
+                { id: uid("su"), kind: "transit", text: "On the truck from Teter Organic, ETA tomorrow 8-9am.", ts: today.getTime() - 6 * 3600e3 },
+                { id: uid("su"), kind: "packed", text: "40 lb harvested this morning and packed in returnable crates.", ts: today.getTime() - 28 * 3600e3, resolved: true },
+                { id: uid("su"), kind: "ontrack", text: "Harvest on schedule, brix looking great this week.", ts: today.getTime() - 3 * 86400e3, resolved: true },
+            ],
         },
         {
             id: "s_greens", crop: "salad greens", unit: "lb", qtyPerWeek: 30, priceCeiling: 6, dishName: "Garden greens, sherry vinaigrette",
@@ -194,6 +252,10 @@ function seedItems(): SourcingItem[] {
                 { id: uid("dl"), date: wk(1), qty: 30, status: "scheduled" },
             ],
             loi: { status: "signed", pricePerUnit: 6, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], log: [{ id: uid("ln"), by: "agent", text: "Matched Growing Places Indy, drafted and signed the terms.", ts: today.getTime() }], signedAt: wk(-2) },
+            updates: [
+                { id: uid("su"), kind: "delay", text: "Rain pushed Tuesday's cut back a day. Sage rerouted 12 lb to Sunfield Acres so your Wednesday service is fully covered. No action needed.", ts: today.getTime() - 5 * 3600e3 },
+                { id: uid("su"), kind: "harvest", text: "Greens cut and washed at Growing Places Indy.", ts: today.getTime() - 30 * 3600e3, resolved: true },
+            ],
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
@@ -353,8 +415,23 @@ export const actions = {
         const farm = state.farms.find((f) => f.id === item.farmId);
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId && i.loi ? { ...i, priceCeiling: finalPrice, loi: { ...i.loi, status: "signed", signedAt: new Date().toISOString().slice(0, 10) } } : i) }));
         actions.confirmAgreement(itemId);
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, updates: [{ id: uid("su"), kind: "ontrack" as SupplyKind, text: `Contract live with ${farm?.name ?? "your farm"}. Sage scheduled your weekly drops and will post an update before every one.`, ts: Date.now() }, ...(i.updates ?? [])] } : i) }));
         pushActivity(`Contract signed with ${farm?.name ?? "the farm"} for ${item.crop}`, "contract", itemId);
         pushActivity(`Scheduled 8 weekly deliveries`, "delivery", itemId);
+    },
+    /** Restaurant asks for a status; the agent posts a fresh supply update. */
+    requestSupplyUpdate(itemId: string) {
+        const item = state.items.find((i) => i.id === itemId);
+        const farm = state.farms.find((f) => f.id === item?.farmId);
+        const next = item?.deliveries.find((d) => d.status === "scheduled");
+        const text = next
+            ? `Next drop is from ${farm?.name ?? "your farm"} on ${new Date(next.date).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}, on schedule.`
+            : `${farm?.name ?? "Your farm"} is harvesting on schedule. Sage will post an ETA the moment it ships.`;
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, updates: [{ id: uid("su"), kind: "ontrack" as SupplyKind, text, ts: Date.now() }, ...(i.updates ?? [])] } : i) }));
+    },
+    /** Acknowledge a heads-up so it clears from the alert strip. */
+    acknowledgeSupply(itemId: string, updateId: string) {
+        set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, updates: (i.updates ?? []).map((u) => u.id === updateId ? { ...u, resolved: true } : u) } : i) }));
     },
     chooseFarm(itemId: string, farmId: string) {
         set((s) => ({ ...s, items: s.items.map((i) => i.id === itemId ? { ...i, farmId, stage: "matched" } : i) }));

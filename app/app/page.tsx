@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useStore, farmById, orderEscrow, type Activity, type ActivityKind } from "@/lib/store";
+import { useStore, farmById, orderEscrow, supplyHeadline, type Activity, type ActivityKind } from "@/lib/store";
 import { Photo } from "@/components/marketing/Photo";
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
@@ -10,7 +10,7 @@ import { AGENT_NAME } from "@/components/app/AgentDock";
 import { Roadmap } from "@/components/app/Roadmap";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
 import { usd, cn } from "@/lib/utils";
-import { Truck, Route, Plus, ArrowRight, Calendar, Farm, Pen, StoryTag, Search } from "@/components/icons";
+import { Truck, Route, Plus, ArrowRight, Calendar, Farm, Pen, StoryTag, Search, Bell } from "@/components/icons";
 
 export default function Dashboard() {
     const items = useStore((s) => s.items);
@@ -53,6 +53,28 @@ export default function Dashboard() {
                 <Kpi label="Weekly spend" value={usd(weeklySpend, { compact: weeklySpend > 9999 })} tone="harvest" />
                 <Kpi label="In escrow" value={usd(escrowHeld, { compact: escrowHeld > 9999 })} tone="violet" />
             </div>
+
+            {/* supply status — the live link to your farms */}
+            {active.length > 0 && (
+                <Card className="mb-6 p-5">
+                    <div className="mb-3 flex items-center gap-2"><Bell size={16} className="text-brand-600" /><h3 className="text-[13px] font-medium text-ink-soft">Supply status</h3><span className="ml-auto text-2xs text-ink-faint">{AGENT_NAME} is watching every drop</span></div>
+                    <div className="space-y-1">
+                        {active.map((it) => {
+                            const h = supplyHeadline(it);
+                            const farm = farmById(it.farmId);
+                            const dot = h.tone === "harvest" ? "bg-harvest-500" : h.tone === "sky" ? "bg-sky-500" : "bg-brand-500";
+                            return (
+                                <Link key={it.id} href={`/app/sourcing/${it.id}`} className="flex items-center gap-3 rounded-lg px-2 py-2 transition hover:bg-canvas">
+                                    <span className={cn("h-2 w-2 shrink-0 rounded-full", dot)} />
+                                    <span className="w-28 shrink-0 truncate text-[13.5px] font-medium capitalize text-ink">{it.crop}</span>
+                                    <span className="min-w-0 flex-1 truncate text-[13px] text-ink-muted">{h.sub}</span>
+                                    <span className="hidden shrink-0 text-2xs text-ink-faint sm:block">{farm?.name}</span>
+                                </Link>
+                            );
+                        })}
+                    </div>
+                </Card>
+            )}
 
             {/* your farms, with real imagery */}
             {farmsUsed.length > 0 && (

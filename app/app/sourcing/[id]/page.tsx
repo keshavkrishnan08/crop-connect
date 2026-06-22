@@ -2,22 +2,25 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useStore, actions, farmById, loiPrice, QUALITY_OPTIONS, farmDueDiligence, orderEscrow, ESCROW_LABEL, type SourcingItem, type Farm, type Delivery } from "@/lib/store";
+import { useStore, actions, farmById, loiPrice, QUALITY_OPTIONS, farmDueDiligence, orderEscrow, ESCROW_LABEL, supplyHeadline, SUPPLY_TONE, type SourcingItem, type Farm, type Delivery, type SupplyUpdate } from "@/lib/store";
 import { AgentAvatar, AGENT_NAME } from "@/components/app/AgentDock";
 import { PageHeader } from "@/components/app/PageHeader";
 import { Card, Button, EmptyState } from "@/components/ui/kit";
 import { Photo } from "@/components/marketing/Photo";
 import { useToast } from "@/components/ui/Toast";
 import { usd, cn } from "@/lib/utils";
-import { Leaf, MapPin, Check, X, Shield, Calendar, Truck, ArrowRight, Plus, Handshake, Pen, Receipt, Dashboard, Sparkle, Star, Clock, Upload } from "@/components/icons";
+import { Leaf, MapPin, Check, X, Shield, Calendar, Truck, ArrowRight, Plus, Handshake, Pen, Receipt, Dashboard, Sparkle, Star, Clock, Upload, Bell } from "@/components/icons";
 
-type TabId = "overview" | "farm" | "terms" | "quality" | "logistics" | "messages" | "deliveries";
+function ago(ts: number) { const m = Math.max(0, Math.round((Date.now() - ts) / 60000)); if (m < 60) return `${m}m ago`; const h = Math.round(m / 60); if (h < 24) return `${h}h ago`; return `${Math.round(h / 24)}d ago`; }
+
+type TabId = "overview" | "farm" | "terms" | "quality" | "logistics" | "supply" | "messages" | "deliveries";
 const TABS: { id: TabId; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
     { id: "overview", label: "Overview", icon: Dashboard },
     { id: "farm", label: "The farm", icon: Leaf },
     { id: "terms", label: "Terms", icon: Receipt },
     { id: "quality", label: "Quality & QC", icon: Shield },
     { id: "logistics", label: "Logistics", icon: Truck },
+    { id: "supply", label: "Supply", icon: Bell },
     { id: "messages", label: "Messages", icon: Sparkle },
     { id: "deliveries", label: "Deliveries", icon: Calendar },
 ];
@@ -75,6 +78,7 @@ export default function ItemPage({ params }: { params: { id: string } }) {
                 {tab === "terms" && <TermsTab item={item} farm={farm} signed={signed} price={price} onSign={() => { actions.signContract(item.id); setSignedFx(true); }} />}
                 {tab === "quality" && <QualityTab item={item} signed={signed} />}
                 {tab === "logistics" && <LogisticsTab item={item} farm={farm} signed={signed} />}
+                {tab === "supply" && <SupplyTab item={item} farm={farm} />}
                 {tab === "messages" && <MessagesTab item={item} farm={farm} />}
                 {tab === "deliveries" && <DeliveriesTab item={item} signed={signed} onGoTerms={() => setTab("terms")} />}
             </div>
@@ -318,6 +322,55 @@ function LogisticsTab({ item, farm, signed }: { item: SourcingItem; farm?: Farm;
                 <Clock size={17} className="mt-0.5 shrink-0 text-brand-600" />
                 <p className="text-[13px] leading-relaxed text-ink-soft">Deliveries land every week on your chosen day. {AGENT_NAME} confirms the window with the farm 48 hours ahead and reschedules around weather or shortfalls using a backup farm.</p>
             </Card>
+        </div>
+    );
+}
+
+function SupplyTab({ item, farm }: { item: SourcingItem; farm?: Farm }) {
+    const head = supplyHeadline(item);
+    const updates = item.updates ?? [];
+    const toast = useToast();
+    const banner = head.tone === "harvest" ? "border-harvest-300 bg-harvest-400/10" : head.tone === "sky" ? "border-sky-200 bg-sky-50/60" : "border-brand-200 bg-brand-50/50";
+    const dot = head.tone === "harvest" ? "bg-harvest-500" : head.tone === "sky" ? "bg-sky-500" : "bg-brand-500";
+    return (
+        <div className="space-y-5">
+            <Card className={cn("flex items-start gap-3.5 border p-5", banner)}>
+                <AgentAvatar size={34} active />
+                <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-2"><span className={cn("h-2 w-2 rounded-full", dot)} /><p className="text-sm font-semibold text-ink">{head.text}</p></div>
+                    <p className="mt-1 text-[14px] leading-relaxed text-ink-soft">{head.sub}</p>
+                </div>
+                <button onClick={() => { actions.requestSupplyUpdate(item.id); toast.success("Status refreshed", "Sage posted the latest."); }} className="btn-soft btn-sm shrink-0">Get an update</button>
+            </Card>
+
+            <Card className="p-5">
+                <div className="mb-4 flex items-center gap-2"><Bell size={16} className="text-brand-600" /><h3 className="text-sm font-medium text-ink">Supply timeline</h3><span className="ml-auto text-2xs text-ink-faint">{farm?.name}</span></div>
+                {updates.length === 0
+                    ? <p className="py-3 text-center text-[13px] text-ink-muted">No updates yet. {AGENT_NAME} posts one before every drop.</p>
+                    : <div>{updates.map((u, i) => <UpdateRow key={u.id} item={item} u={u} last={i === updates.length - 1} />)}</div>}
+            </Card>
+        </div>
+    );
+}
+
+function UpdateRow({ item, u, last }: { item: SourcingItem; u: SupplyUpdate; last: boolean }) {
+    const t = SUPPLY_TONE[u.kind];
+    const color = t === "harvest" ? "bg-harvest-400/15 text-harvest-600" : t === "sky" ? "bg-sky-50 text-sky-600" : t === "violet" ? "bg-violet-50 text-violet-600" : "bg-brand-50 text-brand-600";
+    const Icon = u.kind === "delay" || u.kind === "shortfall" ? Bell : u.kind === "transit" ? Truck : u.kind === "delivered" ? Check : u.kind === "quality" ? Shield : Leaf;
+    const openHeadsUp = (u.kind === "delay" || u.kind === "shortfall") && !u.resolved;
+    return (
+        <div className="flex gap-3">
+            <div className="flex flex-col items-center">
+                <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-full", color)}><Icon size={15} /></span>
+                {!last && <span className="my-1 w-px flex-1 bg-line" />}
+            </div>
+            <div className="min-w-0 flex-1 pb-4">
+                <p className="text-[13.5px] leading-snug text-ink">{u.text}</p>
+                <div className="mt-1 flex items-center gap-3">
+                    <span className="text-2xs text-ink-faint">{ago(u.ts)}</span>
+                    {openHeadsUp && <button onClick={() => actions.acknowledgeSupply(item.id, u.id)} className="text-2xs font-semibold text-brand-600 hover:underline">Got it</button>}
+                </div>
+            </div>
         </div>
     );
 }
