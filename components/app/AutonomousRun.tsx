@@ -10,8 +10,8 @@ import { cn } from "@/lib/utils";
 const STEPS = [
     { icon: Search, label: "Scanning farms near you", done: "Found local matches" },
     { icon: Shield, label: "Vetting the best one", done: "Vetted and ranked" },
-    { icon: Pen, label: "Locking in your agreement", done: "Agreement drafted" },
-    { icon: Truck, label: "Scheduling weekly deliveries", done: "8 deliveries scheduled" },
+    { icon: Pen, label: "Drafting your agreement", done: "Agreement drafted" },
+    { icon: Truck, label: "Lining up the delivery", done: "Delivery planned" },
     { icon: StoryTag, label: "Preparing your provenance", done: "Menu proof ready" },
 ];
 
@@ -36,8 +36,8 @@ export function AutonomousRun({ itemId, crop, onDone }: { itemId: string; crop: 
                     <div className="flex items-center gap-3">
                         <AgentAvatar size={44} active={!done} />
                         <div>
-                            <p className="font-display text-xl leading-tight text-ink">{done ? `${AGENT_NAME} handled it` : `${AGENT_NAME} is sourcing your ${crop}`}</p>
-                            <p className="text-[13px] text-ink-muted">{done ? "Everything below is done. You did not lift a finger." : "Your agent is on it. Sit back."}</p>
+                            <p className="font-display text-xl leading-tight text-ink">{done ? `${AGENT_NAME} drafted your contract` : `${AGENT_NAME} is sourcing your ${crop}`}</p>
+                            <p className="text-[13px] text-ink-muted">{done ? "Review the terms and sign. Add quality guidelines if you want." : "Your agent is on it. Sit back."}</p>
                         </div>
                     </div>
                     <div className="mt-5 h-1.5 overflow-hidden rounded-full bg-canvas-sunk">
@@ -71,8 +71,8 @@ export function AutonomousRun({ itemId, crop, onDone }: { itemId: string; crop: 
                 <AnimatePresence>
                     {done && (
                         <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="border-t border-line p-4">
-                            <div className="mb-3 flex items-center justify-center gap-1.5 text-sm font-medium text-brand-600"><Sparkle size={15} /> Done. You did not lift a finger.</div>
-                            <button onClick={onDone} className="btn-primary w-full">See it running <ArrowRight size={16} /></button>
+                            <div className="mb-3 flex items-center justify-center gap-1.5 text-sm font-medium text-brand-600"><Sparkle size={15} /> Drafted in seconds. Your move.</div>
+                            <button onClick={onDone} className="btn-primary w-full">Review your contract <ArrowRight size={16} /></button>
                         </motion.div>
                     )}
                 </AnimatePresence>
