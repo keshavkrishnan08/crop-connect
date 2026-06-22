@@ -23,7 +23,7 @@ export function MarketingNav() {
                 </nav>
                 <div className="flex items-center gap-2.5">
                     <Link href="/sign-in" className="hidden text-sm font-semibold text-ink-soft transition hover:text-ink sm:block">Sign in</Link>
-                    <Link href="/demo" className="btn-primary btn-sm">See your numbers <ArrowRight size={15} /></Link>
+                    <Link href="/audit" className="btn-primary btn-sm">Get a free audit <ArrowRight size={15} /></Link>
                     <button onClick={() => setOpen((v) => !v)} className="grid h-9 w-9 place-items-center rounded-lg hairline bg-white/70 md:hidden">{open ? <X size={18} /> : <Menu size={18} />}</button>
                 </div>
             </div>
