@@ -2,24 +2,32 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useStore, marginRollup, farmById, getState, type Activity, type ActivityKind } from "@/lib/store";
+import { useStore, farmById, orderEscrow, type Activity, type ActivityKind } from "@/lib/store";
+import { Photo } from "@/components/marketing/Photo";
 import { PageHeader } from "@/components/app/PageHeader";
 import { AutomationBoard } from "@/components/app/AutomationBoard";
 import { AGENT_NAME } from "@/components/app/AgentDock";
 import { Roadmap } from "@/components/app/Roadmap";
 import { SpecialCard } from "@/components/app/SpecialCard";
 import { Card, LinkButton, EmptyState } from "@/components/ui/kit";
-import { CountUp } from "@/components/ui/CountUp";
 import { usd, cn } from "@/lib/utils";
-import { MarginUp, Truck, Route, Plus, ArrowRight, Calendar, Leaf, Farm, Pen, StoryTag, Search, Check } from "@/components/icons";
+import { Truck, Route, Plus, ArrowRight, Calendar, Farm, Pen, StoryTag, Search } from "@/components/icons";
 
 export default function Dashboard() {
     const items = useStore((s) => s.items);
     const restaurant = useStore((s) => s.restaurant);
     const activity = useStore((s) => s.activity);
-    const roll = marginRollup(getState());
-
-    const sourced = items.filter((i) => ["agreed", "delivering", "live"].includes(i.stage)).length;
+    const active = items.filter((i) => ["agreed", "delivering", "live"].includes(i.stage));
+    const liveCount = items.filter((i) => i.stage === "live").length;
+    const farmsUsed = Array.from(new Set(active.map((i) => i.farmId).filter(Boolean)));
+    const allDel = items.flatMap((i) => i.deliveries);
+    const scheduledDel = allDel.filter((d) => d.status === "scheduled").length;
+    const confirmedDel = allDel.filter((d) => d.status === "confirmed").length;
+    const deliveredDel = allDel.filter((d) => d.status === "delivered").length;
+    const onTime = confirmedDel + deliveredDel > 0 ? Math.round((confirmedDel / (confirmedDel + deliveredDel)) * 100) : 100;
+    const weeklyVolume = active.reduce((s, i) => s + (i.qtyPerWeek || 0), 0);
+    const weeklySpend = active.reduce((s, i) => s + (i.qtyPerWeek || 0) * (i.priceCeiling || 0), 0);
+    const escrowHeld = items.reduce((s, i) => s + orderEscrow(i).held, 0);
     const boardItems = items.slice(0, 5);
     const upcoming = items.flatMap((i) => i.deliveries.filter((d) => d.status === "scheduled").map((d) => ({ item: i, d }))).sort((a, b) => +new Date(a.d.date) - +new Date(b.d.date)).slice(0, 5);
 
@@ -35,13 +43,33 @@ export default function Dashboard() {
             {/* recent events */}
             <RecentEvents activity={activity} />
 
-            {/* the numbers */}
-            <div className="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <Stat icon={<Leaf size={20} />} label="Ingredients sourced" value={<span className="font-mono tnum">{sourced}</span>} tone="brand" sub="under contract" />
-                <Stat icon={<Truck size={20} />} label="Deliveries handled" value={<span className="font-mono tnum">{roll.confirmedDeliveries}</span>} tone="sky" sub="confirmed for you" />
-                <Stat icon={<MarginUp size={20} />} label="Realized uplift / mo" value={<CountUp to={roll.realizedMonthly} format={(n) => usd(n, { compact: n > 9999 })} className="value-pos" />} tone="harvest" sub={`${usd(roll.realizedAnnual, { compact: true })}/yr run-rate`} />
-                <Stat icon={<Check size={20} />} label="Your steps this week" value={<span className="font-mono tnum">0</span>} tone="violet" sub="we did the rest" />
+            {/* business KPIs */}
+            <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-4 xl:grid-cols-8">
+                <Kpi label="Active contracts" value={active.length} tone="brand" />
+                <Kpi label="Live on menu" value={liveCount} tone="brand" />
+                <Kpi label="Farms supplying" value={farmsUsed.length} tone="sky" />
+                <Kpi label="Deliveries due" value={scheduledDel} tone="sky" />
+                <Kpi label="On-time rate" value={`${onTime}%`} tone="brand" />
+                <Kpi label="Weekly volume" value={weeklyVolume} sub="lb / wk" tone="violet" />
+                <Kpi label="Weekly spend" value={usd(weeklySpend, { compact: weeklySpend > 9999 })} tone="harvest" />
+                <Kpi label="In escrow" value={usd(escrowHeld, { compact: escrowHeld > 9999 })} tone="violet" />
             </div>
+
+            {/* your farms, with real imagery */}
+            {farmsUsed.length > 0 && (
+                <div className="mb-6">
+                    <div className="mb-3 flex items-center justify-between">
+                        <h3 className="text-[13px] font-medium text-ink-soft">Your farms</h3>
+                        <span className="text-2xs text-ink-faint">{farmsUsed.length} supplying you</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+                        {active.slice(0, 4).map((it, idx) => {
+                            const farm = farmById(it.farmId);
+                            return <Photo key={it.id} q={`${it.crop} farm field`} seed={100 + idx} alt={farm?.name ?? "farm"} caption={farm?.name} place={`${farm?.distanceMi} mi`} className="aspect-[4/3]" />;
+                        })}
+                    </div>
+                </div>
+            )}
 
             {/* proactive: the agent drafts a menu special */}
             <SpecialCard />
@@ -53,7 +81,7 @@ export default function Dashboard() {
                     <Card className="p-5 sm:p-6 transition-shadow duration-200 hover:shadow-lift">
                         <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5">
-                                <h2 className="font-mono text-base font-semibold tracking-tight text-ink">Pipeline</h2>
+                                <h2 className="text-base font-medium text-ink">Pipeline</h2>
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-brand-50 px-2.5 py-1 text-2xs font-semibold text-brand-600"><span className="relative flex h-1.5 w-1.5"><span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-brand-400 opacity-75" /><span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-brand-500" /></span> Live</span>
                             </div>
                             <Link href="/app/sourcing" className="text-sm font-semibold text-brand-600 hover:underline">Open full board</Link>
@@ -68,7 +96,7 @@ export default function Dashboard() {
                 <aside className="space-y-6">
                     <Roadmap />
                     <Card className="p-5 transition-shadow duration-200 hover:shadow-lift">
-                        <div className="mb-4 flex items-center gap-2"><Calendar size={18} className="text-brand-600" /><h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Upcoming deliveries</h3></div>
+                        <div className="mb-4 flex items-center gap-2"><Calendar size={18} className="text-brand-600" /><h3 className="text-sm font-medium text-ink">Upcoming deliveries</h3></div>
                         {upcoming.length === 0 ? <p className="py-5 text-center text-sm text-ink-muted">None scheduled.</p> : (
                             <div className="space-y-1">
                                 {upcoming.map(({ item, d }) => {
@@ -98,7 +126,7 @@ function RecentEvents({ activity }: { activity: Activity[] }) {
     return (
         <div className="mb-6 overflow-hidden rounded-3xl border border-line bg-canvas-soft shadow-card transition-shadow duration-200 hover:shadow-lift">
             <div className="flex items-center justify-between border-b border-line px-5 py-3.5">
-                <h3 className="font-mono text-sm font-semibold tracking-tight text-ink">Recent</h3>
+                <h3 className="text-sm font-medium text-ink">Recent</h3>
                 <span className="text-2xs text-ink-faint">{activity.length} events</span>
             </div>
             {latest.length === 0
@@ -136,14 +164,13 @@ function relTime(ts: number) {
     return `${Math.round(h / 24)}d ago`;
 }
 
-function Stat({ icon, label, value, sub, tone }: { icon: React.ReactNode; label: string; value: React.ReactNode; sub?: string; tone: "brand" | "harvest" | "ink" | "sky" | "violet" }) {
-    const t = tone === "harvest" ? "bg-harvest-400/12 text-harvest-500" : tone === "ink" ? "bg-ink/[0.06] text-ink-soft" : tone === "sky" ? "bg-sky-50 text-sky-600" : tone === "violet" ? "bg-violet-50 text-violet-600" : "bg-brand-50 text-brand-600";
+function Kpi({ label, value, sub, tone }: { label: string; value: React.ReactNode; sub?: string; tone: "brand" | "harvest" | "sky" | "violet" }) {
+    const t = tone === "harvest" ? "text-harvest-600" : tone === "sky" ? "text-sky-600" : tone === "violet" ? "text-violet-600" : "text-brand-600";
     return (
-        <Card className="p-5" hover>
-            <span className={cn("mb-3 grid h-10 w-10 place-items-center rounded-xl", t)}>{icon}</span>
-            <p className="font-display text-3xl leading-none text-ink">{value}</p>
-            <p className="mt-1.5 text-[13px] font-medium text-ink-muted">{label}</p>
-            {sub && <p className="mt-0.5 text-2xs text-ink-faint">{sub}</p>}
-        </Card>
+        <div className="rounded-2xl border border-line bg-canvas-soft p-3.5 transition-shadow duration-200 hover:shadow-card">
+            <p className="text-2xs font-medium uppercase tracking-wide text-ink-faint">{label}</p>
+            <p className={cn("mt-1.5 font-mono text-[1.55rem] leading-none tnum", t)}>{value}</p>
+            {sub && <p className="mt-1 text-2xs text-ink-faint">{sub}</p>}
+        </div>
     );
 }

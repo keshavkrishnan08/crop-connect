@@ -385,19 +385,31 @@ export function marginRollup(s: AppState) {
 // ---- agent roadmap (custom, recomputed each render) ----
 export interface RoadmapStep { id: string; title: string; detail: string; done: boolean; href: string; cta: string }
 export function agentRoadmap(s: AppState): RoadmapStep[] {
+    const hasMenu = s.dishes.length > 0;
     const hasItems = s.items.length > 0;
+    const inReview = s.items.some((i) => i.loi?.status === "review");
     const anyAgreed = s.items.some((i) => ["agreed", "delivering", "live"].includes(i.stage));
     const anyLive = s.items.some((i) => i.stage === "live");
-    const hasMenu = s.dishes.length > 0;
-    const enough = s.items.length >= 3;
-    return [
+    const count = s.items.length;
+
+    const all: RoadmapStep[] = [
         { id: "menu", title: "Finish your setup", detail: "Add your kitchen and menu so Sage can price.", done: hasMenu, href: "/app/onboarding", cta: "Set up" },
-        { id: "first", title: "Source your first ingredient", detail: "Name one thing. The agent runs the rest.", done: hasItems, href: "/app/sourcing/new", cta: "Source it" },
-        { id: "agree", title: "Let the agreement run", detail: "Sage drafted the terms with the farm.", done: anyAgreed, href: "/app/sourcing", cta: "See the board" },
-        { id: "live", title: "Put it on the menu", detail: "Go live and start earning the margin.", done: anyLive, href: "/app/story", cta: "Get the story" },
-        { id: "scale", title: "Add two more ingredients", detail: "Sage runs them in parallel.", done: enough, href: "/app/sourcing/new", cta: "Add more" },
-        { id: "margin", title: "Review your margin lift", detail: "See what local is earning you.", done: anyLive, href: "/app/margins", cta: "Open Margins" },
+        { id: "first", title: "Source your first ingredient", detail: "Name one thing, the agent runs the rest.", done: hasItems, href: "/app/sourcing/new", cta: "Source it" },
     ];
+    if (inReview) all.push({ id: "sign", title: "Sign your contract", detail: "Sage drafted the terms. Review and sign.", done: false, href: "/app/sourcing", cta: "Review" });
+    all.push({ id: "agree", title: "Let the agreement run", detail: "The farm is locked and delivering for you.", done: anyAgreed, href: "/app/sourcing", cta: "See the board" });
+    all.push({ id: "live", title: "Put it on the menu", detail: "Go live and start earning the margin.", done: anyLive, href: "/app/story", cta: "Get the story" });
+    if (anyLive) all.push({ id: "margin", title: "Review your margin lift", detail: "See what local is earning you.", done: count >= 3, href: "/app/margins", cta: "Open Margins" });
+    all.push({ id: "scale", title: count >= 2 ? "Add another ingredient" : "Add two more ingredients", detail: "Sage runs them in parallel.", done: count >= 3, href: "/app/sourcing/new", cta: "Add more" });
+
+    // Show every completed step plus the next few upcoming, so the list length adapts to the user.
+    const out: RoadmapStep[] = [];
+    let upcoming = 0;
+    for (const step of all) {
+        if (!step.done) { upcoming++; if (upcoming > 3) break; }
+        out.push(step);
+    }
+    return out;
 }
 
 // ---- escrow / order tracking ----
