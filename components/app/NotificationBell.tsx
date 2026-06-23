@@ -13,6 +13,12 @@ export function NotificationBell() {
     useStore((s) => s.items);
     useStore((s) => s.notifsReadTs);
     const [open, setOpen] = React.useState(false);
+    React.useEffect(() => {
+        if (!open) return;
+        const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setOpen(false); };
+        window.addEventListener("keydown", onKey);
+        return () => window.removeEventListener("keydown", onKey);
+    }, [open]);
     const notifs = farmNotifications(getState()).slice(0, 14);
     const unread = unreadNotifCount(getState());
 
