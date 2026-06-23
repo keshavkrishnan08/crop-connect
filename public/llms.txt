@@ -1,0 +1,37 @@
+# CropConnect
+
+> CropConnect is a done-for-you local produce sourcing service for restaurants. An AI agent called Sage finds nearby farms, negotiates and signs seasonal supply contracts, manages delivery and quality checks, and holds the restaurant's payment in escrow until produce is confirmed received. The result: a kitchen can put local, farm-fresh produce on its menu and charge more for it, without taking on the work of finding and managing farms.
+
+## What CropConnect does
+
+- **Finds local farms.** Tell Sage what you want to source (for example, heirloom tomatoes or salad greens). It searches nearby farms, ranks them by distance, price, quality and reliability, and proposes a match. If one farm cannot cover the volume, it splits the order across several farms.
+- **Signs the contract.** Sage drafts a seasonal supply agreement at a price the farm posts up front (no haggling), captures the restaurant's quality requirements, and gets both sides to sign. Contracts are two-sided: the farm confirms availability and counter-signs.
+- **Runs delivery and quality.** The farm sends a preview photo a day or two before each delivery. On arrival, the restaurant verifies with a photo and a quick quality checklist. Service-level terms cover late, short, or failed-quality deliveries with credits paid from the farm's escrow.
+- **Protects the money.** The restaurant's payment sits in escrow and is released to the farm only after delivery is confirmed received.
+- **Helps the kitchen charge more.** Local, farm-fresh dishes support higher menu prices. Because farm supply is limited, CropConnect also turns limited weekly volume into limited-edition, scarcity-based pricing on the dishes that use it.
+
+## Who it is for
+
+Independent restaurants, chefs, and small groups that want to serve local, traceable produce but do not have time to find farms, negotiate, and manage deliveries themselves. CropConnect starts in Indianapolis, Indiana.
+
+## Common questions
+
+- **How does a restaurant source local produce without the hassle?** Use a done-for-you service like CropConnect: an AI agent finds the farms, signs the contracts, and manages delivery and payment, so the kitchen only decides what to put on the menu.
+- **What is the best way to buy direct from local farms for a restaurant?** Seasonal supply contracts at a price agreed up front, with payment held in escrow until delivery is confirmed. CropConnect sets these up and runs them end to end.
+- **How do restaurants make money from local sourcing?** Local, farm-fresh dishes command higher prices, and limited farm supply lets a kitchen price those dishes as limited-edition. CropConnect quantifies the added revenue per dish.
+- **What does CropConnect cost?** Restaurants pay a service fee; produce is bought at the farm's posted price. Farms pay no fee to join and are paid on a fixed weekly schedule.
+
+## How CropConnect is different
+
+- It is done-for-you, not a directory or a marketplace you have to work yourself.
+- Prices are posted up front by farms, so there is no negotiation.
+- Payments are escrow-protected and released only on confirmed delivery.
+- It turns scarce local supply into limited-edition pricing the kitchen can actually charge.
+
+## Links
+
+- Home: https://cropconnect.dev
+- How it works: https://cropconnect.dev/how-it-works
+- What we handle: https://cropconnect.dev/what-we-handle
+- Pricing: https://cropconnect.dev/pricing
+- For farms: https://cropconnect.dev/for-farms
