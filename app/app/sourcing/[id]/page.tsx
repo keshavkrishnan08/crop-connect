@@ -8,7 +8,7 @@ import { PageHeader } from "@/components/app/PageHeader";
 import { Card, Button, EmptyState } from "@/components/ui/kit";
 import { Photo } from "@/components/marketing/Photo";
 import { useToast } from "@/components/ui/Toast";
-import { usd, cn } from "@/lib/utils";
+import { usd, cn, fileToCompactDataUrl } from "@/lib/utils";
 import { Leaf, MapPin, Check, X, Shield, Calendar, Truck, ArrowRight, Plus, Handshake, Pen, Receipt, Dashboard, Sparkle, Star, Clock, Upload, Bell } from "@/components/icons";
 
 function ago(ts: number) { const m = Math.max(0, Math.round((Date.now() - ts) / 60000)); if (m < 60) return `${m}m ago`; const h = Math.round(m / 60); if (h < 24) return `${h}h ago`; return `${Math.round(h / 24)}d ago`; }
@@ -456,11 +456,19 @@ function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
     const [open, setOpen] = React.useState(false);
     const [photo, setPhoto] = React.useState<string | null>(null);
     const [checks, setChecks] = React.useState<Record<number, boolean>>({});
+    const fileRef = React.useRef<HTMLInputElement>(null);
     const specs = loi.qualityTerms.length ? loi.qualityTerms.map((t) => t.label) : ["Looks fresh and undamaged", "Correct quantity", "Right product"];
     const allChecked = specs.every((_, i) => checks[i]);
     const toast = useToast();
 
-    function capture() { setPhoto(`https://loremflickr.com/600/450/${encodeURIComponent(item.crop)},produce,fresh?lock=${(d.id.charCodeAt(2) || 7) + d.qty}`); }
+    function openCamera() { fileRef.current?.click(); }
+    async function onFile(e: React.ChangeEvent<HTMLInputElement>) {
+        const f = e.target.files?.[0];
+        e.target.value = "";
+        if (!f) return;
+        try { setPhoto(await fileToCompactDataUrl(f)); } catch { /* keep flow alive */ }
+    }
+    function useSample() { setPhoto(`https://loremflickr.com/600/450/${encodeURIComponent(item.crop)},produce,fresh?lock=${(d.id.charCodeAt(2) || 7) + d.qty}`); }
     function confirm() {
         if (!photo) return;
         actions.confirmDeliveryProof(item.id, d.id, photo, allChecked);
@@ -499,9 +507,11 @@ function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
                 <div className="border-t border-line bg-canvas-soft/60 p-4 animate-fade-in">
                     {prePhoto && <div className="mb-4"><p className="mb-1.5 text-2xs font-semibold uppercase tracking-wide text-ink-faint">Farm's preview, for reference</p><img src={prePhoto} alt="preview" className="h-28 w-full rounded-xl object-cover" /></div>}
                     <p className="mb-2 text-2xs font-semibold uppercase tracking-wide text-ink-faint">1 · Photograph the produce on arrival</p>
+                    <input ref={fileRef} type="file" accept="image/*" capture="environment" className="hidden" onChange={onFile} />
                     {photo
                         ? <div className="relative"><img src={photo} alt="capture" className="h-44 w-full rounded-xl object-cover" /><button onClick={() => setPhoto(null)} className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-ink/70 text-white"><X size={14} /></button></div>
-                        : <button onClick={capture} className="grid h-44 w-full place-items-center rounded-xl border-2 border-dashed border-line bg-white text-ink-muted transition hover:border-brand-300 hover:text-brand-600"><span className="text-center"><Upload size={24} className="mx-auto" /><span className="mt-1 block text-[13px] font-medium">Capture produce photo</span></span></button>}
+                        : <button onClick={openCamera} className="grid h-44 w-full place-items-center rounded-xl border-2 border-dashed border-line bg-white text-ink-muted transition hover:border-brand-300 hover:text-brand-600"><span className="text-center"><Upload size={24} className="mx-auto" /><span className="mt-1 block text-[13px] font-medium">Take or upload a produce photo</span><span className="mt-0.5 block text-2xs text-ink-faint">Opens your camera on a phone</span></span></button>}
+                    {!photo && <button onClick={useSample} className="mt-2 block w-full text-center text-2xs text-ink-faint hover:text-brand-600">No camera handy? Use a sample photo</button>}
 
                     <p className="mb-2 mt-4 text-2xs font-semibold uppercase tracking-wide text-ink-faint">2 · Quality check</p>
                     <div className="space-y-1.5">
