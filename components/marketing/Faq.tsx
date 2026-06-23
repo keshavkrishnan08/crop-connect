@@ -6,6 +6,8 @@ import { Plus } from "@/components/icons";
 import { cn } from "@/lib/utils";
 
 const ITEMS: { q: string; a: string }[] = [
+    { q: "How do I source local produce for my restaurant?", a: "Tell CropConnect what you want to serve. Our AI agent finds nearby farms, signs a seasonal supply contract at a price the farm posts up front, and manages the delivery, the quality check, and the payment. You pick the ingredient; we run the sourcing end to end." },
+    { q: "What is the best way to buy direct from local farms?", a: "A seasonal supply contract at a price agreed up front, with payment held in escrow until delivery is confirmed received. CropConnect sets that up and runs it for you, so you get committed local supply without chasing farms week to week." },
     { q: "Will my guests actually pay more?", a: "Yes, when the value is on the plate and on the menu. A named local farm and a fresher product give people a reason to pick the dish and feel good about the price. You set the prices. We give you the proof to stand behind them." },
     { q: "How fast can I start?", a: "About ten minutes. You share your menu, pick one ingredient to begin with, and we take it from there. No installs, no integrations, no training your staff." },
     { q: "Do you mark up the food?", a: "No. We are not a distributor. You pay a flat fee for the service. The price you agree with the farm is the price you pay." },
@@ -19,8 +21,13 @@ const ITEMS: { q: string; a: string }[] = [
 export function Faq() {
     const [open, setOpen] = React.useState<number | null>(0);
     const reduce = useReducedMotion();
+    const faqSchema = {
+        "@context": "https://schema.org", "@type": "FAQPage",
+        mainEntity: ITEMS.map((it) => ({ "@type": "Question", name: it.q, acceptedAnswer: { "@type": "Answer", text: it.a } })),
+    };
     return (
         <div className="mx-auto max-w-2xl divide-y divide-line overflow-hidden rounded-3xl border border-line bg-canvas-soft">
+            <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
             {ITEMS.map((it, i) => {
                 const isOpen = open === i;
                 return (

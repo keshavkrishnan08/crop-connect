@@ -91,6 +91,55 @@ export interface SourcingItem {
     penalties?: Penalty[]; // SLA credits owed to the restaurant when the farm misses
 }
 
+// ---- menu scarcity: limited weekly supply -> limited-edition pricing ----
+const SERVING_LB: Record<string, number> = {
+    "salad greens": 0.18, greens: 0.18, lettuce: 0.18, salad: 0.18, arugula: 0.18, herb: 0.05,
+    "heirloom tomato": 0.35, tomato: 0.35, "summer squash": 0.3, squash: 0.3, beet: 0.3, carrot: 0.3, root: 0.3,
+    "specialty mushroom": 0.18, mushroom: 0.18, pepper: 0.25, corn: 0.4, cucumber: 0.25, apple: 0.4, peach: 0.4, berry: 0.15, pumpkin: 0.6,
+};
+export function servingLb(crop: string): number {
+    const c = crop.toLowerCase();
+    if (SERVING_LB[c]) return SERVING_LB[c];
+    for (const k in SERVING_LB) if (c.includes(k) || k.includes(c.split(" ")[0])) return SERVING_LB[k];
+    return 0.3;
+}
+/** Scarcity premium: the fewer weekly servings you can make, the more a limited-edition dish carries. */
+export function scarcityLift(servings: number): number {
+    if (servings <= 25) return 5;
+    if (servings <= 50) return 3.5;
+    if (servings <= 90) return 2.25;
+    if (servings <= 150) return 1.25;
+    return 0.75;
+}
+export interface ScarcityDish {
+    dish: Dish; crop: string; farm?: string; farmId?: string;
+    servings: number; oldPrice: number; freshLift: number; scarcity: number; newPrice: number;
+    weeklyUplift: number; monthlyUplift: number; copy: string;
+}
+/** Cross the menu with what you source fresh: limited weekly weight becomes limited servings + scarcity pricing. */
+export function menuScarcity(items: SourcingItem[], dishes: Dish[], farms: Farm[]): ScarcityDish[] {
+    const sourced = items.filter((i) => ["matched", "agreed", "delivering", "live"].includes(i.stage));
+    const out: ScarcityDish[] = [];
+    for (const d of dishes) {
+        const name = d.name.toLowerCase();
+        const item = sourced.find((i) => { const t = i.crop.toLowerCase().split(" "); return t.some((w) => name.includes(w)); });
+        if (!item) continue;
+        const farm = farms.find((f) => f.id === item.farmId);
+        const servings = Math.max(1, Math.floor((item.qtyPerWeek || 0) / servingLb(item.crop)));
+        const freshLift = Math.max(2, item.lift || 3);
+        const scarcity = scarcityLift(servings);
+        const newPrice = Math.round((d.price + freshLift + scarcity) * 2) / 2; // round to $0.50
+        const weeklyUplift = servings * (freshLift + scarcity);
+        out.push({
+            dish: d, crop: item.crop, farm: farm?.name, farmId: item.farmId,
+            servings, oldPrice: d.price, freshLift, scarcity, newPrice,
+            weeklyUplift, monthlyUplift: Math.round(weeklyUplift * 4.345),
+            copy: `${d.name} — ${farm?.name ?? "local farm"} ${item.crop}. Only ${servings} a week.`,
+        });
+    }
+    return out.sort((a, b) => b.monthlyUplift - a.monthlyUplift);
+}
+
 // ---- service-level penalties: protect the restaurant, paid from the farm's escrow ----
 export const PENALTY_POLICY = { latePct: 0.10, shortPct: 0.25, qcPct: 1.0 };
 export type PenaltyKind = "late" | "short" | "qc";
