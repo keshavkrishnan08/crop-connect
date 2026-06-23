@@ -5,6 +5,35 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
+/** Read an image File and downscale it to a compact JPEG data URL — small enough to store/sync per delivery. */
+export async function fileToCompactDataUrl(file: File, maxPx = 1024, quality = 0.72): Promise<string> {
+    const raw = await new Promise<string>((res, rej) => {
+        const r = new FileReader();
+        r.onload = () => res(String(r.result));
+        r.onerror = () => rej(new Error("read failed"));
+        r.readAsDataURL(file);
+    });
+    try {
+        const img = await new Promise<HTMLImageElement>((res, rej) => {
+            const i = new Image();
+            i.onload = () => res(i);
+            i.onerror = () => rej(new Error("decode failed"));
+            i.src = raw;
+        });
+        const scale = Math.min(1, maxPx / Math.max(img.width || maxPx, img.height || maxPx));
+        const w = Math.max(1, Math.round((img.width || maxPx) * scale));
+        const h = Math.max(1, Math.round((img.height || maxPx) * scale));
+        const canvas = document.createElement("canvas");
+        canvas.width = w; canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        if (!ctx) return raw;
+        ctx.drawImage(img, 0, 0, w, h);
+        return canvas.toDataURL("image/jpeg", quality);
+    } catch {
+        return raw; // worst case, keep the original
+    }
+}
+
 /** Format dollars (number) → "$1,240" or "$12.50". */
 export function usd(n: number, opts: { cents?: boolean; compact?: boolean } = {}): string {
     const v = n ?? 0;
