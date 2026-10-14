@@ -150,7 +150,8 @@ function Onboarding({ r, onBack }: { r: Report; onBack: () => void }) {
     const [restaurant, setRestaurant] = React.useState(prefill);
     const [contact, setContact] = React.useState("");
     const [email, setEmail] = React.useState("");
-    const [phone, setPhone] = React.useState("");
+    const [role, setRole] = React.useState("");
+    const [city, setCity] = React.useState(r.city);
     const [note, setNote] = React.useState("");
     const [status, setStatus] = React.useState<"idle" | "sending" | "done" | "error">("idle");
 
@@ -161,9 +162,9 @@ function Onboarding({ r, onBack }: { r: Report; onBack: () => void }) {
         const fields = {
             "Contact name": contact,
             Email: email,
-            Phone: phone || "not given",
+            Role: role || "not given",
             Restaurant: restaurant || r.name,
-            City: r.city,
+            City: city || r.city,
             "Covers per week": r.covers.toLocaleString(),
             "Monthly opportunity": usd(r.monthly),
             "Annual opportunity": usd(r.annual),
@@ -194,52 +195,105 @@ function Onboarding({ r, onBack }: { r: Report; onBack: () => void }) {
 
     if (status === "done") {
         return (
-            <section className="mx-auto max-w-xl px-5 py-16 text-center">
-                <div className="rounded-[2rem] border border-brand-200 bg-gradient-to-br from-brand-50/70 to-canvas-soft p-8 shadow-card sm:p-10">
-                    <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-500 text-white"><Check size={26} /></span>
-                    <h1 className="mt-5 font-display text-3xl leading-tight text-ink sm:text-4xl">You are in{restaurant ? `, ${restaurant}` : ""}.</h1>
-                    <p className="mt-3 text-lg text-ink-muted">Keshav will reach out within a day to set up your first local dish. Nothing to pay, nothing to install.</p>
-                    <div className="mx-auto mt-6 max-w-sm rounded-2xl border border-line bg-white p-4 text-left">
-                        <p className="text-2xs uppercase tracking-[0.16em] text-ink-faint">We are chasing</p>
-                        <p className="mt-1 font-display text-2xl text-ink">{usd(r.annual, { compact: true })}/year <span className="text-base font-normal text-ink-muted">in new margin</span></p>
-                    </div>
-                    <Link href="/" className="btn-ghost mt-6 inline-flex">Back to site</Link>
+            <section className="mx-auto max-w-md px-5 py-20 text-center">
+                <span className="mx-auto grid h-12 w-12 place-items-center rounded-2xl bg-brand-500 text-white"><Check size={24} /></span>
+                <h1 className="mt-5 font-display text-3xl leading-tight text-ink">Request received{restaurant ? `, ${restaurant}` : ""}.</h1>
+                <p className="mt-3 text-ink-muted">We will email {email || "you"} within one business day with your first farm match and a sourcing plan. No card, nothing to install.</p>
+                <div className="mx-auto mt-7 flex max-w-xs items-center justify-between rounded-2xl border border-line bg-canvas-soft px-5 py-4 text-left">
+                    <span className="text-[13px] text-ink-muted">On the table</span>
+                    <span className="font-display text-xl text-ink">{usd(r.annual, { compact: true })}/yr</span>
                 </div>
+                <Link href="/" className="btn-ghost mt-7 inline-flex">Back to site</Link>
             </section>
         );
     }
 
+    const inputCls = "w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink shadow-sm outline-none transition placeholder:text-ink-faint focus:border-brand-500 focus:ring-2 focus:ring-brand-200";
+    const labelCls = "mb-1.5 block text-[13px] font-semibold text-ink-soft";
+
     return (
-        <section className="mx-auto max-w-xl px-5 py-10 sm:py-14">
+        <section className="mx-auto max-w-5xl px-5 py-10 sm:py-14">
             <button onClick={onBack} className="text-sm font-medium text-ink-muted hover:text-ink">&larr; Back to your audit</button>
 
-            <div className="mt-5 rounded-[2rem] border border-brand-200 bg-gradient-to-br from-brand-50/70 to-canvas-soft p-6 text-center shadow-card sm:p-8">
-                <p className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-600"><Sparkle size={13} /> Start free</p>
-                <h1 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-[2.4rem]">Let us claim your <span className="text-gradient">{usd(r.annual, { compact: true })}/year</span>.</h1>
-                <p className="mt-3 text-ink-muted">We set up your first local dish this week. Your first ingredient is on us, and there is no commitment.</p>
-                <div className="mt-5 flex flex-wrap justify-center gap-2">
-                    {[`${usd(r.monthly, { compact: r.monthly > 9999 })}/mo on the table`, `${r.rows.length} dishes to localize`, `${r.farms.length} farms near ${r.city.split(",")[0]}`].map((t) => (
-                        <span key={t} className="rounded-full border border-line bg-white px-3 py-1 text-2xs font-semibold text-ink-soft">{t}</span>
-                    ))}
+            <div className="mt-6 grid gap-10 lg:grid-cols-[1.02fr_1fr] lg:gap-16">
+                <div className="lg:pt-4">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">Get started</p>
+                    <h1 className="mt-3 font-display text-4xl leading-[1.04] text-ink sm:text-[3rem]">Set up your first local dish this week.</h1>
+                    <p className="mt-4 max-w-md text-lg leading-relaxed text-ink-muted">Tell us about your kitchen. You will get a farm match and a sourcing plan back within one business day. Your first ingredient is on us.</p>
+
+                    <div className="mt-8 rounded-3xl border border-line bg-canvas-soft p-6 shadow-card">
+                        <p className="text-2xs font-semibold uppercase tracking-[0.16em] text-ink-faint">Your opportunity</p>
+                        <p className="mt-1.5 font-display text-[2.6rem] leading-none text-ink">{usd(r.annual, { compact: true })}<span className="ml-1 text-xl font-normal text-ink-muted">/year</span></p>
+                        <div className="mt-5 grid grid-cols-3 gap-3 border-t border-line pt-4">
+                            {([[usd(r.monthly, { compact: r.monthly > 9999 }), "per month"], [String(r.rows.length), r.rows.length === 1 ? "local dish" : "local dishes"], [String(r.farms.length), `farms near ${r.city.split(",")[0]}`]] as const).map(([n, l]) => (
+                                <div key={l}><p className="font-mono text-[17px] font-semibold text-ink tnum">{n}</p><p className="mt-0.5 text-2xs leading-tight text-ink-faint">{l}</p></div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <ol className="mt-8 space-y-4">
+                        {([["We match the farms", "Vetted growers near you, matched dish by dish"], ["We contract and deliver", "Negotiated, signed, and dropped off every week"], ["You cook", "Same plates, a story your guests pay more for"]] as const).map(([t, s], i) => (
+                            <li key={i} className="flex gap-3.5">
+                                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-lg bg-brand-50 font-mono text-xs font-bold text-brand-600">{i + 1}</span>
+                                <div><p className="text-[15px] font-semibold text-ink">{t}</p><p className="text-[13px] text-ink-muted">{s}</p></div>
+                            </li>
+                        ))}
+                    </ol>
                 </div>
+
+                <form onSubmit={submit} className="self-start rounded-[1.75rem] border border-line bg-canvas-soft p-6 shadow-card sm:p-8 lg:sticky lg:top-8">
+                    <h2 className="font-display text-xl text-ink">Request your setup</h2>
+                    <p className="mt-1 text-[13px] text-ink-muted">Takes a minute. No card, no commitment.</p>
+
+                    <div className="mt-6 space-y-4">
+                        <div>
+                            <label htmlFor="o-name" className={labelCls}>Full name</label>
+                            <input id="o-name" className={inputCls} value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Alex Rivera" autoComplete="name" required />
+                        </div>
+                        <div>
+                            <label htmlFor="o-email" className={labelCls}>Work email</label>
+                            <input id="o-email" className={inputCls} type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="alex@rosewood.com" autoComplete="email" required />
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="o-rest" className={labelCls}>Restaurant</label>
+                                <input id="o-rest" className={inputCls} value={restaurant} onChange={(e) => setRestaurant(e.target.value)} placeholder="Rosewood" />
+                            </div>
+                            <div>
+                                <label htmlFor="o-role" className={labelCls}>Your role</label>
+                                <select id="o-role" className={inputCls} value={role} onChange={(e) => setRole(e.target.value)}>
+                                    <option value="">Select</option>
+                                    <option>Owner</option>
+                                    <option>General manager</option>
+                                    <option>Executive chef</option>
+                                    <option>Buyer or purchasing</option>
+                                    <option>Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="grid gap-4 sm:grid-cols-2">
+                            <div>
+                                <label htmlFor="o-city" className={labelCls}>City</label>
+                                <input id="o-city" className={inputCls} value={city} onChange={(e) => setCity(e.target.value)} placeholder="Indianapolis, IN" />
+                            </div>
+                            <div>
+                                <label htmlFor="o-covers" className={labelCls}>Covers per week</label>
+                                <input id="o-covers" className={`${inputCls} bg-canvas text-ink-muted`} value={r.covers.toLocaleString()} readOnly />
+                            </div>
+                        </div>
+                        <div>
+                            <label htmlFor="o-note" className={labelCls}>Anything we should know <span className="font-normal text-ink-faint">(optional)</span></label>
+                            <textarea id="o-note" className={`${inputCls} h-20 resize-none`} value={note} onChange={(e) => setNote(e.target.value)} placeholder="We change our menu seasonally and want to lead with local." />
+                        </div>
+                    </div>
+
+                    <button type="submit" disabled={status === "sending"} className="btn-primary mt-6 w-full justify-center disabled:opacity-60">
+                        {status === "sending" ? "Sending..." : <>Request my setup <ArrowRight size={18} /></>}
+                    </button>
+                    {status === "error" && <p className="mt-3 text-center text-[13px] font-medium text-red-600">That did not go through. Email keshavkrishnanbusiness@gmail.com and we will set you up.</p>}
+                    <p className="mt-3 text-center text-2xs text-ink-faint">We reply within one business day, and only use this to reach out about your sourcing.</p>
+                </form>
             </div>
-
-            <form onSubmit={submit} className="mt-6 rounded-3xl border border-line bg-canvas-soft p-6 shadow-card sm:p-7">
-                <div className="grid gap-4 sm:grid-cols-2">
-                    <label className="block"><span className="label">Your name</span><input className="field" value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Alex Rivera" required /></label>
-                    <label className="block"><span className="label">Restaurant</span><input className="field" value={restaurant} onChange={(e) => setRestaurant(e.target.value)} placeholder="Rosewood" /></label>
-                    <label className="block"><span className="label">Email</span><input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@restaurant.com" required /></label>
-                    <label className="block"><span className="label">Phone <span className="text-ink-faint">(optional)</span></span><input className="field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(317) 555 0199" /></label>
-                </div>
-                <label className="mt-4 block"><span className="label">Anything you want us to know <span className="text-ink-faint">(optional)</span></span>
-                    <textarea className="field h-24 resize-none" value={note} onChange={(e) => setNote(e.target.value)} placeholder="We change our menu seasonally and want to lead with local." /></label>
-
-                <button type="submit" disabled={status === "sending"} className="btn-primary mt-5 w-full disabled:opacity-60">
-                    {status === "sending" ? "Sending..." : <>Claim my {usd(r.annual, { compact: true })}/year <ArrowRight size={18} /></>}
-                </button>
-                {status === "error" && <p className="mt-3 text-center text-[13px] font-medium text-red-600">That did not go through. Email keshavkrishnanbusiness@gmail.com and we will set you up.</p>}
-                <p className="mt-3 text-center text-2xs text-ink-faint">We only use this to reach out about your sourcing. No spam, ever.</p>
-            </form>
         </section>
     );
 }

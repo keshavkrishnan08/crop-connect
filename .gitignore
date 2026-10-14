@@ -17,3 +17,5 @@ pitch-deck.html
 /*.png
 test.txt
 .env*.bak
+.vercel
+.env*
