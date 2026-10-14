@@ -25,7 +25,7 @@ The menu price moves. The food cost barely does.
 
 | Feature | Where | Detail |
 |---|---|---|
-| **Meeting request** | `/contact` | A standard B2B form (name, work email, optional phone, restaurant, role, locations, city, topic) sent to a form service that emails the lead (Web3Forms when a key is configured, FormSubmit otherwise). Old `/audit` links redirect here. |
+| **Meeting request** | `/contact` | A standard B2B form (name, work email, optional phone, restaurant, role, locations, city, topic) sent to a form service that emails the lead (Web3Forms when a key is configured, FormSubmit otherwise). Old `/audit` links redirect here (next.config.mjs). |
 | **Margin demo** | `/demo` | A six-step walkthrough (Restaurant, Menu, Read, Margins, Upside, Plan) that lifts the current blended margin to a modeled one using the kitchen's own numbers. |
 | **Farm ranking** | `rankFarms` in `lib/store.ts` | Score out of 100: crop match **55**, reliability **22**, distance **13** (linear to zero at 60 miles), price **10**. Returns up to three plain-language reasons per match. |
 | **Contracts** | `/app/sourcing/[id]` | Posted price per unit, a 12-week default term, weekly cadence, and 11 optional quality specs (organic, 48-hour harvest, cold chain, Brix, and more), each with its own price add-on. |
@@ -66,7 +66,7 @@ The marketing pages, `/contact`, and `/demo` run with no setup. For accounts, se
 app/
   page.tsx               landing page
   contact/               meeting request form
-  audit/                 redirect to /contact
+  (/audit redirects to /contact in next.config.mjs)
   demo/                  six-step margin walkthrough
   how-it-works/  what-we-handle/  pricing/  for-farms/   marketing pages
   sign-in/               Supabase email and password auth

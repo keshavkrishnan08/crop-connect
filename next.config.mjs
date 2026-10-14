@@ -16,6 +16,10 @@ const nextConfig = {
             },
         ],
     },
+    async redirects() {
+        // The self-serve audit was replaced by a meeting request.
+        return [{ source: "/audit", destination: "/contact", permanent: true }];
+    },
 };
 
 export default nextConfig;
