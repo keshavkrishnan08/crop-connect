@@ -1,16 +1,15 @@
 # CropConnect
 
-**Done-for-you local produce sourcing for restaurants. A free menu audit shows a kitchen the margin it is leaving on the table, and an operator app runs the farms, contracts, and deliveries that capture it.**
+**Done-for-you local produce sourcing for restaurants. A kitchen books a call, and an operator app runs the farms, contracts, and deliveries that turn local ingredients into margin.**
 
 Independent kitchens have already called every supplier and cut every cost. There is little left to trim, so the lever that remains is price, and food from a named farm down the road is what diners pay more for. A local dish can carry a few dollars more while its food cost barely changes. Most kitchens skip it anyway, because sourcing locally means calling farms, chasing trucks, and hoping someone shows up. CropConnect treats local sourcing as a margin problem, not a procurement chore: it starts from the menu, prices the upside dish by dish, and then runs the supply side so the kitchen only cooks.
 
 Live site: **https://cropconnect.dev**
 
 ```
-pasted menu  ->  parse dishes (trailing price, category, produce keywords)
+meeting request (/contact)  ->  emailed lead  ->  call: menu, margins, nearby farms
              ->  margin model: (price lift - produce cost) x attach rate x weekly covers
              ->  rank farms per dish (crop match, reliability, distance, price)
-             ->  audit report  ->  setup request  ->  emailed lead
 operator app:  request  ->  farm chosen  ->  under contract  ->  delivering  ->  live on menu
 ```
 
@@ -26,8 +25,7 @@ The menu price moves. The food cost barely does.
 
 | Feature | Where | Detail |
 |---|---|---|
-| **Free margin audit** | `/audit` | Paste a menu, set weekly covers (200 to 3,000). Returns up to **6** dishes to bring local, a matched farm for each, and the monthly and annual margin. No login. Runs entirely in the browser. |
-| **Setup request** | `/audit`, after the report | Name, email, role, and notes are sent with the audit figures to a form service that emails the lead (Web3Forms when a key is configured, FormSubmit otherwise). |
+| **Meeting request** | `/contact` | A standard B2B form (name, work email, optional phone, restaurant, role, locations, city, topic) sent to a form service that emails the lead (Web3Forms when a key is configured, FormSubmit otherwise). Old `/audit` links redirect here. |
 | **Margin demo** | `/demo` | A six-step walkthrough (Restaurant, Menu, Read, Margins, Upside, Plan) that lifts the current blended margin to a modeled one using the kitchen's own numbers. |
 | **Farm ranking** | `rankFarms` in `lib/store.ts` | Score out of 100: crop match **55**, reliability **22**, distance **13** (linear to zero at 60 miles), price **10**. Returns up to three plain-language reasons per match. |
 | **Contracts** | `/app/sourcing/[id]` | Posted price per unit, a 12-week default term, weekly cadence, and 11 optional quality specs (organic, 48-hour harvest, cold chain, Brix, and more), each with its own price add-on. |
@@ -48,7 +46,7 @@ The menu price moves. The food cost barely does.
 
 **State.** The operator app runs on a small dependency-free store (`useSyncExternalStore`) seeded with a demo restaurant, six farms, and live sourcing items, persisted to `localStorage`. The first paint always uses the deterministic seed so server and client render the same markup. When Supabase is configured, `SupabaseSync` pulls the signed-in account after mount, then pushes every change through a 600 ms debounce and a serialized writer that never runs two pushes at once and always persists the latest state. Rows map to `restaurants`, `dishes`, `sourcing_items`, `deliveries`, `orders`, and `activity`.
 
-**Graceful fallback.** With no Supabase keys, middleware lets everything through and the app runs as a local demo. With no Web3Forms key, the lead form posts to FormSubmit's AJAX endpoint instead. The marketing site and the audit need no configuration.
+**Graceful fallback.** With no Supabase keys, middleware lets everything through and the app runs as a local demo. With no Web3Forms key, the lead form posts to FormSubmit's AJAX endpoint instead. The marketing site and the meeting form need no configuration.
 
 **Discoverability.** `app/robots.ts` explicitly allows AI crawlers, `app/sitemap.ts` lists the five marketing routes, `public/llms.txt` describes the service for language models, and the root layout ships Organization and WebSite JSON-LD.
 
@@ -60,14 +58,15 @@ npm run dev        # http://localhost:3000
 npm run build      # production build
 ```
 
-The marketing pages, `/audit`, and `/demo` run with no setup. For accounts, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. For lead email through Web3Forms, set `NEXT_PUBLIC_WEB3FORMS_KEY`.
+The marketing pages, `/contact`, and `/demo` run with no setup. For accounts, set `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` in `.env.local`. For lead email through Web3Forms, set `NEXT_PUBLIC_WEB3FORMS_KEY`.
 
 ## Layout
 
 ```
 app/
   page.tsx               landing page
-  audit/                 free margin audit and setup request form
+  contact/               meeting request form
+  audit/                 redirect to /contact
   demo/                  six-step margin walkthrough
   how-it-works/  what-we-handle/  pricing/  for-farms/   marketing pages
   sign-in/               Supabase email and password auth
@@ -91,13 +90,13 @@ public/llms.txt          plain-text description for language models
 
 ## Honesty
 
-* The farm network in the code is a seed list of six farms around Indianapolis, and the audit
+* The farm network in the code is a seed list of six farms around Indianapolis, and the demo
   matches every city against them. Farm details in the app (year established, acreage, capacity)
   are derived from those seed records, not collected from the farms.
 * Contracts, escrow, payouts, and SLA credits are modeled in the browser store. No payment
   provider is wired in yet.
 * Sage and the autonomous run are deterministic. Farm replies in a contract thread are scripted,
   and Sage answers from local state without calling a model.
-* The audit is a model with stated assumptions, not a guarantee. Every input is editable and every
+* The margin model is a set of stated assumptions, not a guarantee. Every input is editable and every
   uplift is shown as a range.
 * The Supabase schema is not in the repo (`/supabase/` is git-ignored).

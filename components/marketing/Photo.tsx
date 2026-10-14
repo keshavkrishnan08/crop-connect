@@ -1,12 +1,14 @@
-/** A real, keyword-matched photo (stable locked seed). Plain lazy <img>, no config needed. */
+import { photoFor } from "@/lib/photos";
+
+/** A topic-matched photo from the shared library in lib/photos.ts. */
 export function Photo({ q, alt, seed = 1, caption, place, className = "" }: { q: string; alt: string; seed?: number; caption?: string; place?: string; className?: string }) {
     return (
         <figure className={`group relative overflow-hidden rounded-3xl ring-1 ring-line ${className}`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-                src={`https://loremflickr.com/900/700/${encodeURIComponent(q)}?lock=${seed}`}
+                src={photoFor(q, seed)}
                 alt={alt}
-                loading="lazy"
+                decoding="async"
                 className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
             {(caption || place) && (

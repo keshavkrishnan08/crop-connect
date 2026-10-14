@@ -9,7 +9,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { Check, X, ArrowRight, Receipt, Shield, Truck, Handshake, Leaf, Route, Calendar, MarginUp, Sparkle } from "@/components/icons";
 
 export const metadata: Metadata = {
-    title: "Pricing — CropConnect",
+    title: "Pricing",
     description: "You fund the food at cost. We charge a monthly service fee that scales with the number of items you run, and drops the longer you commit.",
 };
 
@@ -50,7 +50,7 @@ export default function PricingPage() {
                         <Reveal><Eyebrow>Pricing</Eyebrow></Reveal>
                         <Reveal delay={0.05}><h1 className="mt-5 text-balance text-4xl leading-[1.05] sm:text-5xl lg:text-[3.4rem]">Pricing that <span className="ink-grad">scales with you.</span></h1></Reveal>
                         <Reveal delay={0.1}><p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-ink-muted">You fund the food at cost, no markup and no cut of your sales. On top of that is one monthly service fee. It scales with how much we run for you and drops the longer you commit.</p></Reveal>
-                        <Reveal delay={0.15}><div className="mt-8 flex justify-center"><LinkButton href="/audit" size="lg" className="gap-2">Get a free audit <ArrowRight size={18} /></LinkButton></div></Reveal>
+                        <Reveal delay={0.15}><div className="mt-8 flex justify-center"><LinkButton href="/contact" size="lg" className="gap-2">Book a meeting <ArrowRight size={18} /></LinkButton></div></Reveal>
                     </div>
                 </section>
 
@@ -77,7 +77,7 @@ export default function PricingPage() {
                             <div className="mt-6 rounded-3xl border border-brand-200 bg-brand-50/50 p-7 text-center">
                                 <p className="text-[16px] text-ink-soft">You pay <b className="text-ink">from $299/mo</b> for the service. The food is funded separately, at cost.</p>
                                 <p className="mt-4 inline-flex items-center gap-2 rounded-full border border-brand-200 bg-white px-4 py-2 text-[13.5px] font-semibold text-brand-700"><Shield size={15} /> We find more than we cost, or your month is free.</p>
-                                <div className="mt-5"><LinkButton href="/audit" className="gap-2">See your number <ArrowRight size={17} /></LinkButton></div>
+                                <div className="mt-5"><LinkButton href="/contact" className="gap-2">Talk to us <ArrowRight size={17} /></LinkButton></div>
                             </div>
                         </Reveal>
                     </div>

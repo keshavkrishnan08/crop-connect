@@ -20,7 +20,7 @@ import {
 } from "@/components/icons";
 
 export const metadata = {
-    title: "What we handle · CropConnect",
+    title: "What we handle",
     description: "Sage runs the entire local supply chain for your restaurant. You say what you want and put it on the menu. Here is everything in between.",
 };
 

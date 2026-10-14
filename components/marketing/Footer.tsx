@@ -13,7 +13,7 @@ export function MarketingFooter() {
                     <div className="grid grid-cols-2 gap-x-12 gap-y-2 text-sm sm:grid-cols-3">
                         <FCol title="Product" links={[["See your numbers", "/demo"], ["How it works", "/how-it-works"], ["What we handle", "/what-we-handle"], ["Pricing", "/pricing"]]} />
                         <FCol title="Partners" links={[["For farms", "/for-farms"], ["Sign in", "/app"]]} />
-                        <FCol title="Start" links={[["See your numbers", "/demo"], ["Talk to us", "/demo"]]} />
+                        <FCol title="Start" links={[["Book a meeting", "/contact"], ["See the demo", "/demo"]]} />
                     </div>
                 </div>
                 <div className="mt-10 flex flex-col items-start justify-between gap-3 border-t border-line pt-6 text-[12.5px] text-ink-faint sm:flex-row sm:items-center">

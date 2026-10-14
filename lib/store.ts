@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { photoFor } from "./photos";
 import { type Dish, type Restaurant, type Levers, DEFAULT_LEVERS, parseMenu, SAMPLES, computeUplift } from "@/lib/margin";
 import { uid, usd } from "@/lib/utils";
 
@@ -519,7 +520,7 @@ export const actions = {
     sendPreDeliveryPhoto(itemId: string, deliveryId: string) {
         const item = state.items.find((i) => i.id === itemId);
         const farm = state.farms.find((f) => f.id === item?.farmId);
-        const photo = `https://loremflickr.com/600/450/${encodeURIComponent(item?.crop ?? "produce")},farm,fresh?lock=${(deliveryId.charCodeAt(3) || 9) + 11}`;
+        const photo = photoFor(`${item?.crop ?? "produce"} crate`, (deliveryId.charCodeAt(3) || 9) + 11, 600);
         set((s) => ({
             ...s, items: s.items.map((i) => {
                 if (i.id !== itemId) return i;

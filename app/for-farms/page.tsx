@@ -29,7 +29,7 @@ import {
 } from "@/components/icons";
 
 export const metadata: Metadata = {
-    title: "For farms — CropConnect",
+    title: "For farms",
     description: "Restaurants want committed local supply. Sage brings you recurring demand, prices set up front, reliable pay, and runs the chef relationship and logistics.",
 };
 

@@ -2,15 +2,16 @@
 
 import { motion } from "framer-motion";
 import { MapPin } from "@/components/icons";
+import { photoUrl, type PhotoKey } from "@/lib/photos";
 
-/** Real, keyword-matched photos (stable locked seeds). Plain <img>, lazy-loaded. */
-const TILES: { q: string; label: string; place: string; feature?: boolean }[] = [
-    { q: "heirloom,tomatoes", label: "Heirloom tomatoes", place: "Teter Farm", feature: true },
-    { q: "salad,greens", label: "Garden greens", place: "Blue Oak" },
+/** Produce photos from the shared library in lib/photos.ts. */
+const TILES: { q: PhotoKey; label: string; place: string; feature?: boolean }[] = [
+    { q: "tomatoCrate", label: "Heirloom tomatoes", place: "Teter Farm", feature: true },
+    { q: "greens", label: "Garden greens", place: "Blue Oak" },
     { q: "mushrooms", label: "Mushrooms", place: "Ember & Lu" },
-    { q: "fresh,herbs", label: "Herbs", place: "Blue Oak" },
-    { q: "squash,vegetable", label: "Summer squash", place: "Sunfield" },
-    { q: "farm,field,vegetables", label: "Picked this week", place: "Sebastopol" },
+    { q: "herbs", label: "Herbs", place: "Blue Oak" },
+    { q: "squash", label: "Summer squash", place: "Sunfield" },
+    { q: "produce", label: "Picked this week", place: "Sebastopol" },
 ];
 
 export function ProduceGallery() {
@@ -27,9 +28,9 @@ export function ProduceGallery() {
                 >
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                        src={`https://loremflickr.com/800/800/${t.q}?lock=${i + 21}`}
+                        src={photoUrl(t.q, t.feature ? 1000 : 600)}
                         alt={t.label}
-                        loading="lazy"
+                        decoding="async"
                         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                     />
                     <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-ink/55 via-transparent to-transparent" />

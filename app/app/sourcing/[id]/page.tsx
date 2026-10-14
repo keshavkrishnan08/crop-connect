@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { photoFor } from "@/lib/photos";
 import Link from "next/link";
 import { useStore, actions, farmById, loiPrice, QUALITY_OPTIONS, farmDueDiligence, orderEscrow, ESCROW_LABEL, supplyHeadline, SUPPLY_TONE, type SourcingItem, type Farm, type Delivery, type SupplyUpdate } from "@/lib/store";
 import { AgentAvatar, AGENT_NAME } from "@/components/app/AgentDock";
@@ -452,7 +453,7 @@ function DeliveriesTab({ item, signed, onGoTerms }: { item: SourcingItem; signed
 function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
     const loi = item.loi!;
     const meta = item.deliveryMeta?.[d.id];
-    const prePhoto = meta?.prePhoto ?? (d.status !== "confirmed" ? `https://loremflickr.com/600/450/${encodeURIComponent(item.crop)},farm,harvest?lock=${(d.id.charCodeAt(1) || 5) + d.qty + 3}` : undefined);
+    const prePhoto = meta?.prePhoto ?? (d.status !== "confirmed" ? photoFor(`${item.crop} harvest`, (d.id.charCodeAt(1) || 5) + d.qty + 3, 600) : undefined);
     const [open, setOpen] = React.useState(false);
     const [photo, setPhoto] = React.useState<string | null>(null);
     const [checks, setChecks] = React.useState<Record<number, boolean>>({});
@@ -468,7 +469,7 @@ function DeliveryRow({ item, d }: { item: SourcingItem; d: Delivery }) {
         if (!f) return;
         try { setPhoto(await fileToCompactDataUrl(f)); } catch { /* keep flow alive */ }
     }
-    function useSample() { setPhoto(`https://loremflickr.com/600/450/${encodeURIComponent(item.crop)},produce,fresh?lock=${(d.id.charCodeAt(2) || 7) + d.qty}`); }
+    function useSample() { setPhoto(photoFor(`${item.crop} crate`, (d.id.charCodeAt(2) || 7) + d.qty, 600)); }
     function confirm() {
         if (!photo) return;
         actions.confirmDeliveryProof(item.id, d.id, photo, allChecked);

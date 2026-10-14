@@ -24,7 +24,7 @@ import {
 } from "@/components/icons";
 
 export const metadata = {
-    title: "How it works · CropConnect",
+    title: "How it works",
     description: "Sage runs your local sourcing end to end. You say what you want and put it on the menu. Here is every step.",
 };
 
