@@ -9,16 +9,25 @@ import { usd } from "@/lib/utils";
 import { ArrowRight, Leaf, MapPin, Check, Sparkle, MarginUp } from "@/components/icons";
 
 const WEEKS = 4.345;
+const WEB3FORMS_KEY = process.env.NEXT_PUBLIC_WEB3FORMS_KEY || "";
+
+type Report = ReturnType<typeof buildReport>;
 
 export default function AuditPage() {
     const [name, setName] = React.useState("");
     const [city, setCity] = React.useState("Indianapolis, IN");
     const [covers, setCovers] = React.useState(800);
     const [menu, setMenu] = React.useState("");
-    const [report, setReport] = React.useState<null | ReturnType<typeof buildReport>>(null);
+    const [report, setReport] = React.useState<null | Report>(null);
+    const [lead, setLead] = React.useState(false);
 
     function run() {
         setReport(buildReport(name.trim() || "Your restaurant", city, covers, menu || SAMPLES[0].menu));
+        if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function startOnboarding() {
+        setLead(true);
         if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -26,10 +35,12 @@ export default function AuditPage() {
         <main className="min-h-screen bg-canvas bg-aura">
             <header className="mx-auto flex max-w-5xl items-center justify-between px-5 py-5">
                 <Logo href="/" />
-                <Link href="/sign-in" className="text-sm font-semibold text-ink-soft hover:text-ink">Sign in</Link>
+                <Link href="/" className="text-sm font-semibold text-ink-soft hover:text-ink">Back to site</Link>
             </header>
 
-            {!report ? (
+            {lead && report ? (
+                <Onboarding r={report} onBack={() => setLead(false)} />
+            ) : !report ? (
                 <section className="mx-auto max-w-xl px-5 py-10 sm:py-16">
                     <p className="text-center text-xs font-semibold uppercase tracking-[0.2em] text-brand-600">Free sourcing audit</p>
                     <h1 className="mt-3 text-center font-display text-4xl leading-[1.05] text-ink sm:text-5xl">See your money on the table in 60 seconds.</h1>
@@ -49,7 +60,7 @@ export default function AuditPage() {
                         <p className="mt-3 text-center text-2xs text-ink-faint">No account, no card. Your menu is not stored.</p>
                     </div>
                 </section>
-            ) : <Report r={report} onReset={() => setReport(null)} />}
+            ) : <Report r={report} onReset={() => setReport(null)} onStart={startOnboarding} />}
         </main>
     );
 }
@@ -68,14 +79,14 @@ function buildReport(name: string, city: string, covers: number, menuText: strin
     return { name, city, covers, rows, monthly, annual: monthly * 12, farms, dishCount: dishes.length };
 }
 
-function Report({ r, onReset }: { r: ReturnType<typeof buildReport>; onReset: () => void }) {
+function Report({ r, onReset, onStart }: { r: Report; onReset: () => void; onStart: () => void }) {
     return (
         <section className="mx-auto max-w-3xl px-5 pb-20">
             <div className="rounded-[2rem] border border-brand-200 bg-gradient-to-br from-brand-50/70 to-canvas-soft p-7 text-center shadow-card sm:p-10">
                 <p className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-600"><Sparkle size={13} /> Audit for {r.name}</p>
                 <h1 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-[2.7rem]">You are leaving about <span className="text-gradient">{usd(r.monthly, { compact: r.monthly > 9999 })}</span> a month on the table.</h1>
                 <p className="mt-3 text-lg text-ink-muted">That is <b className="text-ink">{usd(r.annual, { compact: true })}/year</b> in extra margin from {r.rows.length} dishes you could bring local in {r.city.split(",")[0]}.</p>
-                <Link href="/sign-in" className="btn-primary mt-6 inline-flex">Start free, we set it up this week <ArrowRight size={18} /></Link>
+                <button onClick={onStart} className="btn-primary mt-6 inline-flex">Start free, we set it up this week <ArrowRight size={18} /></button>
                 <p className="mt-2 text-2xs text-ink-faint">Your first ingredient is on us. No commitment.</p>
             </div>
 
@@ -127,9 +138,108 @@ function Report({ r, onReset }: { r: ReturnType<typeof buildReport>; onReset: ()
             </div>
 
             <div className="mt-8 flex flex-col items-center gap-3 text-center">
-                <Link href="/sign-in" className="btn-primary inline-flex"><MarginUp size={18} /> Claim {usd(r.annual, { compact: true })}/year, start free</Link>
+                <button onClick={onStart} className="btn-primary inline-flex"><MarginUp size={18} /> Claim {usd(r.annual, { compact: true })}/year, start free</button>
                 <button onClick={onReset} className="text-sm font-medium text-ink-muted hover:text-ink">Run another audit</button>
             </div>
+        </section>
+    );
+}
+
+function Onboarding({ r, onBack }: { r: Report; onBack: () => void }) {
+    const prefill = r.name === "Your restaurant" ? "" : r.name;
+    const [restaurant, setRestaurant] = React.useState(prefill);
+    const [contact, setContact] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [phone, setPhone] = React.useState("");
+    const [note, setNote] = React.useState("");
+    const [status, setStatus] = React.useState<"idle" | "sending" | "done" | "error">("idle");
+
+    async function submit(e: React.FormEvent) {
+        e.preventDefault();
+        if (!contact.trim() || !email.trim()) return;
+        setStatus("sending");
+        const fields = {
+            "Contact name": contact,
+            Email: email,
+            Phone: phone || "not given",
+            Restaurant: restaurant || r.name,
+            City: r.city,
+            "Covers per week": r.covers.toLocaleString(),
+            "Monthly opportunity": usd(r.monthly),
+            "Annual opportunity": usd(r.annual),
+            "Dishes to localize": r.rows.map((x) => x.dish.name).join(", ") || "n/a",
+            Notes: note || "none",
+        };
+        const subject = `New CropConnect lead: ${restaurant || contact}`;
+        try {
+            const req = WEB3FORMS_KEY
+                ? fetch("https://api.web3forms.com/submit", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json", Accept: "application/json" },
+                      body: JSON.stringify({ access_key: WEB3FORMS_KEY, subject, from_name: "CropConnect onboarding", ...fields }),
+                  })
+                : fetch("https://formsubmit.co/ajax/keshavkrishnanbusiness@gmail.com", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json", Accept: "application/json" },
+                      body: JSON.stringify({ _subject: subject, _template: "table", _captcha: "false", ...fields }),
+                  });
+            const res = await req;
+            const ok = res.ok && Boolean((await res.json().catch(() => ({}))).success);
+            setStatus(ok ? "done" : "error");
+            if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "smooth" });
+        } catch {
+            setStatus("error");
+        }
+    }
+
+    if (status === "done") {
+        return (
+            <section className="mx-auto max-w-xl px-5 py-16 text-center">
+                <div className="rounded-[2rem] border border-brand-200 bg-gradient-to-br from-brand-50/70 to-canvas-soft p-8 shadow-card sm:p-10">
+                    <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-brand-500 text-white"><Check size={26} /></span>
+                    <h1 className="mt-5 font-display text-3xl leading-tight text-ink sm:text-4xl">You are in{restaurant ? `, ${restaurant}` : ""}.</h1>
+                    <p className="mt-3 text-lg text-ink-muted">Keshav will reach out within a day to set up your first local dish. Nothing to pay, nothing to install.</p>
+                    <div className="mx-auto mt-6 max-w-sm rounded-2xl border border-line bg-white p-4 text-left">
+                        <p className="text-2xs uppercase tracking-[0.16em] text-ink-faint">We are chasing</p>
+                        <p className="mt-1 font-display text-2xl text-ink">{usd(r.annual, { compact: true })}/year <span className="text-base font-normal text-ink-muted">in new margin</span></p>
+                    </div>
+                    <Link href="/" className="btn-ghost mt-6 inline-flex">Back to site</Link>
+                </div>
+            </section>
+        );
+    }
+
+    return (
+        <section className="mx-auto max-w-xl px-5 py-10 sm:py-14">
+            <button onClick={onBack} className="text-sm font-medium text-ink-muted hover:text-ink">&larr; Back to your audit</button>
+
+            <div className="mt-5 rounded-[2rem] border border-brand-200 bg-gradient-to-br from-brand-50/70 to-canvas-soft p-6 text-center shadow-card sm:p-8">
+                <p className="flex items-center justify-center gap-1.5 text-xs font-semibold uppercase tracking-[0.18em] text-brand-600"><Sparkle size={13} /> Start free</p>
+                <h1 className="mt-3 font-display text-3xl leading-tight text-ink sm:text-[2.4rem]">Let us claim your <span className="text-gradient">{usd(r.annual, { compact: true })}/year</span>.</h1>
+                <p className="mt-3 text-ink-muted">We set up your first local dish this week. Your first ingredient is on us, and there is no commitment.</p>
+                <div className="mt-5 flex flex-wrap justify-center gap-2">
+                    {[`${usd(r.monthly, { compact: r.monthly > 9999 })}/mo on the table`, `${r.rows.length} dishes to localize`, `${r.farms.length} farms near ${r.city.split(",")[0]}`].map((t) => (
+                        <span key={t} className="rounded-full border border-line bg-white px-3 py-1 text-2xs font-semibold text-ink-soft">{t}</span>
+                    ))}
+                </div>
+            </div>
+
+            <form onSubmit={submit} className="mt-6 rounded-3xl border border-line bg-canvas-soft p-6 shadow-card sm:p-7">
+                <div className="grid gap-4 sm:grid-cols-2">
+                    <label className="block"><span className="label">Your name</span><input className="field" value={contact} onChange={(e) => setContact(e.target.value)} placeholder="Alex Rivera" required /></label>
+                    <label className="block"><span className="label">Restaurant</span><input className="field" value={restaurant} onChange={(e) => setRestaurant(e.target.value)} placeholder="Rosewood" /></label>
+                    <label className="block"><span className="label">Email</span><input className="field" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@restaurant.com" required /></label>
+                    <label className="block"><span className="label">Phone <span className="text-ink-faint">(optional)</span></span><input className="field" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(317) 555 0199" /></label>
+                </div>
+                <label className="mt-4 block"><span className="label">Anything you want us to know <span className="text-ink-faint">(optional)</span></span>
+                    <textarea className="field h-24 resize-none" value={note} onChange={(e) => setNote(e.target.value)} placeholder="We change our menu seasonally and want to lead with local." /></label>
+
+                <button type="submit" disabled={status === "sending"} className="btn-primary mt-5 w-full disabled:opacity-60">
+                    {status === "sending" ? "Sending..." : <>Claim my {usd(r.annual, { compact: true })}/year <ArrowRight size={18} /></>}
+                </button>
+                {status === "error" && <p className="mt-3 text-center text-[13px] font-medium text-red-600">That did not go through. Email keshavkrishnanbusiness@gmail.com and we will set you up.</p>}
+                <p className="mt-3 text-center text-2xs text-ink-faint">We only use this to reach out about your sourcing. No spam, ever.</p>
+            </form>
         </section>
     );
 }

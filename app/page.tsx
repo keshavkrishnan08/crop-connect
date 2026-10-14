@@ -56,7 +56,7 @@ function Hero() {
                 <Reveal delay={0.42}><p className="mx-auto mt-7 max-w-xl text-xl leading-relaxed text-ink-muted">You run the kitchen. We run the supply. Local ingredients let you raise prices and stand out, but sourcing them is a job most kitchens never have time for. We do the whole thing for you.</p></Reveal>
                 <Reveal delay={0.5}>
                     <div className="mt-9 flex flex-wrap justify-center gap-3">
-                        <LinkButton href="/demo" size="lg">See your numbers <ArrowRight size={17} /></LinkButton>
+                        <LinkButton href="/audit" size="lg">See your numbers <ArrowRight size={17} /></LinkButton>
                         <LinkButton href="/how-it-works" variant="ghost" size="lg">How it works</LinkButton>
                     </div>
                 </Reveal>
@@ -93,7 +93,7 @@ function Result() {
             <Split reverse
                 text={<Benefit icon={<MarginUp size={22} />} eyebrow="The result" title="Local food lets you charge more."
                     body="When a dish comes from a named farm down the road, guests will pay more for it and feel good doing it. Your food cost barely moves. The menu price does. On a business this thin, that gap is almost pure profit."
-                    href="/demo" cta="See it on your menu" />}
+                    href="/audit" cta="See it on your menu" />}
                 visual={<MenuRepricing />}
             />
         </Section>
@@ -262,7 +262,7 @@ function StartFree() {
                     <span className="badge-harvest"><Sparkle size={13} /> No risk to try</span>
                     <h2 className="mt-5 font-display text-4xl leading-tight text-ink sm:text-5xl">Start free.</h2>
                     <p className="mx-auto mt-4 max-w-md text-lg leading-relaxed text-ink-muted">One local item. One week. Free, with no commitment. The first taste is on us, and the value sells the rest.</p>
-                    <div className="mt-8 flex justify-center"><LinkButton href="/demo" size="lg">Start free <ArrowRight size={17} /></LinkButton></div>
+                    <div className="mt-8 flex justify-center"><LinkButton href="/audit" size="lg">Start free <ArrowRight size={17} /></LinkButton></div>
                 </div>
             </Reveal>
         </Section>
@@ -280,7 +280,7 @@ function FinalCta() {
                         <h2 className="font-display text-4xl leading-[1.02] sm:text-6xl">Start with one dish.</h2>
                         <p className="mx-auto mt-5 max-w-md text-lg leading-relaxed text-white/75">See your own margin number in two minutes. Then let us source one ingredient for one week, free. If it does not earn its keep, you walk away.</p>
                         <div className="mt-10 flex flex-wrap justify-center gap-3">
-                            <LinkButton href="/demo" size="lg" className="bg-white !text-brand-700 hover:bg-canvas">See your numbers <ArrowRight size={17} /></LinkButton>
+                            <LinkButton href="/audit" size="lg" className="bg-white !text-brand-700 hover:bg-canvas">See your numbers <ArrowRight size={17} /></LinkButton>
                             <LinkButton href="/how-it-works" size="lg" variant="ghost" className="border-white/25 bg-white/10 text-white hover:bg-white/20">How it works</LinkButton>
                         </div>
                     </div>
