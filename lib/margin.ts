@@ -126,7 +126,7 @@ export function parseMenu(text: string): Dish[] {
         if (!m) continue;
         const price = parseFloat(m[1]);
         if (!price || price < 3 || price > 200) continue;
-        const name = line.replace(PRICE_RE, "").replace(/[. \-, ·|]+\s*$/, "").trim();
+        const name = line.replace(PRICE_RE, "").replace(/[.\u2014\-\u2014·|]+\s*$/, "").trim();
         if (!name || name.length < 2) continue;
         const category = inferCategory(name);
         const produceDriven = PRODUCE_HINTS.some((h) => name.toLowerCase().includes(h)) || category === "salad";
