@@ -28,11 +28,11 @@ const mono = JetBrains_Mono({
 export const metadata: Metadata = {
     metadataBase: new URL("https://cropconnect.dev"),
     title: {
-        default: "CropConnect — Done-for-you local produce sourcing for restaurants",
+        default: "CropConnect, Done-for-you local produce sourcing for restaurants",
         template: "%s · CropConnect",
     },
     description:
-        "CropConnect is a done-for-you local sourcing service for restaurants. An AI agent named Sage finds nearby farms, negotiates and signs seasonal supply contracts, manages delivery and quality, and holds payment in escrow — so a kitchen can put local produce on the menu and charge more for it without the work.",
+        "CropConnect is a done-for-you local sourcing service for restaurants. An AI agent named Sage finds nearby farms, negotiates and signs seasonal supply contracts, manages delivery and quality, and holds payment in escrow, so a kitchen can put local produce on the menu and charge more for it without the work.",
     keywords: [
         "how to source local produce for a restaurant", "local food sourcing for restaurants", "farm to table sourcing service",
         "restaurant produce supplier", "buy direct from local farms restaurant", "farm to restaurant platform",
@@ -40,13 +40,13 @@ export const metadata: Metadata = {
     ],
     alternates: { canonical: "/" },
     openGraph: {
-        title: "CropConnect — Done-for-you local produce sourcing for restaurants",
-        description: "An AI agent finds local farms, signs the supply contracts, and manages delivery and escrow — so your kitchen serves local and charges more, without the work.",
+        title: "CropConnect, Done-for-you local produce sourcing for restaurants",
+        description: "An AI agent finds local farms, signs the supply contracts, and manages delivery and escrow, so your kitchen serves local and charges more, without the work.",
         url: "https://cropconnect.dev",
         siteName: "CropConnect",
         type: "website",
     },
-    twitter: { card: "summary_large_image", title: "CropConnect — local sourcing for restaurants, done for you", description: "AI sources local farms, signs the contracts, runs delivery + escrow. Serve local, charge more." },
+    twitter: { card: "summary_large_image", title: "CropConnect, local sourcing for restaurants, done for you", description: "AI sources local farms, signs the contracts, runs delivery + escrow. Serve local, charge more." },
     robots: { index: true, follow: true, googleBot: { index: true, follow: true, "max-snippet": -1, "max-image-preview": "large" } },
 };
 

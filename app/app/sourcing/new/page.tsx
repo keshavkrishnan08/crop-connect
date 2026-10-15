@@ -69,7 +69,7 @@ export default function NewNeedPage() {
                     </div>
 
                     <FieldGroup label="Season / availability" hint="When you need it. We'll plan deliveries around the harvest window.">
-                        <Field placeholder="e.g. Jun–Sep" value={season} onChange={(e) => setSeason(e.target.value)} />
+                        <Field placeholder="e.g. Jun-Sep" value={season} onChange={(e) => setSeason(e.target.value)} />
                     </FieldGroup>
 
                     <div className="flex items-center justify-between rounded-xl bg-brand-50/60 px-4 py-3">

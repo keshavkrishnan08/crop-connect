@@ -25,7 +25,7 @@ export default function MenuPage() {
     const avgPlate = scarce.length ? scarce.reduce((s, d) => s + (d.freshLift + d.scarcity), 0) / scarce.length : 0;
 
     const copyMenu = () => {
-        const text = scarce.map((d) => `${d.dish.name} — ${usd(d.newPrice)}\n  Limited: ${d.farm} ${d.crop}, only ${d.servings}/week`).join("\n\n");
+        const text = scarce.map((d) => `${d.dish.name}, ${usd(d.newPrice)}\n  Limited: ${d.farm} ${d.crop}, only ${d.servings}/week`).join("\n\n");
         navigator.clipboard?.writeText(text);
         toast.success("Menu copied", "Paste it straight onto your menu.");
     };

@@ -4,7 +4,7 @@ import { Reveal, Stagger, StaggerItem } from "@/components/ui/Reveal";
 import { cn } from "@/lib/utils";
 
 /**
- * HONEST early-partner voices — role-only attribution, no fake photos or invented
+ * HONEST early-partner voices: role-only attribution, no fake photos or invented
  * customer counts. Swap these for real quotes once partners are live.
  */
 const QUOTES: { q: string; who: string; role: string; init: string; tone: "brand" | "harvest" | "ink" }[] = [

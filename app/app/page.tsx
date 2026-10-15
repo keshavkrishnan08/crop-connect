@@ -57,7 +57,7 @@ export default function Dashboard() {
                 <Kpi label="In escrow" value={usd(escrowHeld, { compact: escrowHeld > 9999 })} tone="violet" />
             </div>
 
-            {/* supply status — the live link to your farms */}
+            {/* supply status, the live link to your farms */}
             {active.length > 0 && (
                 <Card className="mb-6 p-5">
                     <div className="mb-3 flex items-center gap-2"><Bell size={16} className="text-brand-600" /><h3 className="text-[13px] font-medium text-ink-soft">Supply status</h3><span className="ml-auto text-2xs text-ink-faint">{AGENT_NAME} is watching every drop</span></div>

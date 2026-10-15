@@ -2,7 +2,7 @@
 
 import * as React from "react";
 
-/** Animated number — counts up on mount or whenever `to` changes. Respects reduced motion. */
+/** Animated number: counts up on mount or whenever `to` changes. Respects reduced motion. */
 export function CountUp({ to, duration = 900, format = (n) => Math.round(n).toString(), className }: { to: number; duration?: number; format?: (n: number) => string; className?: string }) {
     const [val, setVal] = React.useState(to);
     const from = React.useRef(to);

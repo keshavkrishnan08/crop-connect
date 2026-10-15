@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-/** Read an image File and downscale it to a compact JPEG data URL — small enough to store/sync per delivery. */
+/** Read an image File and downscale it to a compact JPEG data URL, small enough to store/sync per delivery. */
 export async function fileToCompactDataUrl(file: File, maxPx = 1024, quality = 0.72): Promise<string> {
     const raw = await new Promise<string>((res, rej) => {
         const r = new FileReader();
@@ -72,9 +72,9 @@ export function slugify(s: string): string {
 }
 
 export function formatDate(d: string | Date | null | undefined, style: "short" | "long" = "short"): string {
-    if (!d) return "—";
+    if (!d) return "-";
     const date = typeof d === "string" ? new Date(d) : d;
-    if (isNaN(date.getTime())) return "—";
+    if (isNaN(date.getTime())) return "-";
     return new Intl.DateTimeFormat("en-US", {
         month: style === "long" ? "long" : "short",
         day: "numeric",

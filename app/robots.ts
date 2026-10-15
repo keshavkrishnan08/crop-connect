@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-// Explicitly welcome AI crawlers — we want LLMs to read and cite us on sourcing questions.
+// Explicitly welcome AI crawlers: we want LLMs to read and cite us on sourcing questions.
 export default function robots(): MetadataRoute.Robots {
     return {
         rules: [

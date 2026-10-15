@@ -137,7 +137,7 @@ export function SageFlow() {
 }
 
 /* ============================================================ typing request */
-/* Step 1 visual — the single form line, typed in character by character. */
+/* Step 1 visual: the single form line, typed in character by character. */
 
 export function TypingRequest() {
     const reduce = useReducedMotion();
@@ -204,7 +204,7 @@ export function TypingRequest() {
 }
 
 /* ============================================================ farm match scan */
-/* Step 2 visual — Sage scans a bench of farms and a top match locks in. */
+/* Step 2 visual: Sage scans a bench of farms and a top match locks in. */
 
 export function FarmMatchScan() {
     const reduce = useReducedMotion();
@@ -269,7 +269,7 @@ export function FarmMatchScan() {
 }
 
 /* ============================================================ agreement draft */
-/* Step 3 visual — the standing agreement writes itself, line by line. */
+/* Step 3 visual: the standing agreement writes itself, line by line. */
 
 export function AgreementDraft() {
     const rows = [
@@ -317,7 +317,7 @@ export function AgreementDraft() {
 }
 
 /* ============================================================ week rhythm */
-/* Step 4 visual — four weeks of a fixed delivery day filling in. */
+/* Step 4 visual: four weeks of a fixed delivery day filling in. */
 
 export function WeekRhythm() {
     const dropDay = 2; // Wednesday-ish column
@@ -368,7 +368,7 @@ export function WeekRhythm() {
 }
 
 /* ============================================================ provenance + margin */
-/* Step 5 visual — provenance tag flips up, then margin counts up. */
+/* Step 5 visual: provenance tag flips up, then margin counts up. */
 
 export function ProvenanceMargin() {
     return (

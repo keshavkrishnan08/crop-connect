@@ -8,7 +8,7 @@ const ICON: Record<Stage, React.ComponentType<{ size?: number }>> = {
     requested: Search, matched: Farm, agreed: Pen, delivering: Truck, live: MarginUp,
 };
 
-/** Horizontal pipeline tracker — where this ingredient is in the sourcing flow. */
+/** Horizontal pipeline tracker: where this ingredient is in the sourcing flow. */
 export function StageRail({ stage, className }: { stage: Stage; className?: string }) {
     const idx = STAGES.indexOf(stage);
     return (

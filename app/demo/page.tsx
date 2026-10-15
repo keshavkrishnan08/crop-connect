@@ -16,7 +16,7 @@ import {
 } from "@/lib/margin";
 
 // ============================================================================
-//  MARGIN-ANALYSIS DEMO — a stepped, clickable proof for restaurant owners.
+//  MARGIN-ANALYSIS DEMO: a stepped, clickable proof for restaurant owners.
 //  Self-contained, local state only. No backend. The "wow" is step 5:
 //  their current blended margin lifting to a modeled one, in their numbers.
 // ============================================================================
@@ -157,13 +157,13 @@ function StepHead({ eyebrow, title, sub }: { eyebrow: string; title: string; sub
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 1 — Your restaurant
+//  STEP 1: Your restaurant
 // ---------------------------------------------------------------------------
 function Step1({ restaurant, setRestaurant }: { restaurant: Restaurant; setRestaurant: (r: Restaurant) => void }) {
     const set = <K extends keyof Restaurant>(k: K, v: Restaurant[K]) => setRestaurant({ ...restaurant, [k]: v });
     return (
         <div className="animate-fade-up">
-            <StepHead eyebrow="Your restaurant" title="Let's start with the basics" sub="Four quick fields. We use them to size the math against your real volume — nothing leaves your browser." />
+            <StepHead eyebrow="Your restaurant" title="Let's start with the basics" sub="Four quick fields. We use them to size the math against your real volume, nothing leaves your browser." />
             <Card className="max-w-2xl p-6 sm:p-7">
                 <FieldGroup label="Restaurant name">
                     <Field value={restaurant.name} onChange={(e) => set("name", e.target.value)} placeholder="e.g. Rosewood" autoFocus />
@@ -192,7 +192,7 @@ function Step1({ restaurant, setRestaurant }: { restaurant: Restaurant; setResta
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 2 — Add your menu
+//  STEP 2: Add your menu
 // ---------------------------------------------------------------------------
 function Step2({ menuText, setMenuText, onSample }: { menuText: string; setMenuText: (s: string) => void; onSample: (i: number) => void }) {
     return (
@@ -239,7 +239,7 @@ function Step2({ menuText, setMenuText, onSample }: { menuText: string; setMenuT
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 3 — We read your menu (editable rows)
+//  STEP 3: We read your menu (editable rows)
 // ---------------------------------------------------------------------------
 function Step3({ dishes, setDishes }: { dishes: Dish[]; setDishes: (d: Dish[]) => void }) {
     const update = (id: string, patch: Partial<Dish>) => setDishes(dishes.map((d) => (d.id === id ? { ...d, ...patch } : d)));
@@ -261,7 +261,7 @@ function Step3({ dishes, setDishes }: { dishes: Dish[]; setDishes: (d: Dish[]) =
 
             <div className="mb-4 flex items-center gap-2 rounded-xl border border-line bg-canvas-soft px-4 py-3 text-[13px] text-ink-muted">
                 <Pen size={15} className="text-brand-500" />
-                Low confidence on a row? Just fix it. These are first-pass estimates, fully editable — nothing here is locked.
+                Low confidence on a row? Just fix it. These are first-pass estimates, fully editable, nothing here is locked.
             </div>
 
             <Card className="overflow-hidden p-0">
@@ -324,7 +324,7 @@ function TogglePill({ on, onClick, label, tone = "brand" }: { on: boolean; onCli
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 4 — Your current margins (estimate)
+//  STEP 4: Your current margins (estimate)
 // ---------------------------------------------------------------------------
 function Step4({ dishes }: { dishes: Dish[] }) {
     const rows = dishes.map((d) => ({ d, ...dishCurrent(d) }));
@@ -349,7 +349,7 @@ function Step4({ dishes }: { dishes: Dish[] }) {
                     </Card>
                     <Card className="p-5">
                         <p className="mb-2 flex items-center gap-1.5 text-[13px] font-medium text-ink-soft"><MarginUp size={16} className="text-harvest-500" /> Most upside</p>
-                        <p className="mb-3 text-[12.5px] text-ink-faint">Produce-driven dishes with the thinnest margins — the best candidates for a local lift.</p>
+                        <p className="mb-3 text-[12.5px] text-ink-faint">Produce-driven dishes with the thinnest margins, the best candidates for a local lift.</p>
                         <div className="space-y-2">
                             {upside.map((r) => (
                                 <div key={r.d.id} className="flex items-center justify-between text-[13px]">
@@ -385,7 +385,7 @@ function Step4({ dishes }: { dishes: Dish[] }) {
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 5 — What we could get you (THE PEAK)
+//  STEP 5: What we could get you (THE PEAK)
 // ---------------------------------------------------------------------------
 function Step5({ dishes, restaurant, levers, setLevers, setRestaurant }: {
     dishes: Dish[]; restaurant: Restaurant; levers: Levers;
@@ -396,7 +396,7 @@ function Step5({ dishes, restaurant, levers, setLevers, setRestaurant }: {
 
     return (
         <div className="animate-fade-up">
-            <StepHead eyebrow="What we could get you" title="Your upside, in your numbers" sub="We raise prices on featured dishes behind a credible local story — we don't cut your costs. Drag the levers; the math is live." />
+            <StepHead eyebrow="What we could get you" title="Your upside, in your numbers" sub="We raise prices on featured dishes behind a credible local story, we don't cut your costs. Drag the levers; the math is live." />
 
             {/* HERO */}
             <Card className="relative overflow-hidden p-7 sm:p-9">
@@ -408,11 +408,11 @@ function Step5({ dishes, restaurant, levers, setLevers, setRestaurant }: {
                             <CountUp to={up.monthlyExpected} format={(n) => usd(n)} />
                         </p>
                         <p className="mt-3 text-[14px] text-ink-muted">
-                            Range <span className="font-mono tnum text-ink">{usd(up.monthlyConservative)}</span>–<span className="font-mono tnum text-ink">{usd(up.monthlyExpected)}</span> / month.
-                            That's <span className="font-mono tnum text-harvest-500">{usd(up.annualConservative)}</span>–<span className="font-mono tnum text-harvest-500">{usd(up.annualExpected)}</span> a year.
+                            Range <span className="font-mono tnum text-ink">{usd(up.monthlyConservative)}</span>-<span className="font-mono tnum text-ink">{usd(up.monthlyExpected)}</span> / month.
+                            That's <span className="font-mono tnum text-harvest-500">{usd(up.annualConservative)}</span>-<span className="font-mono tnum text-harvest-500">{usd(up.annualExpected)}</span> a year.
                         </p>
                         <p className="mt-3 max-w-md text-[12.5px] leading-relaxed text-ink-faint">
-                            A range, not a promise. Built from your covers, the attach rate, and the price lift below — all editable.
+                            A range, not a promise. Built from your covers, the attach rate, and the price lift below, all editable.
                         </p>
                     </div>
 
@@ -481,7 +481,7 @@ function Step5({ dishes, restaurant, levers, setLevers, setRestaurant }: {
                             </div>
                         ))}
                         {up.perDishMonthly.length === 0 && (
-                            <p className="px-5 py-6 text-center text-[13px] text-ink-faint">No featured dishes — go back and feature at least one.</p>
+                            <p className="px-5 py-6 text-center text-[13px] text-ink-faint">No featured dishes, go back and feature at least one.</p>
                         )}
                     </div>
                     <div className="flex items-center justify-between border-t border-line bg-canvas-soft px-5 py-3.5">
@@ -515,7 +515,7 @@ function Lever({ label, value, min, max, step, fmt, onChange }: {
 }
 
 // ---------------------------------------------------------------------------
-//  STEP 6 — Your plan
+//  STEP 6: Your plan
 // ---------------------------------------------------------------------------
 function Step6({ dishes, restaurant, levers, copied, setCopied }: {
     dishes: Dish[]; restaurant: Restaurant; levers: Levers; copied: boolean; setCopied: (b: boolean) => void;
@@ -525,20 +525,20 @@ function Step6({ dishes, restaurant, levers, copied, setCopied }: {
 
     function summary(): string {
         const lines = [
-            `CropConnect — margin plan for ${restaurant.name || "your restaurant"}`,
-            `${restaurant.cuisine} · ${restaurant.location || "—"} · ${restaurant.coversPerWeek} covers/week`,
+            `CropConnect, margin plan for ${restaurant.name || "your restaurant"}`,
+            `${restaurant.cuisine} · ${restaurant.location || "-"} · ${restaurant.coversPerWeek} covers/week`,
             ``,
             `Featured dishes:`,
-            ...up.featured.map((d) => `  • ${d.name} — ${usd(d.price)} → ${usd(dishModeled(d, levers).newPrice)}`),
+            ...up.featured.map((d) => `  • ${d.name}, ${usd(d.price)} → ${usd(dishModeled(d, levers).newPrice)}`),
             ``,
             `Sourcing from: ${farms.join(", ")}`,
             ``,
-            `Projected uplift: ${usd(up.monthlyConservative)}–${usd(up.monthlyExpected)} / month`,
-            `                  ${usd(up.annualConservative)}–${usd(up.annualExpected)} / year`,
+            `Projected uplift: ${usd(up.monthlyConservative)}-${usd(up.monthlyExpected)} / month`,
+            `                  ${usd(up.annualConservative)}-${usd(up.annualExpected)} / year`,
             `Blended margin: ${pct(up.blendedMarginNow, 1)} → ${pct(up.blendedMarginModeled, 1)}`,
             ``,
             `Assumptions: +${usd(levers.priceLift)} price lift, +${usd(levers.produceCostDelta)} produce cost, ${pct(levers.attachRate * 100, 0)} attach rate.`,
-            `A range, not a promise — every input editable at cropconnect.app`,
+            `A range, not a promise, every input editable at cropconnect.app`,
         ];
         return lines.join("\n");
     }
@@ -583,7 +583,7 @@ function Step6({ dishes, restaurant, levers, copied, setCopied }: {
                                 </div>
                             ))}
                         </div>
-                        <p className="mt-3 text-[12px] text-ink-faint">Real farm matches appear once you connect — these are representative for the demo.</p>
+                        <p className="mt-3 text-[12px] text-ink-faint">Real farm matches appear once you connect, these are representative for the demo.</p>
                     </Card>
                 </div>
 
@@ -593,19 +593,19 @@ function Step6({ dishes, restaurant, levers, copied, setCopied }: {
                         <div className="bg-aura pointer-events-none absolute inset-0" aria-hidden />
                         <div className="relative">
                             <p className="label">Projected monthly uplift</p>
-                            <p className="mt-1 font-mono text-4xl font-medium tnum text-harvest-500">{usd(up.monthlyConservative)}–{usd(up.monthlyExpected)}</p>
+                            <p className="mt-1 font-mono text-4xl font-medium tnum text-harvest-500">{usd(up.monthlyConservative)}-{usd(up.monthlyExpected)}</p>
                             <p className="mt-2 text-[12.5px] text-ink-muted">{pct(up.blendedMarginNow, 1)} → <span className="font-medium text-harvest-500">{pct(up.blendedMarginModeled, 1)}</span> blended margin</p>
                         </div>
                     </Card>
 
                     <a href="/app" className="btn-primary w-full justify-center btn-lg">
-                        Start — source one item, one week, free
+                        Start, source one item, one week, free
                     </a>
                     <Button variant="soft" className="w-full justify-center" onClick={copy}>
                         {copied ? <><Check size={16} /> Copied</> : <><Copy size={16} /> Copy summary</>}
                     </Button>
                     <p className="px-1 text-center text-[12px] leading-relaxed text-ink-faint">
-                        No card, no contract. Cancel the item anytime — the math stays a range, not a promise.
+                        No card, no contract. Cancel the item anytime, the math stays a range, not a promise.
                     </p>
                 </div>
             </div>

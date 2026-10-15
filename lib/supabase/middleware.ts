@@ -6,7 +6,7 @@ import { SUPABASE_URL, SUPABASE_ANON, supabaseConfigured } from "./client";
 export async function updateSession(request: NextRequest) {
     let response = NextResponse.next({ request });
 
-    // Not configured yet — let everything through (local demo mode).
+    // Not configured yet: let everything through (local demo mode).
     if (!supabaseConfigured()) return response;
 
     const supabase = createServerClient(SUPABASE_URL!, SUPABASE_ANON!, {

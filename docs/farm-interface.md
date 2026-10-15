@@ -1,8 +1,8 @@
-# Farm-Facing Interface — Spec
+# Farm-Facing Interface: Spec
 
 This is the **supply side** of CropConnect, to be built as a separate interface (a farm logs in and sees this). The restaurant-facing app is built *as if* this exists; everything below is the real counterpart that makes those flows two-sided. Capture, don't build yet.
 
-The shared spine is the same `SourcingItem` / `LOI` / `Delivery` / `SupplyUpdate` model — the farm app reads and writes the same records, just from the other party's point of view.
+The shared spine is the same `SourcingItem` / `LOI` / `Delivery` / `SupplyUpdate` model, the farm app reads and writes the same records, just from the other party's point of view.
 
 ---
 
@@ -16,7 +16,7 @@ A farm cannot transact until it is **vetted and approved**.
 - Restaurant-facing counterpart: the "Vetted" badge and the due-diligence tab read these records.
 
 ## 2. Catalog & availability (posted, in advance)
-Pricing is **not negotiated** — farms publish it up front.
+Pricing is **not negotiated**: farms publish it up front.
 
 - **Posted price list** per crop (per unit). This is the fixed rate restaurants see.
 - **Availability calendar**: what crops are available, in what weeks (seasonality), and **how much weekly capacity is free** vs already committed.
@@ -28,8 +28,8 @@ When the agent matches a request, the farm sees it and must respond.
 
 - **Request inbox**: crop, volume/week, term, requested quality specs, start date, the restaurant (anonymized until accepted, optional).
 - **Capacity check**: system shows whether the farm has the free capacity; farm confirms or proposes a **partial fill** (which triggers fractional allocation across farms on the restaurant side).
-- **Spec confirmation**: farm confirms it can meet each requested spec (organic, Grade No. 1, cold-chain, etc.) — some specs a farm may not offer.
-- **Respond**: **Accept** (at posted terms), **Counter** (volume or start date only — never price), or **Decline**.
+- **Spec confirmation**: farm confirms it can meet each requested spec (organic, Grade No. 1, cold-chain, etc.), some specs a farm may not offer.
+- **Respond**: **Accept** (at posted terms), **Counter** (volume or start date only, never price), or **Decline**.
 - Restaurant-facing counterpart: the contract's "Farm accepted / confirmed availability" state and the supply timeline reflect this.
 
 ## 4. Contract execution (two-sided signature)

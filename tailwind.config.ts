@@ -8,17 +8,17 @@ const config: Config = {
     theme: {
         extend: {
             colors: {
-                // Paper / canvas — warm soft white with a green whisper
+                // Paper / canvas: warm soft white with a green whisper
                 canvas: { DEFAULT: "#F6F7F2", soft: "#FBFCF9", sunk: "#EDEFE7" },
-                // Ink — deep forest-charcoal (reads black, warm)
+                // Ink: deep forest-charcoal (reads black, warm)
                 ink: { DEFAULT: "#16241C", soft: "#3B4A42", muted: "#697469", faint: "#9BA49C" },
-                // Brand — deep garden green
+                // Brand: deep garden green
                 brand: {
                     50: "#ECF3EE", 100: "#D6E7DC", 200: "#AED0BA", 300: "#7FB191",
                     400: "#4C8A65", 500: "#235C3A", 600: "#1B4A2F", 700: "#163C26",
                     800: "#11301E", 900: "#0F2E1D",
                 },
-                // Harvest — warm honey, reserved for value/margin
+                // Harvest: warm honey, reserved for value/margin
                 harvest: { 300: "#EFC97E", 400: "#E0A436", 500: "#C6881F" },
                 // small functional accents (status / category pops, used sparingly)
                 violet: { 50: "#f2effb", 400: "#8b5cf6", 500: "#7c3aed", 600: "#6b27cf" },

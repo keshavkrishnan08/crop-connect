@@ -33,7 +33,7 @@ export function Impact() {
                 ))}
             </div>
 
-            {/* the headline number: what we add per restaurant, per month — with the math */}
+            {/* the headline number: what we add per restaurant, per month, with the math */}
             <motion.div initial={{ opacity: 0, y: 14 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }}
                 className="relative mt-4 overflow-hidden rounded-3xl border border-brand-800 bg-gradient-to-br from-brand-700 to-brand-900 p-9 text-center text-white sm:p-12">
                 <div className="pointer-events-none absolute inset-0 bg-grid opacity-[0.12]" />

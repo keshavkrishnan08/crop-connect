@@ -34,7 +34,7 @@ export default function MarginsPage() {
                             <CountUp to={up.monthlyExpected} format={(n) => usd(n, { compact: n > 9999 })} className="value-pos" /><span className="text-2xl text-ink-muted">/mo</span>
                         </p>
                         <p className="mt-2 font-mono text-sm text-ink-muted tnum">
-                            Conservative {usd(up.monthlyConservative, { compact: true })} – Expected {usd(up.monthlyExpected, { compact: true })} · ≈ {usd(up.annualExpected, { compact: true })}/yr
+                            Conservative {usd(up.monthlyConservative, { compact: true })}, Expected {usd(up.monthlyExpected, { compact: true })} · ≈ {usd(up.annualExpected, { compact: true })}/yr
                         </p>
                         <div className="mt-5 flex items-center gap-5">
                             <Delta label="Blended margin now" v={pct(up.blendedMarginNow)} />

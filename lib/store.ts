@@ -7,7 +7,7 @@ import { uid, usd } from "@/lib/utils";
 
 // ============ CONCRETE SOURCING FLOW ============
 // The spine of the app: every locally-sourced ingredient moves through a real
-// pipeline. Not input→result — a flow with stages, farms, contracts, deliveries.
+// pipeline. Not input→result: a flow with stages, farms, contracts, deliveries.
 
 export type Stage = "requested" | "matched" | "agreed" | "delivering" | "live";
 export const STAGES: Stage[] = ["requested", "matched", "agreed", "delivering", "live"];
@@ -135,7 +135,7 @@ export function menuScarcity(items: SourcingItem[], dishes: Dish[], farms: Farm[
             dish: d, crop: item.crop, farm: farm?.name, farmId: item.farmId,
             servings, oldPrice: d.price, freshLift, scarcity, newPrice,
             weeklyUplift, monthlyUplift: Math.round(weeklyUplift * 4.345),
-            copy: `${d.name} — ${farm?.name ?? "local farm"} ${item.crop}. Only ${servings} a week.`,
+            copy: `${d.name}, ${farm?.name ?? "local farm"} ${item.crop}. Only ${servings} a week.`,
         });
     }
     return out.sort((a, b) => b.monthlyUplift - a.monthlyUplift);
@@ -300,7 +300,7 @@ function seedItems(): SourcingItem[] {
     return [
         {
             id: "s_tom", crop: "heirloom tomato", unit: "lb", qtyPerWeek: 40, priceCeiling: 4.5, dishName: "Heirloom tomato salad, basil, stracciatella",
-            stage: "live", farmId: "f_teter", lift: 3, harvestWindow: "Jun–Sep",
+            stage: "live", farmId: "f_teter", lift: 3, harvestWindow: "Jun-Sep",
             createdAt: wk(-6), agreedAt: wk(-5),
             deliveries: [
                 { id: uid("dl"), date: wk(-4), qty: 40, status: "confirmed" },
@@ -337,7 +337,7 @@ function seedItems(): SourcingItem[] {
         },
         {
             id: "s_squash", crop: "summer squash", unit: "lb", qtyPerWeek: 25, priceCeiling: 3, dishName: "Grilled local squash, salsa verde",
-            stage: "matched", farmId: "f_sunfield", lift: 2, harvestWindow: "Jun–Oct",
+            stage: "matched", farmId: "f_sunfield", lift: 2, harvestWindow: "Jun-Oct",
             createdAt: wk(-1), deliveries: [],
             loi: { status: "review", pricePerUnit: 3, cadence: "Weekly", transport: "we", termWeeks: 12, qualityTerms: [], farmAccepted: true, log: [{ id: uid("ln"), by: "agent", text: "I matched Sunfield Acres and drafted the terms. Review them, add any quality guidelines you want, and sign when you are ready.", ts: today.getTime() }] },
         },
@@ -690,12 +690,12 @@ export interface Deal { id: string; farmId: string; crop: string; unit: string; 
 export function computeDeals(s: AppState): Deal[] {
     const sourcedCrops = new Set(s.items.map((i) => i.crop.toLowerCase()));
     const seeds = [
-        { farmId: "f_teter", crop: "heirloom tomato", unit: "lb", price: 4.2, qty: 120, window: "Jun–Sep", blurb: "Surplus dry-farmed crop, priced under market this week." },
+        { farmId: "f_teter", crop: "heirloom tomato", unit: "lb", price: 4.2, qty: 120, window: "Jun-Sep", blurb: "Surplus dry-farmed crop, priced under market this week." },
         { farmId: "f_blue", crop: "salad greens", unit: "lb", price: 5.5, qty: 80, window: "Year-round", blurb: "Standing weekly cut. Lock a season rate now." },
-        { farmId: "f_sunfield", crop: "summer squash", unit: "lb", price: 2.6, qty: 150, window: "Jun–Oct", blurb: "Peak volume. Strong margin on a grilled side." },
-        { farmId: "f_marsh", crop: "beets", unit: "lb", price: 3.0, qty: 90, window: "Sep–Feb", blurb: "Storage crop. Reliable all winter long." },
+        { farmId: "f_sunfield", crop: "summer squash", unit: "lb", price: 2.6, qty: 150, window: "Jun-Oct", blurb: "Peak volume. Strong margin on a grilled side." },
+        { farmId: "f_marsh", crop: "beets", unit: "lb", price: 3.0, qty: 90, window: "Sep-Feb", blurb: "Storage crop. Reliable all winter long." },
         { farmId: "f_emberlu", crop: "specialty mushroom", unit: "lb", price: 9.0, qty: 40, window: "Year-round", blurb: "Oyster and lion's mane. A premium plate driver." },
-        { farmId: "f_rivergate", crop: "stone fruit", unit: "case", price: 28, qty: 30, window: "Jun–Aug", blurb: "Tree-ripened peaches. Short window, high demand." },
+        { farmId: "f_rivergate", crop: "stone fruit", unit: "case", price: 28, qty: 30, window: "Jun-Aug", blurb: "Tree-ripened peaches. Short window, high demand." },
     ];
     return seeds.map((d, i) => ({ id: "deal_" + i, farmId: d.farmId, crop: d.crop, unit: d.unit, price: d.price, qtyAvail: d.qty, window: d.window, blurb: d.blurb, sourced: sourcedCrops.has(d.crop.toLowerCase()) }));
 }

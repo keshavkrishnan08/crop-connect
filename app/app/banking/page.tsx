@@ -96,7 +96,7 @@ export default function BankingPage() {
                                         <span className="font-mono text-ink-muted tnum">{new Date(r.d.date).toLocaleDateString("en-US", { month: "short", day: "numeric" })}</span>
                                         <span className="truncate font-medium text-ink"><span className="tnum">{r.d.qty}</span> {r.item.unit} <span className="capitalize">{r.item.crop}</span></span>
                                         <span className="hidden truncate text-ink-muted sm:block">{farm?.name}</span>
-                                        <span className="hidden truncate font-mono text-2xs text-ink-faint sm:block">{r.item.loi?.ref ?? "—"}</span>
+                                        <span className="hidden truncate font-mono text-2xs text-ink-faint sm:block">{r.item.loi?.ref ?? "-"}</span>
                                         <span className="text-right font-mono font-medium text-ink tnum">{usd(r.amt)}</span>
                                     </div>
                                 );

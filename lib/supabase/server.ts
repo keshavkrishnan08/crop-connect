@@ -15,7 +15,7 @@ export function getServerClient() {
                 try {
                     cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
                 } catch {
-                    // called from a Server Component — middleware refreshes the session instead
+                    // called from a Server Component: middleware refreshes the session instead
                 }
             },
         },

@@ -1,4 +1,4 @@
-// Profit Recovery — the money the agent finds across invoices, waste, and the menu.
+// Profit Recovery: the money the agent finds across invoices, waste, and the menu.
 // Shared by the recovery hub and the three detail pages so every number agrees.
 import type { Dish, Levers } from "@/lib/margin";
 

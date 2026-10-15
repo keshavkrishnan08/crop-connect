@@ -1,4 +1,4 @@
-// Landing — landing-page-guide-v2 framework (all 11 elements), standard reasoning arc:
+// Landing: landing-page-guide-v2 framework (all 11 elements), standard reasoning arc:
 // Hook -> Problem -> Promise/Result -> How it works -> The service -> Proof it's real ->
 // Recap -> Pricing -> Social proof -> Objections -> Close.
 // Aesthetic: refined B2B-premium. Fraunces + Hanken + JetBrains mono. Garden green + honey.
@@ -86,7 +86,7 @@ function Problem() {
     );
 }
 
-/* ---------- 3. Promise / result — the menu reprices ---------- */
+/* ---------- 3. Promise / result: the menu reprices ---------- */
 function Result() {
     return (
         <Section>
@@ -100,7 +100,7 @@ function Result() {
     );
 }
 
-/* ---------- Impact — the one numbers gallery ---------- */
+/* ---------- Impact: the one numbers gallery ---------- */
 function ImpactSection() {
     return (
         <Section tint>
@@ -150,7 +150,7 @@ function Delivery() {
     );
 }
 
-/* ---------- 6. Proof it's real — photos ---------- */
+/* ---------- 6. Proof it's real: photos ---------- */
 function Produce() {
     return (
         <Section>

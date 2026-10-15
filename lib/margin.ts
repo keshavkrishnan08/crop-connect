@@ -1,6 +1,6 @@
 // ============ MARGIN MODEL ============
 // The spine of the product: we raise prices, not cut costs. Everything is an
-// EDITABLE ESTIMATE with visible assumptions and ranges — never fabricated certainty.
+// EDITABLE ESTIMATE with visible assumptions and ranges, never fabricated certainty.
 
 export type DishCategory = "starter" | "salad" | "main" | "side" | "special";
 
@@ -102,7 +102,7 @@ export function computeUplift(dishes: Dish[], r: Restaurant, lv: Levers): Uplift
 
 function avg(xs: number[]) { return xs.length ? xs.reduce((a, b) => a + b, 0) / xs.length : 0; }
 
-// ---- Menu parsing (client-side heuristic for the demo — no backend) ----
+// ---- Menu parsing (client-side heuristic for the demo, no backend) ----
 const PRICE_RE = /\$?\s?(\d{1,3}(?:\.\d{2})?)\s*$/;
 const PRODUCE_HINTS = ["tomato", "greens", "salad", "kale", "squash", "beet", "carrot", "corn", "pepper", "mushroom", "herb", "arugula", "spinach", "berry", "apple", "peach", "radish", "fennel", "chard", "pea", "bean", "cucumber", "eggplant", "zucchini", "garden", "seasonal", "vegetable", "roasted", "grilled veg"];
 
@@ -126,7 +126,7 @@ export function parseMenu(text: string): Dish[] {
         if (!m) continue;
         const price = parseFloat(m[1]);
         if (!price || price < 3 || price > 200) continue;
-        const name = line.replace(PRICE_RE, "").replace(/[.—\-—·|]+\s*$/, "").trim();
+        const name = line.replace(PRICE_RE, "").replace(/[. \-, ·|]+\s*$/, "").trim();
         if (!name || name.length < 2) continue;
         const category = inferCategory(name);
         const produceDriven = PRODUCE_HINTS.some((h) => name.toLowerCase().includes(h)) || category === "salad";

@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cn } from "@/lib/utils";
 
-/** Custom icon set — 24px grid · 1.6 stroke · round caps · currentColor. No icon library. */
+/** Custom icon set: 24px grid · 1.6 stroke · round caps · currentColor. No icon library. */
 export interface IconProps extends React.SVGProps<SVGSVGElement> { size?: number; strokeWidth?: number; }
 
 function Base({ size = 22, strokeWidth = 1.6, className, children, ...p }: IconProps & { children: React.ReactNode }) {
@@ -14,7 +14,7 @@ function Base({ size = 22, strokeWidth = 1.6, className, children, ...p }: IconP
     );
 }
 
-// Brand mark — sprout rising through a plate line (farm → plate)
+// Brand mark: sprout rising through a plate line (farm → plate)
 export const Mark = (p: IconProps) => (
     <Base {...p} strokeWidth={p.strokeWidth ?? 1.7}>
         <path d="M12 21v-7" />
@@ -30,13 +30,13 @@ export const Farm = (p: IconProps) => (<Base {...p}><path d="M4 10 12 4l8 6v10H4
 
 export const Route = (p: IconProps) => (<Base {...p}><circle cx="6" cy="18" r="2.2" /><circle cx="18" cy="6" r="2.2" /><path d="M8 17h6a3 3 0 0 0 0-6H9a3 3 0 0 1 0-6h3" /></Base>);
 
-// menu card — a card with text lines + a price tick
+// menu card: a card with text lines + a price tick
 export const MenuCard = (p: IconProps) => (<Base {...p}><rect x="4" y="3.5" width="16" height="17" rx="2.2" /><path d="M8 8h8M8 11.5h6M8 15h4" /><path d="M15.5 15h.5" /></Base>);
 
 // story tag (provenance)
 export const StoryTag = (p: IconProps) => (<Base {...p}><path d="M4 4h7l9 9-7 7-9-9V4Z" /><circle cx="8.5" cy="8.5" r="1.4" /></Base>);
 
-// margin up — bar + rising arrow
+// margin up: bar + rising arrow
 export const MarginUp = (p: IconProps) => (<Base {...p}><path d="M4 20h16" /><path d="M7 20v-5M12 20v-9M17 20v-7" /><path d="M14 6l3-2 2 3" /><path d="M17 4c-2.5 2.5-5 3.5-9 4" /></Base>);
 export const TrendUp = (p: IconProps) => (<Base {...p}><path d="M4 15l5-5 3 3 7-7" /><path d="M16 6h4v4" /></Base>);
 
